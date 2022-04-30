@@ -2,28 +2,46 @@
 
 import {
   type uint8,
+  segment,
 } from "@i-xi-dev/fundamental";
-import { stringify } from "querystring";
+import { ByteSequence } from "@i-xi-dev/bytes";
 
-function _isRgbData(value: unknown): value is Color.Rgb {
+// alpha >= 0 && alpha <= 1
+type alpha = number;
+
+// hue >= 0 && hue < 360
+type hue = number;
+
+// hsl_s >= 0 && hsl_s <= 1
+type hsl_s = number;
+
+// hsl_l >= 0 && hsl_l <= 1
+type hsl_l = number;
+
+type _AlphaChannel = {
+  a: alpha,
+}
+
+type _ClampedRgb = {
+  r: uint8,
+  g: uint8,
+  b: uint8,
+};
+
+function _isRgb(value: unknown): value is Color.Rgb {
   const r = (value as Color.Rgb).r;
   const g = (value as Color.Rgb).g;
   const b = (value as Color.Rgb).b;
-  if (Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b)) {
-    const a = (value as Color.Rgb).a;
-    return (Number.isFinite(a) || (a === undefined));
-  }
-  return false;
+  return (Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b));
 }
 
-// hslhue >= 0 && hslhue < 360
-type hslhue = number;
-
-// hslsaturation >= 0 && hslsaturation <= 100
-type hslsaturation = number;
-
-// hslhue >= 0 && hslhue <= 100
-type hsllightness = number;
+function _isRgba(value: unknown): value is Color.Rgba {
+  if (_isRgb(value) !== true) {
+    return false;
+  }
+  const a = (value as Color.Rgba).a;
+  return Number.isFinite(a);
+}
 
 function _clamp(val: number, min: number, max: number): number {
   if (val < min) {
@@ -35,152 +53,219 @@ function _clamp(val: number, min: number, max: number): number {
   return val;
 }
 
-class Color {
-  // #scR: number;
-  // #scG: number;
-  // #scB: number;
-  #sRgbClamped: Uint8ClampedArray;
-  #alpha: number;
+const _RgbComponentIndex = {
+  R: 0,
+  G: 1,
+  B: 2,
+} as const;
+export type _RgbComponentIndex = typeof _RgbComponentIndex[keyof typeof _RgbComponentIndex];
 
-  private constructor(r: number, g: number, b: number, alpha: number) {
-    // this.#scR = r;
-    // this.#scG = g;
-    // this.#scB = b;
-    this.#sRgbClamped = Uint8ClampedArray.of(r, g, b, (alpha * 255));
-    this.#alpha = alpha;
-    Object.seal(this);
-  }
+const _alphaIndex = 3;
 
-  get r(): uint8 {
-    return this.#sRgbClamped[0] as uint8;
-  }
+function _rgbToHsl(rgb: _ClampedRgb): Color.Hsl {
+  const { r, g, b } = rgb;
+  const rgbMin = Math.min(r, g, b) as uint8;
+  const rgbMax = Math.max(r, g, b) as uint8;
+  const rgbMaxMinusMin = (rgbMax - rgbMin);
+  const rgbMaxPlusMin = (rgbMax + rgbMin);
+  const l255 = (rgbMaxPlusMin / 2);
 
-  get g(): uint8 {
-    return this.#sRgbClamped[1] as uint8;
-  }
-
-  get b(): uint8 {
-    return this.#sRgbClamped[2] as uint8;
-  }
-
-  get alpha(): number {
-    return _clamp(this.#alpha, 0, 1);
-  }
-
-  get #max(): uint8 {
-    return Math.max(this.r, this.g, this.b) as uint8;
-  }
-
-  get #min(): uint8 {
-    return Math.min(this.r, this.g, this.b) as uint8;
-  }
-
-  get #maxMinusMin(): uint8 {
-    return (this.#max - this.#min) as uint8;
-  }
-
-  get #maxPlusMin(): number /* int */ {
-    return (this.#max + this.#min);
-  }
-
-  get #luminance255(): number {
-    return (this.#maxPlusMin / 2);
-  }
-
-  get hue(): hslhue {
-    if (this.#max === this.#min) {
+  // h
+  const hue: hue = (() => {
+    if (rgbMax === rgbMin) {
       return 0;
     }
     let h: number;
-    if (this.r === this.#max) {
-      h = 60 * ((this.g - this.b) / this.#maxMinusMin);
-    }
-    else if (this.g === this.#max) {
-      h = 60 * ((this.b - this.r) / this.#maxMinusMin) + 120;
-    }
-    else /* if (this.b === this.#max) */ {
-      h = 60 * ((this.r - this.g) / this.#maxMinusMin) + 240;
+    switch (rgbMax) {
+      case r:
+        h = 60 * ((g - b) / rgbMaxMinusMin);
+        break;
+      case g:
+        h = 60 * ((b - r) / rgbMaxMinusMin) + 120;
+        break;
+      //case b:
+      default:
+        h = 60 * ((r - g) / rgbMaxMinusMin) + 240;
+        break;
     }
     return (h < 0) ? (h + 360) : h;
-  }
+  })();
 
-  get saturation(): hslsaturation {
-    let saturation1: number;
-    if (this.#luminance255 <= 127) {
-      saturation1 = this.#maxMinusMin / this.#maxPlusMin;
+  // s
+  const saturation: hsl_s = (() => {
+    let s: number;
+    if (l255 <= 127) {
+      s = rgbMaxMinusMin / rgbMaxPlusMin;
     } else {
-      saturation1 = this.#maxMinusMin / (510 - this.#maxMinusMin);
+      s = rgbMaxMinusMin / (510 - rgbMaxMinusMin);
     }
-    return (saturation1 * 100);
+    return s;
+  })();
+
+  // l
+  const lightness: hsl_l = (() => {
+    return (l255 / 255);
+  })();
+
+  return {
+    h: hue,
+    s: saturation,
+    l: lightness,
+  };
+}
+
+/**
+ * RGBA color in sRGB color space
+ */
+class Color {
+  #rgba: [ number, number, number, number ];
+  #rgbaBytes: Uint8ClampedArray;
+
+  private constructor(rgba: Color.Rgba) {
+    this.#rgba = [ 0, 0, 0, 255 ];
+    this.#rgbaBytes = Uint8ClampedArray.of(0, 0, 0, 255);
+    Object.seal(this);
+
+    this.setRgb(rgba);
+    this.setOpacity(rgba.a);
   }
 
-  get luminance(): hsllightness {
-    return ((this.#luminance255 / 255) * 100);
+  get r(): uint8 {
+    return this.#rgbaBytes[_RgbComponentIndex.R] as uint8;
   }
 
-  setRgb(rgb: Color.Rgb): this {
-    if (_isRgbData(rgb) !== true) {
-      throw new TypeError("rgb");
+  get g(): uint8 {
+    return this.#rgbaBytes[_RgbComponentIndex.G] as uint8;
+  }
+
+  get b(): uint8 {
+    return this.#rgbaBytes[_RgbComponentIndex.B] as uint8;
+  }
+
+  get #sR(): number {
+    return _clamp(this.#rgba[_RgbComponentIndex.R], 0, 255);
+  }
+
+  get #sG(): number {
+    return _clamp(this.#rgba[_RgbComponentIndex.G], 0, 255);
+  }
+
+  get #sB(): number {
+    return _clamp(this.#rgba[_RgbComponentIndex.B], 0, 255);
+  }
+
+  get opacity(): alpha {
+    return _clamp(this.#rgba[_alphaIndex], 0, 1);
+  }
+
+  #setRgbComponent(index: _RgbComponentIndex, value: number): void {
+    this.#rgba[index] = value;
+    this.#rgbaBytes[index] = value;
+  }
+
+  setRgb(absoluteRgb: Color.Rgb): this {
+    if (_isRgb(absoluteRgb) !== true) {
+      throw new TypeError("absoluteRgb");
     }
-
-    this.#sRgbClamped[0] = rgb.r;
-    this.#sRgbClamped[1] = rgb.g;
-    this.#sRgbClamped[2] = rgb.b;
-
-    const alpha = ((typeof rgb.a === "number") && Number.isFinite(rgb.a)) ? rgb.a : 1;
-    this.#sRgbClamped[3] = (alpha * 255);
-    this.#alpha = alpha;
+    this.#setRgbComponent(_RgbComponentIndex.R, absoluteRgb.r);
+    this.#setRgbComponent(_RgbComponentIndex.G, absoluteRgb.g);
+    this.#setRgbComponent(_RgbComponentIndex.B, absoluteRgb.b);
     return this;
   }
 
+  addRgb(relativeRgb: Color.Rgb): this {
+    if (_isRgb(relativeRgb) !== true) {
+      throw new TypeError("relativeRgb");
+    }
+    return this.setRgb({
+      r: this.#sR + relativeRgb.r,
+      g: this.#sG + relativeRgb.g,
+      b: this.#sB + relativeRgb.b,
+    });
+  }
+
+  setOpacity(absoluteAlpha: number): this {
+    if (Number.isFinite(absoluteAlpha) !== true) {
+      throw new TypeError("absoluteAlpha");
+    }
+    this.#rgba[_alphaIndex] = absoluteAlpha;
+    this.#rgbaBytes[_alphaIndex] = (absoluteAlpha * 255);
+    return this;
+  }
+
+  addOpacity(relativeAlpha: number): this {
+    if (Number.isFinite(relativeAlpha) !== true) {
+      throw new TypeError("relativeAlpha");
+    }
+    return this.setOpacity(this.opacity + relativeAlpha);
+  }
+
+  discardTransparency(): this {
+    return this.setOpacity(1);
+  }
+
   static fromRgb(rgb: Color.Rgb): Color {
-    if (_isRgbData(rgb) !== true) {
+    if (_isRgb(rgb) !== true) {
       throw new TypeError("rgb");
     }
+    return Color.fromRgba(Object.assign({
+      a: 1,
+    }, rgb));
+  }
 
-    const alpha = ((typeof rgb.a === "number") && Number.isFinite(rgb.a)) ? rgb.a : 1;
-    return new Color(rgb.r, rgb.g, rgb.b, alpha);
+  toRgb(): Color.Rgb {
+    const rgb: _ClampedRgb = {
+      r: this.r,
+      g: this.g,
+      b: this.b,
+    };
+    return rgb;
+  }
+
+  static fromRgba(rgba: Color.Rgba): Color {
+    if (_isRgba(rgba) !== true) {
+      throw new TypeError("rgba");
+    }
+    return new Color(rgba);
+  }
+
+  toRgba(): Color.Rgba {
+    const rgba: _ClampedRgb & { a: number } = {
+      r: this.r,
+      g: this.g,
+      b: this.b,
+      a: this.opacity,
+    };
+    return rgba;
   }
 
   static fromHsl(hsl: Color.Hsl): Color {
     throw new Error("not implemented"); //TODO
   }
 
-  toRgb(): Color.Rgb {
-    return {
-      r: this.r,
-      g: this.g,
-      b: this.b,
-      a: this.alpha,
-    };
-  }
-
   toHsl(): Color.Hsl {
-    return {
-      h: this.hue,
-      s: this.saturation,
-      l: this.luminance,
-      a: this.alpha,
-    };
+    return _rgbToHsl(this);
   }
 
-  //TODO
-  // rotateHue(deg)
-  // saturate(number)
-  // lighter(number)
-  // equals()
-  // clone()
-  // mix(blendMode): this
-
-  static fromString(): Color {
+  static fromHsla(hsla: Color.Hsla): Color {
     throw new Error("not implemented"); //TODO
+  }
+
+  toHsla(): Color.Hsla {
+    const hsl = this.toHsl();
+    return {
+      h: hsl.h,
+      s: hsl.s,
+      l: hsl.l,
+      a: this.opacity,
+    };
   }
 
   static fromHexString(input: string): Color {
     if (typeof input !== "string") {
       throw new TypeError("input");
     }
-    if (/^#[0-9A-Fa-f]{3,4,6,8}$/.test(input) !== true) {
+    if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})?$/i.test(input) !== true) {
       throw new RangeError("input");
     }
 
@@ -206,12 +291,56 @@ class Color {
       }
     }
 
-    return Color.fromRgb({
+    return Color.fromRgba({
       r: Number.parseInt(r.join(""), 16),
       g: Number.parseInt(g.join(""), 16),
       b: Number.parseInt(b.join(""), 16),
       a: (Number.parseInt(a.join(""), 16) / 255),
     });
+  }
+
+  toHexString(options: Color.HexFormatOptions = {}): string {
+    const bytes = ByteSequence.fromArrayBufferView(this.#rgbaBytes);
+    const hexRgba = bytes.format({ lowerCase: true });
+    const [ hexR, hexG, hexB, hexA ] = segment(hexRgba, { count: 2, unit: "char" }) as [ string, string, string, string ];
+
+    const omitAlphaMode = options?.omitAlpha ? options.omitAlpha : Color.OmitAlpha.IF_OPAQUE;
+    const omitAlpha = (
+      (omitAlphaMode === Color.OmitAlpha.ALWAYS) ||
+      ((omitAlphaMode === Color.OmitAlpha.IF_OPAQUE) && (hexA === "ff"))
+    );
+    const hexComponents = (omitAlpha === true) ? [ hexR, hexG, hexB ] : [ hexR, hexG, hexB, hexA ];
+
+    const shorten = (
+      (options?.shorten === true) &&
+      (hexComponents.every((str) => /^([0-9a-z])\1$/.test(str)))
+    );
+
+    return "#" + hexComponents.map((c) => {
+      if (shorten === true) {
+        c = c.substring(0, 1);
+      }
+      if (options?.upperCase === true) {
+        c = c.toUpperCase();
+      }
+      return c;
+    }).join("");
+  }
+
+  //TODO
+  // 色相セット(absoluteHue): this
+  // 色相加算(relativeHue): this
+  // 彩度セット(absoluteS): this
+  // 彩度加算(relativeS): this
+  // 明度セット(absoluteL): this
+  // 明度加算(relativeL): this
+  // equals(other: Color): boolean
+  // 
+  // clone(): Color
+  // mix(blendMode, other: Color): this
+
+  static fromString(): Color {
+    throw new Error("not implemented"); //TODO
   }
 
   toString(): string {
@@ -222,79 +351,54 @@ class Color {
     return this.toRgb();
   }
 
-  toHexString(options: Color.HexFormatOptions = {}): string {
-    const [ r1, r2 ] = [ ...this.r.toString(16).padStart(2, "0") ] as [ string, string ];
-    const [ g1, g2 ] = [ ...this.g.toString(16).padStart(2, "0") ] as [ string, string ];
-    const [ b1, b2 ] = [ ...this.b.toString(16).padStart(2, "0") ] as [ string, string ];
-    const [ a1, a2 ] = [ ...(this.#sRgbClamped[3] as uint8).toString(16).padStart(2, "0") ] as [ string, string ];
-
-    let r: string;
-    let g: string;
-    let b: string;
-    let a: string;
-    if ((options?.shorten === true) && (r1 === r2) && (g1 === g2) && (b1 === b2) && (a1 === a2)) {
-      r = r1;
-      g = g1;
-      b = b1;
-      a = a1;
-    }
-    else {
-      r = r1 + r2;
-      g = g1 + g2;
-      b = b1 + b2;
-      a = a1 + a2;
-    }
-
-    let rgb: string;
-    if (options?.style === Color.HexFormatStyle.RGBA) {
-      rgb = r + g + b + a;
-    }
-    else /* if (options?.style === Color.HexFormatStyle.RGB) */ {
-      rgb = r + g + b;
-    }
-
-    const str = "#" + rgb;
-    if (options?.upperCase === true) {
-      return str.toUpperCase();
-    }
-    return str;
-  }
-
   toCssString(options: Color.CssFormatOptions = {}): string {
-    const hslStyles = [
-      Color.CssFormatStyle.L4_HSL,
-      Color.CssFormatStyle.LEGACY_HSL,
-      Color.CssFormatStyle.LEGACY_HSLA,
-    ] as string[];
-    if (hslStyles.includes(options?.style as string)) {
-      return this.#toCssHslFunction(options?.style);
-    }
-    else {
-      return this.#toCssRgbFunction(options?.style);
+    const omitAlphaMode = options.omitAlpha ? options.omitAlpha : Color.OmitAlpha.IF_OPAQUE;
+    const omitAlpha = (
+      (omitAlphaMode === Color.OmitAlpha.ALWAYS) ||
+      ((omitAlphaMode === Color.OmitAlpha.IF_OPAQUE) && (this.opacity === 1))
+    );
+
+    switch (options?.style) {
+      case Color.CssFormatStyle.L4_HSL:
+      case Color.CssFormatStyle.LEGACY_HSL:
+        return this.#toCssHslFunction(omitAlpha, options.style);
+
+      default:
+        return this.#toCssRgbFunction(omitAlpha, options.style);
     }
   }
 
-  #toCssRgbFunction(style?: Color.CssFormatStyle): string {
+  #toCssRgbFunction(omitAlpha: boolean, style: Color.CssFormatStyle = Color.CssFormatStyle.LEGACY_RGB): string {
+    const { r, g, b } = this;
     if (style === Color.CssFormatStyle.L4_RGB) {
-      return `rgb(${ this.r } ${ this.g } ${ this.b } / ${ this.alpha })`;
+      if (omitAlpha === true) {
+        return `rgb(${ r } ${ g } ${ b })`;
+      }
+      return `rgb(${ r } ${ g } ${ b } / ${ this.opacity })`;
     }
-    else if (style === Color.CssFormatStyle.LEGACY_RGB) {
-      return `rgb(${ this.r }, ${ this.g }, ${ this.b })`;
-    }
-    else /* if (style === Color.CssFormatStyle.LEGACY_RGBA) */ {
-      return `rgba(${ this.r }, ${ this.g }, ${ this.b }, ${ this.alpha })`;
+    else /* Color.CssFormatStyle.LEGACY_RGB */ {
+      if (omitAlpha === true) {
+        return `rgb(${ r }, ${ g }, ${ b })`;
+      }
+      return `rgba(${ r }, ${ g }, ${ b }, ${ this.opacity })`;
     }
   }
 
-  #toCssHslFunction(style?: Color.CssFormatStyle): string {
+  #toCssHslFunction(omitAlpha: boolean, style: Color.CssFormatStyle = Color.CssFormatStyle.LEGACY_HSL): string {
+    const hsl = this.toHsl();
+    const sp = (hsl.s * 100);
+    const lp = (hsl.l * 100);
     if (style === Color.CssFormatStyle.L4_HSL) {
-      return `hsl(${ this.hue } ${ this.saturation } ${ this.luminance } / ${ this.alpha })`;
+      if (omitAlpha === true) {
+        return `hsl(${ hsl.h }deg ${ sp }% ${ lp }%)`;
+      }
+      return `hsl(${ hsl.h }deg ${ sp }% ${ lp }% / ${ this.opacity })`;
     }
-    else if (style === Color.CssFormatStyle.LEGACY_HSL) {
-      return `hsl(${ this.hue }, ${ this.saturation }, ${ this.luminance })`;
-    }
-    else /* if (style === Color.CssFormatStyle.LEGACY_HSLA) */ {
-      return `hsla(${ this.hue }, ${ this.saturation }, ${ this.luminance }, ${ this.alpha })`;
+    else /* Color.CssFormatStyle.LEGACY_HSL */ {
+      if (omitAlpha === true) {
+        return `hsl(${ hsl.h }, ${ sp }%, ${ lp }%)`;
+      }
+      return `hsl(${ hsl.h }, ${ sp }%, ${ lp }%, ${ this.opacity })`;
     }
   }
 
@@ -305,41 +409,43 @@ namespace Color {
     r: number,
     g: number,
     b: number,
-    a?: number,
   };
+
+  export type Rgba = Rgb & _AlphaChannel;
 
   export type Hsl = {
-    h: number,
-    s: number,
-    l: number,
-    a?: number,
+    h: hue,
+    s: hsl_s,
+    l: hsl_l,
   };
 
-  export const HexFormatStyle = {
-    RGB: "rgb", // HTML, CSS(1,2,3,4,5), ...
-    RGBA: "rgba", // CSS(5), ...
+  export type Hsla = Hsl & _AlphaChannel;
+
+  export const OmitAlpha = {
+    IF_OPAQUE: "if-opaque",
+    ALWAYS: "always",
+    NEVER: "never",
   } as const;
-  export type HexFormatStyle = typeof HexFormatStyle[keyof typeof HexFormatStyle];
+  export type OmitAlpha = typeof OmitAlpha[keyof typeof OmitAlpha];
 
   export type HexFormatOptions = {
-    style?: HexFormatStyle,
+    omitAlpha?: OmitAlpha,
     upperCase?: boolean,
     shorten?: boolean,
   };
 
   export const CssFormatStyle = {
-    LEGACY_RGB: "legacy-rgb", // CSS(1,2,3), ...
-    LEGACY_RGBA: "legacy-rgba", // CSS(3), ...
-    LEGACY_HSL: "legacy-hsl", // CSS(3), ...
-    LEGACY_HSLA: "legacy-hsla", // CSS(3), ...
-    L4_RGB: "l4-rgb", // CSS(4,5), ...
-    L4_HSL: "l4-hsl", // CSS(4,5), ...
+    LEGACY_RGB: "legacy-rgb",
+    LEGACY_HSL: "legacy-hsl",
+    L4_RGB: "l4-rgb",
+    L4_HSL: "l4-hsl",
     // XXX lab, lch, ...
   } as const;
   export type CssFormatStyle = typeof CssFormatStyle[keyof typeof CssFormatStyle];
 
   export type CssFormatOptions = {
     style?: CssFormatStyle,
+    omitAlpha?: OmitAlpha,
     // XXX percentage
   };
 }
