@@ -3,6 +3,7 @@
 import {
   type uint8,
   segment,
+  Uint8,
 } from "@i-xi-dev/fundamental";
 import { ByteSequence } from "@i-xi-dev/bytes";
 
@@ -18,30 +19,20 @@ type hsl_s = number;
 // hsl_l >= 0 && hsl_l <= 1
 type hsl_l = number;
 
-type _AlphaChannel = {
-  a: alpha,
-}
+// hwb_w >= 0 && hwb_w <= 1
+type hwb_w = number;
+
+// hwb_b >= 0 && hwb_b <= 1
+type hwb_b = number;
+
+
+
 
 type _ClampedRgb = {
   r: uint8,
   g: uint8,
   b: uint8,
 };
-
-function _isRgb(value: unknown): value is Color.Rgb {
-  const r = (value as Color.Rgb).r;
-  const g = (value as Color.Rgb).g;
-  const b = (value as Color.Rgb).b;
-  return (Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b));
-}
-
-function _isRgba(value: unknown): value is Color.Rgba {
-  if (_isRgb(value) !== true) {
-    return false;
-  }
-  const a = (value as Color.Rgba).a;
-  return Number.isFinite(a);
-}
 
 function _clamp(val: number, min: number, max: number): number {
   if (val < min) {
@@ -52,6 +43,17 @@ function _clamp(val: number, min: number, max: number): number {
   }
   return val;
 }
+
+function _isRgbParams(value: unknown): value is SrgbColor.RgbParams {
+  const { r, g, b, a } = value as SrgbColor.RgbParams;
+  const rValid = Number.isFinite(r);
+  const gValid = Number.isFinite(g);
+  const bValid = Number.isFinite(b);
+  const aValid = Number.isFinite(a) || (a === undefined);
+  return (rValid && gValid && bValid && aValid);
+}
+
+
 
 const _RgbComponentIndex = {
   R: 0,
@@ -117,79 +119,29 @@ function _rgbToHsl(rgb: _ClampedRgb): Color.Hsl {
 /**
  * RGBA color in sRGB color space
  */
-class Color {
-  #rgba: [ number, number, number, number ];
-  #rgbaBytes: Uint8ClampedArray;
+class SrgbColor {
+  #r: number;
+  #g: number;
+  #b: number;
+  #a: number;
 
-  private constructor(rgba: Color.Rgba) {
-    this.#rgba = [ 0, 0, 0, 255 ];
-    this.#rgbaBytes = Uint8ClampedArray.of(0, 0, 0, 255);
+  private constructor(r: number, g: number, b: number, a: number) {
+    this.#r = r;
+    this.#g = g;
+    this.#b = b;
+    this.#a = a;
     Object.seal(this);
-
-    this.setRgb(rgba);
-    this.setOpacity(rgba.a);
-  }
-
-  get r(): uint8 {
-    return this.#rgbaBytes[_RgbComponentIndex.R] as uint8;
-  }
-
-  get g(): uint8 {
-    return this.#rgbaBytes[_RgbComponentIndex.G] as uint8;
-  }
-
-  get b(): uint8 {
-    return this.#rgbaBytes[_RgbComponentIndex.B] as uint8;
-  }
-
-  get #sR(): number {
-    return _clamp(this.#rgba[_RgbComponentIndex.R], 0, 255);
-  }
-
-  get #sG(): number {
-    return _clamp(this.#rgba[_RgbComponentIndex.G], 0, 255);
-  }
-
-  get #sB(): number {
-    return _clamp(this.#rgba[_RgbComponentIndex.B], 0, 255);
   }
 
   get opacity(): alpha {
-    return _clamp(this.#rgba[_alphaIndex], 0, 1);
-  }
-
-  #setRgbComponent(index: _RgbComponentIndex, value: number): void {
-    this.#rgba[index] = value;
-    this.#rgbaBytes[index] = value;
-  }
-
-  setRgb(absoluteRgb: Color.Rgb): this {
-    if (_isRgb(absoluteRgb) !== true) {
-      throw new TypeError("absoluteRgb");
-    }
-    this.#setRgbComponent(_RgbComponentIndex.R, absoluteRgb.r);
-    this.#setRgbComponent(_RgbComponentIndex.G, absoluteRgb.g);
-    this.#setRgbComponent(_RgbComponentIndex.B, absoluteRgb.b);
-    return this;
-  }
-
-  addRgb(relativeRgb: Color.Rgb): this {
-    if (_isRgb(relativeRgb) !== true) {
-      throw new TypeError("relativeRgb");
-    }
-    return this.setRgb({
-      r: this.#sR + relativeRgb.r,
-      g: this.#sG + relativeRgb.g,
-      b: this.#sB + relativeRgb.b,
-    });
+    return this.#a;
   }
 
   setOpacity(absoluteAlpha: number): this {
     if (Number.isFinite(absoluteAlpha) !== true) {
       throw new TypeError("absoluteAlpha");
     }
-    this.#rgba[_alphaIndex] = absoluteAlpha;
-    this.#rgbaBytes[_alphaIndex] = (absoluteAlpha * 255);
+    this.#a = absoluteAlpha;
     return this;
   }
 
@@ -204,64 +156,68 @@ class Color {
     return this.setOpacity(1);
   }
 
-  static fromRgb(rgb: Color.Rgb): Color {
-    if (_isRgb(rgb) !== true) {
+  static fromRgb(rgba: SrgbColor.RgbParams): SrgbColor {
+    if (_isRgbParams(rgba) !== true) {
       throw new TypeError("rgb");
     }
-    return Color.fromRgba(Object.assign({
-      a: 1,
-    }, rgb));
+    const { r: rByte, g: gByte, b: bByte, a } = rgba;
+    const aByte = Uint8ClampedArray.of(a ? (a * 255) : 255)[0] as uint8;
+    return SrgbColor.fromBytes([ rByte, gByte, bByte, aByte ]);
   }
 
-  toRgb(): Color.Rgb {
-    const rgb: _ClampedRgb = {
-      r: this.r,
-      g: this.g,
-      b: this.b,
+  toRgb(): SrgbColor.RgbParams {
+    const [ r, g, b ] = this.toBytes() ;
+    return {
+      r,
+      g,
+      b,
+      a: this.#a,
     };
-    return rgb;
   }
 
-  static fromRgba(rgba: Color.Rgba): Color {
-    if (_isRgba(rgba) !== true) {
-      throw new TypeError("rgba");
+  static fromBytes(rgbaBytes: Iterable<number>): SrgbColor {
+    if (rgbaBytes[Symbol.iterator]) {
+      const rgba: [ number, number, number, number ] = [ 0, 0, 0, 1 ];
+
+      let i = 0;
+      for (const byte of rgbaBytes) {
+        if (Uint8.isUint8(byte)) {
+          rgba[i] = byte / 255;
+        }
+        if (i >= 3) {
+          break;
+        }
+        i = i + 1;
+      }
+      return new SrgbColor(...rgba);
     }
-    return new Color(rgba);
+    throw new TypeError("rgbaBytes");
   }
 
-  toRgba(): Color.Rgba {
-    const rgba: _ClampedRgb & { a: number } = {
-      r: this.r,
-      g: this.g,
-      b: this.b,
-      a: this.opacity,
-    };
-    return rgba;
+  static fromArray
+
+  toArray(): [ number, number, number, number ] {
+    return [ ...Uint8ClampedArray.of(
+      this.#r * 255,
+      this.#g * 255,
+      this.#b * 255,
+      this.#a * 255,
+    ) ] as [ uint8, uint8, uint8, uint8 ];
   }
 
-  static fromHsl(hsl: Color.Hsl): Color {
-    throw new Error("not implemented"); //TODO
-  }
+  //TODO static fromHsl(hsla: Color.Hsl): SrgbColor
 
   toHsl(): Color.Hsl {
-    return _rgbToHsl(this);
-  }
-
-  static fromHsla(hsla: Color.Hsla): Color {
-    throw new Error("not implemented"); //TODO
-  }
-
-  toHsla(): Color.Hsla {
-    const hsl = this.toHsl();
+    const { h, s, l } = this.toHsl();
     return {
-      h: hsl.h,
-      s: hsl.s,
-      l: hsl.l,
-      a: this.opacity,
+      h,
+      s,
+      l,
+      a: this.#a,
     };
   }
 
-  static fromHexString(input: string): Color {
+  static fromHexString(input: string): SrgbColor {
     if (typeof input !== "string") {
       throw new TypeError("input");
     }
@@ -269,47 +225,39 @@ class Color {
       throw new RangeError("input");
     }
 
-    const chars = [ ...input.substring(1) ];
-    let r: [ string, string ];
-    let g: [ string, string ];
-    let b: [ string, string ];
-    let a: [ string, string ] = [ "f", "f" ];
-    if (chars.length < 4) {
-      r = [ chars[0] as string, chars[0] as string ];
-      g = [ chars[1] as string, chars[1] as string ];
-      b = [ chars[2] as string, chars[2] as string ];
-      if (chars.length === 4) {
-        a = [ chars[3] as string, chars[3] as string ];
-      }
+    const inputHex = input.substring(1);
+    let rrggbbaa: string;
+    switch (inputHex.length) {
+      case 8:
+      case 6:
+        rrggbbaa = inputHex;
+        break;
+      case 4:
+      case 3:
+      default:
+        rrggbbaa = [ ...inputHex ].map(h => h.repeat(2)).join("");
+        break;
     }
-    else {
-      r = [ chars[0] as string, chars[1] as string ];
-      g = [ chars[2] as string, chars[3] as string ];
-      b = [ chars[4] as string, chars[5] as string ];
-      if (chars.length === 8) {
-        a = [ chars[6] as string, chars[7] as string ];
-      }
+    if (rrggbbaa.length < 8) {
+      rrggbbaa = rrggbbaa + "ff";
     }
+    rrggbbaa = rrggbbaa.toLowerCase();
 
-    return Color.fromRgba({
-      r: Number.parseInt(r.join(""), 16),
-      g: Number.parseInt(g.join(""), 16),
-      b: Number.parseInt(b.join(""), 16),
-      a: (Number.parseInt(a.join(""), 16) / 255),
-    });
+    return SrgbColor.fromBytes(ByteSequence.parse(rrggbbaa, { lowerCase: true }).getUint8View());
   }
 
   toHexString(options: Color.HexFormatOptions = {}): string {
-    const bytes = ByteSequence.fromArrayBufferView(this.#rgbaBytes);
-    const hexRgba = bytes.format({ lowerCase: true });
-    const [ hexR, hexG, hexB, hexA ] = segment(hexRgba, { count: 2, unit: "char" }) as [ string, string, string, string ];
+    const bytes = this.toArray();
+    const rrggbbaa = ByteSequence.fromArray(bytes).format({ lowerCase: true });
+
+    const [ rr, gg, bb, aa ] = segment(rrggbbaa, { count: 2, unit: "char" }) as [ string, string, string, string ];
 
     const omitAlphaMode = options?.omitAlpha ? options.omitAlpha : Color.OmitAlpha.IF_OPAQUE;
     const omitAlpha = (
       (omitAlphaMode === Color.OmitAlpha.ALWAYS) ||
-      ((omitAlphaMode === Color.OmitAlpha.IF_OPAQUE) && (hexA === "ff"))
+      ((omitAlphaMode === Color.OmitAlpha.IF_OPAQUE) && (aa === "ff"))
     );
-    const hexComponents = (omitAlpha === true) ? [ hexR, hexG, hexB ] : [ hexR, hexG, hexB, hexA ];
+    const hexComponents = (omitAlpha === true) ? [ rr, gg, bb ] : [ rr, gg, bb, aa ];
 
     const shorten = (
       (options?.shorten === true) &&
@@ -330,26 +278,28 @@ class Color {
   //TODO
   // 色相セット(absoluteHue): this
   // 色相加算(relativeHue): this
-  // 彩度セット(absoluteS): this
-  // 彩度加算(relativeS): this
-  // 明度セット(absoluteL): this
-  // 明度加算(relativeL): this
-  // equals(other: Color): boolean
+  // HSL彩度セット(absoluteS): this
+  // HSL彩度加算(relativeS): this
+  // HSL明度セット(absoluteL): this
+  // HSL明度加算(relativeL): this
+  // HWB白セット(absoluteW): this
+  // HWB白加算(relativeW): this
+  // HWB黒セット(absoluteB): this
+  // HWB黒加算(relativeB): this
+  // equals(other: SrgbColor | *): boolean
   // 
-  // clone(): Color
-  // mix(blendMode, other: Color): this
+  // clone(): SrgbColor
+  // mix(blendMode, other: SrgbColor | *): this
 
-  static fromString(): Color {
-    throw new Error("not implemented"); //TODO
-  }
+  //TODO static fromString(): SrgbColor {
 
   toString(): string {
     return this.toHexString();
   }
 
-  toJSON(): Color.Rgb {
-    return this.toRgb();
-  }
+  // toJSON(): Color.Rgb {
+  //   return this.toRgb(); // rgbは0-255の方が一般的か？
+  // }
 
   toCssString(options: Color.CssFormatOptions = {}): string {
     const omitAlphaMode = options.omitAlpha ? options.omitAlpha : Color.OmitAlpha.IF_OPAQUE;
@@ -404,22 +354,32 @@ class Color {
 
 }
 
-namespace Color {
-  export type Rgb = {
-    r: number,
-    g: number,
-    b: number,
+namespace SrgbColor {
+  export type RgbParams = {
+    r: number, // 0-255
+    g: number, // 0-255
+    b: number, // 0-255
+    a?: alpha, // 0-1
   };
+}
 
-  export type Rgba = Rgb & _AlphaChannel;
+namespace Color {
+  // 
+
 
   export type Hsl = {
-    h: hue,
-    s: hsl_s,
-    l: hsl_l,
+    h: hue, // angle
+    s: hsl_s, // 0-1
+    l: hsl_l, // 0-1
+    a?: alpha, // 0-1
   };
 
-  export type Hsla = Hsl & _AlphaChannel;
+  export type Hwb = {
+    h: hue, // angle
+    w: hwb_w, // 0-1
+    b: hwb_b, // 0-1
+    a?: alpha, // 0-1
+  };
 
   export const OmitAlpha = {
     IF_OPAQUE: "if-opaque",
