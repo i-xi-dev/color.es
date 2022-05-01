@@ -4,6 +4,7 @@ import {
   type uint8,
   segment,
   Uint8,
+  Uint8Utils,
 } from "@i-xi-dev/fundamental";
 import { ByteSequence } from "@i-xi-dev/bytes";
 
@@ -25,95 +26,33 @@ type hwb_w = number;
 // hwb_b >= 0 && hwb_b <= 1
 type hwb_b = number;
 
+function _clamp(c: number): number {
+  return (c < 0) ? 0 : ((c > 1) ? 1 : c);
+}
 
-
-
-type _ClampedRgb = {
-  r: uint8,
-  g: uint8,
-  b: uint8,
-};
-
-function _clamp(val: number, min: number, max: number): number {
-  if (val < min) {
-    return min;
-  }
-  else if (val > max) {
-    return max;
-  }
-  return val;
+function _clampeRgb({ r, g, b }: SrgbColor.RgbParams): { r: number, g: number, b: number } {
+  return {
+    r: _clamp(r),
+    g: _clamp(g),
+    b: _clamp(b),
+  };
 }
 
 function _isRgbParams(value: unknown): value is SrgbColor.RgbParams {
   const { r, g, b, a } = value as SrgbColor.RgbParams;
-  const rValid = Number.isFinite(r);
-  const gValid = Number.isFinite(g);
-  const bValid = Number.isFinite(b);
+  const rValid = Uint8.isUint8(r);
+  const gValid = Uint8.isUint8(g);
+  const bValid = Uint8.isUint8(b);
   const aValid = Number.isFinite(a) || (a === undefined);
   return (rValid && gValid && bValid && aValid);
 }
 
+function _rgbToHsl(rgb: SrgbColor.RgbParams): SrgbColor.HslParams {
 
+}
 
-const _RgbComponentIndex = {
-  R: 0,
-  G: 1,
-  B: 2,
-} as const;
-export type _RgbComponentIndex = typeof _RgbComponentIndex[keyof typeof _RgbComponentIndex];
-
-const _alphaIndex = 3;
-
-function _rgbToHsl(rgb: _ClampedRgb): Color.Hsl {
-  const { r, g, b } = rgb;
-  const rgbMin = Math.min(r, g, b) as uint8;
-  const rgbMax = Math.max(r, g, b) as uint8;
-  const rgbMaxMinusMin = (rgbMax - rgbMin);
-  const rgbMaxPlusMin = (rgbMax + rgbMin);
-  const l255 = (rgbMaxPlusMin / 2);
-
-  // h
-  const hue: hue = (() => {
-    if (rgbMax === rgbMin) {
-      return 0;
-    }
-    let h: number;
-    switch (rgbMax) {
-      case r:
-        h = 60 * ((g - b) / rgbMaxMinusMin);
-        break;
-      case g:
-        h = 60 * ((b - r) / rgbMaxMinusMin) + 120;
-        break;
-      //case b:
-      default:
-        h = 60 * ((r - g) / rgbMaxMinusMin) + 240;
-        break;
-    }
-    return (h < 0) ? (h + 360) : h;
-  })();
-
-  // s
-  const saturation: hsl_s = (() => {
-    let s: number;
-    if (l255 <= 127) {
-      s = rgbMaxMinusMin / rgbMaxPlusMin;
-    } else {
-      s = rgbMaxMinusMin / (510 - rgbMaxMinusMin);
-    }
-    return s;
-  })();
-
-  // l
-  const lightness: hsl_l = (() => {
-    return (l255 / 255);
-  })();
-
-  return {
-    h: hue,
-    s: saturation,
-    l: lightness,
-  };
+function _hslToRgb(hsl: SrgbColor.HslParams): SrgbColor.RgbParams {
+  
 }
 
 /**
@@ -161,12 +100,12 @@ class SrgbColor {
       throw new TypeError("rgb");
     }
     const { r: rByte, g: gByte, b: bByte, a } = rgba;
-    const aByte = Uint8ClampedArray.of(a ? (a * 255) : 255)[0] as uint8;
-    return SrgbColor.fromBytes([ rByte, gByte, bByte, aByte ]);
+    const aByte = a ? (a * 255) : 255;
+    return SrgbColor.fromBytes(Uint8ClampedArray.of(rByte, gByte, bByte, aByte));
   }
 
   toRgb(): SrgbColor.RgbParams {
-    const [ r, g, b ] = this.toBytes() ;
+    const [ r, g, b ] = this.toByteArray() ;
     return {
       r,
       g,
@@ -194,9 +133,14 @@ class SrgbColor {
     throw new TypeError("rgbaBytes");
   }
 
-  static fromArray
+  static fromByteArray(rgbaBytes: [ number, number, number, number ]): SrgbColor {
+    if (Uint8Utils.isArrayOfUint8(rgbaBytes) !== true) {
+      throw new TypeError("rgbaBytes");
+    }
+    return SrgbColor.fromBytes(rgbaBytes);
+  }
 
-  toArray(): [ number, number, number, number ] {
+  toByteArray(): [ number, number, number, number ] {
     return [ ...Uint8ClampedArray.of(
       this.#r * 255,
       this.#g * 255,
@@ -205,9 +149,9 @@ class SrgbColor {
     ) ] as [ uint8, uint8, uint8, uint8 ];
   }
 
-  //TODO static fromHsl(hsla: Color.Hsl): SrgbColor
+  //TODO static fromHsl(hsla: SrgbColor.HslParams): SrgbColor
 
-  toHsl(): Color.Hsl {
+  toHsl(): SrgbColor.HslParams {
     const { h, s, l } = this.toHsl();
     return {
       h,
@@ -246,16 +190,15 @@ class SrgbColor {
     return SrgbColor.fromBytes(ByteSequence.parse(rrggbbaa, { lowerCase: true }).getUint8View());
   }
 
-  toHexString(options: Color.HexFormatOptions = {}): string {
-    const bytes = this.toArray();
-    const rrggbbaa = ByteSequence.fromArray(bytes).format({ lowerCase: true });
+  toHexString(options: SrgbColor.Format.HexOptions = {}): string {
+    const rrggbbaa = ByteSequence.fromArray(this.toByteArray()).format({ lowerCase: true });
 
     const [ rr, gg, bb, aa ] = segment(rrggbbaa, { count: 2, unit: "char" }) as [ string, string, string, string ];
 
-    const omitAlphaMode = options?.omitAlpha ? options.omitAlpha : Color.OmitAlpha.IF_OPAQUE;
+    const omitAlphaMode = options?.omitAlpha ? options.omitAlpha : SrgbColor.Format.OmitAlpha.IF_OPAQUE;
     const omitAlpha = (
-      (omitAlphaMode === Color.OmitAlpha.ALWAYS) ||
-      ((omitAlphaMode === Color.OmitAlpha.IF_OPAQUE) && (aa === "ff"))
+      (omitAlphaMode === SrgbColor.Format.OmitAlpha.ALWAYS) ||
+      ((omitAlphaMode === SrgbColor.Format.OmitAlpha.IF_OPAQUE) && (aa === "ff"))
     );
     const hexComponents = (omitAlpha === true) ? [ rr, gg, bb ] : [ rr, gg, bb, aa ];
 
@@ -298,35 +241,35 @@ class SrgbColor {
   }
 
   // toJSON(): Color.Rgb {
-  //   return this.toRgb(); // rgbは0-255の方が一般的か？
+  //   return this.toRgb();
   // }
 
-  toCssString(options: Color.CssFormatOptions = {}): string {
-    const omitAlphaMode = options.omitAlpha ? options.omitAlpha : Color.OmitAlpha.IF_OPAQUE;
+  toCssString(options: SrgbColor.Format.CssOptions = {}): string {
+    const omitAlphaMode = options.omitAlpha ? options.omitAlpha : SrgbColor.Format.OmitAlpha.IF_OPAQUE;
     const omitAlpha = (
-      (omitAlphaMode === Color.OmitAlpha.ALWAYS) ||
-      ((omitAlphaMode === Color.OmitAlpha.IF_OPAQUE) && (this.opacity === 1))
+      (omitAlphaMode === SrgbColor.Format.OmitAlpha.ALWAYS) ||
+      ((omitAlphaMode === SrgbColor.Format.OmitAlpha.IF_OPAQUE) && (this.opacity === 1))
     );
 
-    switch (options?.style) {
-      case Color.CssFormatStyle.L4_HSL:
-      case Color.CssFormatStyle.LEGACY_HSL:
-        return this.#toCssHslFunction(omitAlpha, options.style);
+    switch (options?.type) {
+      case SrgbColor.Format.CssFunction.L4_HSL:
+      case SrgbColor.Format.CssFunction.LEGACY_HSL:
+        return this.#toCssHslFunction(omitAlpha, options.type);
 
       default:
-        return this.#toCssRgbFunction(omitAlpha, options.style);
+        return this.#toCssRgbFunction(omitAlpha, options.type);
     }
   }
 
-  #toCssRgbFunction(omitAlpha: boolean, style: Color.CssFormatStyle = Color.CssFormatStyle.LEGACY_RGB): string {
-    const { r, g, b } = this;
-    if (style === Color.CssFormatStyle.L4_RGB) {
+  #toCssRgbFunction(omitAlpha: boolean, type: SrgbColor.Format.CssFunction = SrgbColor.Format.CssFunction.LEGACY_RGB): string {
+    const { r, g, b } = this.toRgb();
+    if (type === SrgbColor.Format.CssFunction.L4_RGB) {
       if (omitAlpha === true) {
         return `rgb(${ r } ${ g } ${ b })`;
       }
       return `rgb(${ r } ${ g } ${ b } / ${ this.opacity })`;
     }
-    else /* Color.CssFormatStyle.LEGACY_RGB */ {
+    else /* SrgbColor.Format.CssFunction.LEGACY_RGB */ {
       if (omitAlpha === true) {
         return `rgb(${ r }, ${ g }, ${ b })`;
       }
@@ -334,21 +277,21 @@ class SrgbColor {
     }
   }
 
-  #toCssHslFunction(omitAlpha: boolean, style: Color.CssFormatStyle = Color.CssFormatStyle.LEGACY_HSL): string {
-    const hsl = this.toHsl();
-    const sp = (hsl.s * 100);
-    const lp = (hsl.l * 100);
-    if (style === Color.CssFormatStyle.L4_HSL) {
+  #toCssHslFunction(omitAlpha: boolean, type: SrgbColor.Format.CssFunction = SrgbColor.Format.CssFunction.LEGACY_HSL): string {
+    const { h, s, l } = this.toHsl();
+    const sp = (s * 100);
+    const lp = (l * 100);
+    if (type === SrgbColor.Format.CssFunction.L4_HSL) {
       if (omitAlpha === true) {
-        return `hsl(${ hsl.h }deg ${ sp }% ${ lp }%)`;
+        return `hsl(${ h }deg ${ sp }% ${ lp }%)`;
       }
-      return `hsl(${ hsl.h }deg ${ sp }% ${ lp }% / ${ this.opacity })`;
+      return `hsl(${ h }deg ${ sp }% ${ lp }% / ${ this.opacity })`;
     }
-    else /* Color.CssFormatStyle.LEGACY_HSL */ {
+    else /* SrgbColor.Format.CssFunction.LEGACY_HSL */ {
       if (omitAlpha === true) {
-        return `hsl(${ hsl.h }, ${ sp }%, ${ lp }%)`;
+        return `hsl(${ h }, ${ sp }%, ${ lp }%)`;
       }
-      return `hsl(${ hsl.h }, ${ sp }%, ${ lp }%, ${ this.opacity })`;
+      return `hsl(${ h }, ${ sp }%, ${ lp }%, ${ this.opacity })`;
     }
   }
 
@@ -361,56 +304,54 @@ namespace SrgbColor {
     b: number, // 0-255
     a?: alpha, // 0-1
   };
-}
 
-namespace Color {
-  // 
-
-
-  export type Hsl = {
+  export type HslParams = {
     h: hue, // angle
     s: hsl_s, // 0-1
     l: hsl_l, // 0-1
     a?: alpha, // 0-1
   };
 
-  export type Hwb = {
+  export type HwbParams = {
     h: hue, // angle
     w: hwb_w, // 0-1
     b: hwb_b, // 0-1
     a?: alpha, // 0-1
   };
 
-  export const OmitAlpha = {
-    IF_OPAQUE: "if-opaque",
-    ALWAYS: "always",
-    NEVER: "never",
-  } as const;
-  export type OmitAlpha = typeof OmitAlpha[keyof typeof OmitAlpha];
+  export namespace Format {
+    export const OmitAlpha = {
+      IF_OPAQUE: "if-opaque",
+      ALWAYS: "always",
+      NEVER: "never",
+    } as const;
+    export type OmitAlpha = typeof OmitAlpha[keyof typeof OmitAlpha];
 
-  export type HexFormatOptions = {
-    omitAlpha?: OmitAlpha,
-    upperCase?: boolean,
-    shorten?: boolean,
-  };
+    export type HexOptions = {
+      omitAlpha?: OmitAlpha,
+      upperCase?: boolean,
+      shorten?: boolean,
+    };
 
-  export const CssFormatStyle = {
-    LEGACY_RGB: "legacy-rgb",
-    LEGACY_HSL: "legacy-hsl",
-    L4_RGB: "l4-rgb",
-    L4_HSL: "l4-hsl",
-    // XXX lab, lch, ...
-  } as const;
-  export type CssFormatStyle = typeof CssFormatStyle[keyof typeof CssFormatStyle];
+    export const CssFunction = {
+      LEGACY_RGB: "legacy-rgb",
+      LEGACY_HSL: "legacy-hsl",
+      L4_RGB: "l4-rgb",
+      L4_HSL: "l4-hsl",
+      // XXX lab, lch, ...
+    } as const;
+    export type CssFunction = typeof CssFunction[keyof typeof CssFunction];
 
-  export type CssFormatOptions = {
-    style?: CssFormatStyle,
-    omitAlpha?: OmitAlpha,
-    // XXX percentage
-  };
+    export type CssOptions = {
+      omitAlpha?: OmitAlpha,
+      type?: CssFunction,
+    };
+
+  }
+
+
+
 }
-
-Object.freeze(Color);
 
 
 
