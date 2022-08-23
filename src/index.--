@@ -1,0 +1,178 @@
+//
+
+function _clampeRgb({ r, g, b }: SrgbColor.RgbParams): { r: number, g: number, b: number } {
+  return {
+    r: _clamp(r),
+    g: _clamp(g),
+    b: _clamp(b),
+  };
+}
+
+function _isHslParams(value: unknown): value is SrgbColor.HslParams {
+  const { h, s, l, a } = value as SrgbColor.HslParams;
+  const hValid = Number.isFinite(h);
+  const sValid = Number.isFinite(s);
+  const lValid = Number.isFinite(l);
+  const aValid = Number.isFinite(a) || (a === undefined);
+  return (hValid && sValid && lValid && aValid);
+}
+
+class SrgbColor {
+
+
+  //TODO
+  // 色相セット(absoluteHue): this
+  // 色相加算(relativeHue): this
+  // HSL彩度セット(absoluteS): this
+  // HSL彩度加算(relativeS): this
+  // HSL明度セット(absoluteL): this
+  // HSL明度加算(relativeL): this
+  // HWB白セット(absoluteW): this
+  // HWB白加算(relativeW): this
+  // HWB黒セット(absoluteB): this
+  // HWB黒加算(relativeB): this
+  // equals(other: SrgbColor | *): boolean
+  // 
+  // clone(): SrgbColor
+  // mix(blendMode, other: SrgbColor | *): this
+
+  //TODO static fromString(): SrgbColor {
+
+  // toJSON(): Color.Rgb {
+  //   return this.toRgb();
+  // }
+
+  toCssString(options: SrgbColor.Format.CssOptions = {}): string {
+    const omitAlphaMode = options.omitAlpha ? options.omitAlpha : SrgbColor.Format.OmitAlpha.IF_OPAQUE;
+    const omitAlpha = (
+      (omitAlphaMode === SrgbColor.Format.OmitAlpha.ALWAYS) ||
+      ((omitAlphaMode === SrgbColor.Format.OmitAlpha.IF_OPAQUE) && (this.opacity === 1))
+    );
+
+    switch (options?.type) {
+      case SrgbColor.Format.CssFunction.L4_HSL:
+      case SrgbColor.Format.CssFunction.LEGACY_HSL:
+        return this.#toCssHslFunction(omitAlpha, options.type);
+
+      default:
+        return this.#toCssRgbFunction(omitAlpha, options.type);
+    }
+  }
+
+  #toCssRgbFunction(omitAlpha: boolean, type: SrgbColor.Format.CssFunction = SrgbColor.Format.CssFunction.LEGACY_RGB): string {
+    const { r, g, b } = this.toRgb();
+    if (type === SrgbColor.Format.CssFunction.L4_RGB) {
+      if (omitAlpha === true) {
+        return `rgb(${ r } ${ g } ${ b })`;
+      }
+      return `rgb(${ r } ${ g } ${ b } / ${ this.opacity })`;
+    }
+    else /* SrgbColor.Format.CssFunction.LEGACY_RGB */ {
+      if (omitAlpha === true) {
+        return `rgb(${ r }, ${ g }, ${ b })`;
+      }
+      return `rgba(${ r }, ${ g }, ${ b }, ${ this.opacity })`;
+    }
+  }
+
+  #toCssHslFunction(omitAlpha: boolean, type: SrgbColor.Format.CssFunction = SrgbColor.Format.CssFunction.LEGACY_HSL): string {
+    const { h, s, l } = this.toHsl();
+    const sp = (s * 100);
+    const lp = (l * 100);
+    if (type === SrgbColor.Format.CssFunction.L4_HSL) {
+      if (omitAlpha === true) {
+        return `hsl(${ h }deg ${ sp }% ${ lp }%)`;
+      }
+      return `hsl(${ h }deg ${ sp }% ${ lp }% / ${ this.opacity })`;
+    }
+    else /* SrgbColor.Format.CssFunction.LEGACY_HSL */ {
+      if (omitAlpha === true) {
+        return `hsl(${ h }, ${ sp }%, ${ lp }%)`;
+      }
+      return `hsl(${ h }, ${ sp }%, ${ lp }%, ${ this.opacity })`;
+    }
+  }
+
+}
+
+namespace SrgbColor {
+
+  export type HwbParams = {
+    h: hue, // angle
+    w: hwb_w, // 0-1
+    b: hwb_b, // 0-1
+    a?: alpha, // 0-1
+  };
+
+
+
+
+}
+
+
+
+
+/*
+static fromCssString(cssString: string): RgbColor {
+  // computed valueを使うならrgb(a)関数以外の値にはならないはず
+  if (typeof cssString === "string") {
+    const trimmed = cssString.trim().toLowerCase();
+    if (trimmed.startsWith("#")) {
+      return RgbColor.#parseCssHexColor(trimmed);
+    }
+    else if (trimmed === "transparent") {
+      return RgbColor.fromRgb(0, 0, 0); // XXX グラデーションやアニメーションで補完されるときはalpha以外無視する仕様
+    }
+    else if (trimmed.startsWith("rgb(") || trimmed.startsWith("rgba(")) {
+      return RgbColor.#parseCssRgbFunction(trimmed);
+    }
+    else if (trimmed.startsWith("hsl(") || trimmed.startsWith("hsla(")) {
+      return RgbColor.#parseCssHslFunction(trimmed);
+    }
+    else if (trimmed.startsWith("var(")) {
+      throw new RangeError("cssString");
+    }
+    else if ([ "inherit", "initial", "unset", "revert", "currentcolor" ].includes(trimmed)) {
+      throw new RangeError("cssString");
+    }
+    else {
+      // XXX: not implemented: color names, hwb(), システム色L4, deprecatedシステム色, ...
+    }
+  }
+  throw new TypeError("cssString");
+}
+
+static #parseCssHexColor(cssString: string): RgbColor {
+  void cssString;
+  throw new Error("not implemented");
+}
+
+static #parseCssRgbFunction(cssString: string): RgbColor {
+  const result = (new RegExp(RGBFUNC, "i")).exec(cssString);
+  
+}
+
+static #parseCssHslFunction(cssString: string): RgbColor {
+  void cssString;
+  throw new Error("not implemented");
+}
+*/
+// }
+
+const SP = "[\\u0009\\u000A\\u000D\\u0020]*";
+const CM = `${SP},${SP}`;
+const SL = `${SP}/${SP}`;
+const NUM = `\\-?(?:[0-9]*\\.)?[0-9]+`;
+const PERCENT = `\\-?(?:[0-9]*\\.)?[0-9]+%`;
+const NUM_L4 = `(?:\\-?(?:[0-9]*\\.)?[0-9]+|none)`;
+const PERCENT_L4 = `(?:\\-?(?:[0-9]*\\.)?[0-9]+%|none)`;
+const ALPHA_L4 = `(?:\\-?(?:[0-9]*\\.)?[0-9]+%?|none)`;
+const ALPHA_L4L = `(?:\\-?(?:[0-9]*\\.)?[0-9]+%?)`;
+
+const RGB_NUM_L4 = `rgb\\(${SP}(${NUM_L4})${SP}(${NUM_L4})${SP}(${NUM_L4})(?:${SL}(${ALPHA_L4}))?${SP}\\)`;
+const RGB_PERCENT_L4 = `rgb\\(${SP}(${PERCENT_L4})${SP}(${PERCENT_L4})${SP}(${PERCENT_L4})(?:${SL}(${ALPHA_L4}))?${SP}\\)`;
+
+const RGB_NUM_L4L = `rgba?\\(${SP}(${NUM})${CM}(${NUM})${CM}(${NUM})(?:${CM}(${ALPHA_L4L}))?${SP}\\)`;
+const RGB_PERCENT_L4L = `rgba?\\(${SP}(${PERCENT})${CM}(${PERCENT})${CM}(${PERCENT})(?:${CM}(${ALPHA_L4L}))?${SP}\\)`;
+
+const RGBFUNC = `^(?:${RGB_NUM_L4}|${RGB_PERCENT_L4}|${RGB_NUM_L4L}|${RGB_PERCENT_L4L})$`;
