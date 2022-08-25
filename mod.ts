@@ -26,7 +26,7 @@ type hwb_w = number;
 // hwb_b >= 0 && hwb_b <= 1
 type hwb_b = number;
 
-function _clamp(c: number): number {
+function _clamp_0_1(c: number): number {
   return (c < 0) ? 0 : ((c > 1) ? 1 : c);
 }
 
@@ -114,9 +114,17 @@ namespace SRgb {
       Object.seal(this);
     }
 
-    //XXX get red 0-1にすべきか0-255にすべきか
-    //XXX get green 同上
-    //XXX get blue 同上
+    get red(): number {
+      return this.#r;
+    }
+
+    get green(): number {
+      return this.#g;
+    }
+
+    get blue(): number {
+      return this.#b;
+    }
 
     get alpha(): number {
       return this.#a;
@@ -166,10 +174,10 @@ namespace SRgb {
       const { r: rByte, g: gByte, b: bByte, a } = rgba;
       // const aByte = a ? (a * 255) : 255;
       // return SrgbColor.fromBytes(Uint8ClampedArray.of(rByte, gByte, bByte, aByte)); // 丸めないことにする
-      const r = rByte / 255;
-      const g = gByte / 255;
-      const b = bByte / 255;
-      return new Color(r, g, b, a ?? 1);
+      const r = _clamp_0_1(rByte / 255);
+      const g = _clamp_0_1(gByte / 255);
+      const b = _clamp_0_1(bByte / 255);
+      return new Color(r, g, b, _clamp_0_1(a ?? 1));
     }
 
     //XXX static fromHsl()
@@ -212,10 +220,10 @@ namespace SRgb {
         throw new TypeError("rgba");
       }
       const { r: rByte, g: gByte, b: bByte, a } = rgba;
-      this.#r = rByte / 255;
-      this.#g = gByte / 255;
-      this.#b = bByte / 255;
-      this.#a = _clamp(a ?? 1);
+      this.#r = _clamp_0_1(rByte / 255);
+      this.#g = _clamp_0_1(gByte / 255);
+      this.#b = _clamp_0_1(bByte / 255);
+      this.#a = _clamp_0_1(a ?? 1);
       return this;
     }
 
@@ -223,7 +231,7 @@ namespace SRgb {
       if (Number.isFinite(absoluteAlpha) !== true) {
         throw new TypeError("absoluteAlpha");
       }
-      this.#a = _clamp(absoluteAlpha);
+      this.#a = _clamp_0_1(absoluteAlpha);
       return this;
     }
 
