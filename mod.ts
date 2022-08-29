@@ -32,9 +32,9 @@ function _clamp_0_1(c: number): number {
 
 function _isRgbComponents(value: unknown): value is SRgb.RgbComponents {
   const { r, g, b, a } = value as SRgb.RgbComponents;
-  const rValid = Number.isFinite(r); // Uint8.isUint8(r);
-  const gValid = Number.isFinite(g); // Uint8.isUint8(g);
-  const bValid = Number.isFinite(b); // Uint8.isUint8(b);
+  const rValid = Number.isFinite(r);
+  const gValid = Number.isFinite(g);
+  const bValid = Number.isFinite(b);
   const aValid = Number.isFinite(a) || (a === undefined);
   return (rValid && gValid && bValid && aValid);
 }
@@ -114,18 +114,30 @@ namespace SRgb {
       Object.seal(this);
     }
 
+    /**
+     * The red component value.
+     */
     get red(): number {
       return this.#r;
     }
 
+    /**
+     * The green component value.
+     */
     get green(): number {
       return this.#g;
     }
 
+    /**
+     * The blue component value.
+     */
     get blue(): number {
       return this.#b;
     }
 
+    /**
+     * The alpha component value.
+     */
     get alpha(): number {
       return this.#a;
     }
@@ -167,7 +179,7 @@ namespace SRgb {
       return Color.fromBytes(rgbaBytes);
     }
 
-    static fromRgb(rgba: RgbComponents): Color {
+    static fromRgba(rgba: RgbComponents): Color {
       if (_isRgbComponents(rgba) !== true) {
         throw new TypeError("rgba");
       }
@@ -215,15 +227,14 @@ namespace SRgb {
       );
     }
 
-    setRgb(rgba: RgbComponents): this {
-      if (_isRgbComponents(rgba) !== true) {
-        throw new TypeError("rgba");
+    setRgb(absoluteRgb: RgbComponents): this {
+      if (_isRgbComponents(absoluteRgb) !== true) {
+        throw new TypeError("absoluteRgb");
       }
-      const { r: rByte, g: gByte, b: bByte, a } = rgba;
+      const { r: rByte, g: gByte, b: bByte } = absoluteRgb;
       this.#r = _clamp_0_1(rByte / 255);
       this.#g = _clamp_0_1(gByte / 255);
       this.#b = _clamp_0_1(bByte / 255);
-      this.#a = _clamp_0_1(a ?? 1);
       return this;
     }
 
@@ -235,7 +246,16 @@ namespace SRgb {
       return this;
     }
 
-    //XXX addRgb()
+    addRgb(relativeRgb: RgbComponents): this {
+      if (_isRgbComponents(relativeRgb) !== true) {
+        throw new TypeError("relativeRgb");
+      }
+      const { r: rByte, g: gByte, b: bByte } = relativeRgb;
+      this.#r = _clamp_0_1(this.#r + (rByte / 255));
+      this.#g = _clamp_0_1(this.#g + (gByte / 255));
+      this.#b = _clamp_0_1(this.#b + (bByte / 255));
+      return this;
+    }
 
     addAlpha(relativeAlpha: number): this {
       if (Number.isFinite(relativeAlpha) !== true) {
@@ -261,7 +281,7 @@ namespace SRgb {
       return [...this.toUint8ClampedArray()] as [uint8, uint8, uint8, uint8];
     }
 
-    toRgb(): RgbComponents {
+    toRgba(): RgbComponents {
       const [r, g, b] = this.toUint8ClampedArray();
       return {
         r,
@@ -271,8 +291,8 @@ namespace SRgb {
       };
     }
 
-    toHsl(): Hsl {
-      const { h, s, l } = _rgbToHsl(this.toRgb());
+    toHsla(): Hsl {
+      const { h, s, l } = _rgbToHsl(this.toRgba());
       return {
         h,
         s,
