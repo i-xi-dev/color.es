@@ -33,9 +33,23 @@ function _normalizeHue(h: number): number {
   return (t < 0) ? (t + 360) : t;
 } 
 
-function _hslToRgb({ h, s, l }: Hsl): Rgb {
-  const normalizedH = _normalizeHue(h);
+function _f(n: number, { h, s, l }: Hsl): number {
+  const k = (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+}
 
+function _hslToRgb({ h, s, l }: Hsl): Rgb {
+  const normalizedHsl = {
+    h: _normalizeHue(h),
+    s,
+    l,
+  };
+  return {
+    r: _f(0, normalizedHsl),
+    g: _f(8, normalizedHsl),
+    b: _f(4, normalizedHsl),
+  };
 }
 
 function _rgbToHsl({ r, g, b }: Rgb): Hsl {
@@ -178,6 +192,11 @@ class SRgbColor implements Rgb {
     return SRgbColor.fromRgbBytes(ByteSequence.parse(rrggbb, { lowerCase: true }).getUint8View());
   }
 
+  static fromHsl(hsl: Hsl): SRgbColor {
+    const { r, g, b } = _hslToRgb(hsl);
+    return new SRgbColor(r, g, b);
+  }
+
   toUint8ClampedArray(): Uint8ClampedArray {
     return Uint8ClampedArray.of(
       this.#r * 255,
@@ -218,6 +237,62 @@ class SRgbColor implements Rgb {
   toHsl(): Hsl {
     return _rgbToHsl(this);
   }
+
+  #setRgb(rgb: Rgb): void {
+    this.#r = rgb.r;
+    this.#g = rgb.b;
+    this.#b = rgb.b;
+  }
+
+  addHue(relativeHue: number): this {
+    if (Number.isFinite(relativeHue) !== true) {
+      throw new TypeError("relativeHue");
+    }
+
+    const hsl = _rgbToHsl(this);
+    hsl.h = hsl.h + relativeHue;
+    this.#setRgb(_hslToRgb(hsl));
+    return this;
+  }
+
+  setHue(absoluteHue: number): this {
+    if (Number.isFinite(absoluteHue) !== true) {
+      throw new TypeError("absoluteHue");
+    }
+
+    const hsl = _rgbToHsl(this);
+    hsl.h = absoluteHue;
+    this.#setRgb(_hslToRgb(hsl));
+    return this;
+  }
+
+  addLightness(relativeLightness: number): this {
+    if (Number.isFinite(relativeLightness) !== true) {
+      throw new TypeError("relativeLightness");
+    }
+
+    const hsl = _rgbToHsl(this);
+    hsl.l = hsl.l + relativeLightness;
+    this.#setRgb(_hslToRgb(hsl));
+    return this;
+  }
+
+  setLightness(absoluteLightness: number): this {
+    if (Number.isFinite(absoluteLightness) !== true) {
+      throw new TypeError("absoluteLightness");
+    }
+
+    const hsl = _rgbToHsl(this);
+    hsl.l = absoluteLightness;
+    this.#setRgb(_hslToRgb(hsl));
+    return this;
+  }
+
+
+  // addSaturation()
+
+  // setSaturation()
+
 
 
 
