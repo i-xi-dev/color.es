@@ -58,6 +58,14 @@ function _hslToRgb({ h, s, l }: Hsl): Rgb {
   };
 }
 
+function _rgbToUint8ClampedArray({ r, g, b }: Rgb): Uint8ClampedArray {
+  return Uint8ClampedArray.of(
+    r * 255,
+    g * 255,
+    b * 255,
+  );
+}
+
 function _rgbToHsl({ r, g, b }: Rgb): Hsl {
   const maxRgb = Math.max(r, g, b);
   const minRgb = Math.min(r, g, b);
@@ -105,19 +113,17 @@ class SRgbColor implements Rgb {
   readonly #r: rgbcomponent;
   readonly #g: rgbcomponent;
   readonly #b: rgbcomponent;
-  readonly #h: hue;
-  readonly #s: saturation;
-  readonly #l: lightness;
+  #rgbBytes: [r: uint8, g: uint8, b: uint8];
+  #hsl: Hsl;
 
   private constructor(r: rgbcomponent, g: rgbcomponent, b: rgbcomponent) {
     this.#r = r;
     this.#g = g;
     this.#b = b;
 
-    const { h, s, l } = _rgbToHsl({ r, g, b });
-    this.#h = h;
-    this.#s = s;
-    this.#l = l;
+    const rgb = { r, g, b };
+    this.#rgbBytes = [..._rgbToUint8ClampedArray(rgb)] as [uint8, uint8, uint8];
+    this.#hsl = _rgbToHsl(rgb);
 
     Object.freeze(this);
   }
@@ -143,8 +149,20 @@ class SRgbColor implements Rgb {
     return this.#b;
   }
 
+  get rByte(): uint8 {
+    return this.#rgbBytes[0];
+  }
+
+  get gByte(): uint8 {
+    return this.#rgbBytes[1];
+  }
+
+  get bByte(): uint8 {
+    return this.#rgbBytes[2];
+  }
+
   get hue(): hue {
-    return this.#h;
+    return this.#hsl.h;
   }
 
   //XXX s, l, w, b
@@ -268,44 +286,44 @@ class SRgbColor implements Rgb {
     return _rgbToHsl(this);
   }
 
-  withHue(absoluteHue: number): SRgbColor {
-    if (Number.isFinite(absoluteHue) !== true) {
-      throw new TypeError("absoluteHue");
-    }
+  // withHue(absoluteHue: number): SRgbColor {
+  //   if (Number.isFinite(absoluteHue) !== true) {
+  //     throw new TypeError("absoluteHue");
+  //   }
 
-    const { r, g, b } = _hslToRgb({ h: absoluteHue, s: this.#s, l: this.#l });
-    return new SRgbColor(r, g, b);
-  }
+  //   const { r, g, b } = _hslToRgb({ h: absoluteHue, s: this.#s, l: this.#l });
+  //   return new SRgbColor(r, g, b);
+  // }
 
   // xxxHue(relativeHue: number): SRgbColor {
 
-  withLightness(absoluteLightness: number): SRgbColor {
-    if (Number.isFinite(absoluteLightness) !== true) {
-      throw new TypeError("absoluteLightness");
-    }
+  // withLightness(absoluteLightness: number): SRgbColor {
+  //   if (Number.isFinite(absoluteLightness) !== true) {
+  //     throw new TypeError("absoluteLightness");
+  //   }
 
-    const { r, g, b } = _hslToRgb({
-      h: this.#h,
-      s: this.#s,
-      l: absoluteLightness,
-    });
-    return new SRgbColor(r, g, b);
-  }
+  //   const { r, g, b } = _hslToRgb({
+  //     h: this.#h,
+  //     s: this.#s,
+  //     l: absoluteLightness,
+  //   });
+  //   return new SRgbColor(r, g, b);
+  // }
 
   // xxxLightness(relativeLightness: number): SRgbColor {
 
-  withSaturation(absoluteSaturation: number): SRgbColor {
-    if (Number.isFinite(absoluteSaturation) !== true) {
-      throw new TypeError("absoluteSaturation");
-    }
+  // withSaturation(absoluteSaturation: number): SRgbColor {
+  //   if (Number.isFinite(absoluteSaturation) !== true) {
+  //     throw new TypeError("absoluteSaturation");
+  //   }
 
-    const { r, g, b } = _hslToRgb({
-      h: this.#h,
-      s: absoluteSaturation,
-      l: this.#l,
-    });
-    return new SRgbColor(r, g, b);
-  }
+  //   const { r, g, b } = _hslToRgb({
+  //     h: this.#h,
+  //     s: absoluteSaturation,
+  //     l: this.#l,
+  //   });
+  //   return new SRgbColor(r, g, b);
+  // }
 }
 
 export { SRgbColor };
