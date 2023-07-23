@@ -1,24 +1,29 @@
-import {
-  type uint8,
-  ByteSequence,
-  Uint8,
-} from "../deps.ts";
+import { ByteSequence, Uint8, type uint8 } from "../deps.ts";
 import {
   type Hsl,
+  type hue,
   type Hwb,
+  type lightness,
   type Rgb,
   type Rgb24Bit,
   type rgbcomponent,
+  type saturation,
 } from "./color.ts";
 
-function _normalizeRgb24Bit(value: unknown): Rgb24Bit {
+function _normalize24BitRgb(value: unknown): Rgb24Bit {
   let srcR = 0;
   let srcG = 0;
   let srcB = 0;
   if (value && (typeof value === "object")) {
-    srcR = (("r" in value) && Number.isFinite(value.r)) ? (value.r as number) : 0;
-    srcG = (("g" in value) && Number.isFinite(value.g)) ? (value.g as number) : 0;
-    srcB = (("b" in value) && Number.isFinite(value.b)) ? (value.b as number) : 0;
+    srcR = (("r" in value) && Number.isFinite(value.r))
+      ? (value.r as number)
+      : 0;
+    srcG = (("g" in value) && Number.isFinite(value.g))
+      ? (value.g as number)
+      : 0;
+    srcB = (("b" in value) && Number.isFinite(value.b))
+      ? (value.b as number)
+      : 0;
   }
   const [r, g, b] = Uint8ClampedArray.of(srcR, srcG, srcB);
   return { r, g, b } as Rgb24Bit;
@@ -31,7 +36,7 @@ function _clamp(c: number, min: number, max: number): number {
 function _normalizeHue(h: number): number {
   const t = h % 360;
   return (t < 0) ? (t + 360) : t;
-} 
+}
 
 function _f(n: number, { h, s, l }: Hsl): number {
   const k = (n + h / 30) % 12;
@@ -45,6 +50,7 @@ function _hslToRgb({ h, s, l }: Hsl): Rgb {
     s,
     l,
   };
+
   return {
     r: _f(0, normalizedHsl),
     g: _f(8, normalizedHsl),
@@ -62,7 +68,7 @@ function _rgbToHsl({ r, g, b }: Rgb): Hsl {
   if (d !== 0) {
     switch (maxRgb) {
       case r:
-        h = ((g - b) / d);
+        h = (g - b) / d;
         break;
 
       case g:
@@ -96,15 +102,24 @@ type _HexStringOptions = {
  * RGBA color in sRGB color space
  */
 class SRgbColor implements Rgb {
-  #r: rgbcomponent;
-  #g: rgbcomponent;
-  #b: rgbcomponent;
+  readonly #r: rgbcomponent;
+  readonly #g: rgbcomponent;
+  readonly #b: rgbcomponent;
+  readonly #h: hue;
+  readonly #s: saturation;
+  readonly #l: lightness;
 
   private constructor(r: rgbcomponent, g: rgbcomponent, b: rgbcomponent) {
     this.#r = r;
     this.#g = g;
     this.#b = b;
-    Object.seal(this);
+
+    const { h, s, l } = _rgbToHsl({ r, g, b });
+    this.#h = h;
+    this.#s = s;
+    this.#l = l;
+
+    Object.freeze(this);
   }
 
   /**
@@ -128,13 +143,19 @@ class SRgbColor implements Rgb {
     return this.#b;
   }
 
-  //XXX h, s, l, w, b
+  get hue(): hue {
+    return this.#h;
+  }
 
-  static fromRgb24Bit(rgbBytes: { r: number, g: number, b: number }): SRgbColor {
-    const { r: rByte, g: gByte, b: bByte } = _normalizeRgb24Bit(rgbBytes);
-    const r = (rByte / 255);
-    const g = (gByte / 255);
-    const b = (bByte / 255);
+  //XXX s, l, w, b
+
+  static from24BitRgb(
+    rgbBytes: { r: number; g: number; b: number },
+  ): SRgbColor {
+    const { r: rByte, g: gByte, b: bByte } = _normalize24BitRgb(rgbBytes);
+    const r = rByte / 255;
+    const g = gByte / 255;
+    const b = bByte / 255;
     return new SRgbColor(r, g, b);
   }
 
@@ -154,7 +175,7 @@ class SRgbColor implements Rgb {
         i = i + 1;
       }
 
-      return SRgbColor.fromRgb24Bit({
+      return SRgbColor.from24BitRgb({
         r: bytes[0],
         g: bytes[1],
         b: bytes[2],
@@ -189,7 +210,9 @@ class SRgbColor implements Rgb {
     }
     rrggbb = rrggbb.toLowerCase();
 
-    return SRgbColor.fromRgbBytes(ByteSequence.parse(rrggbb, { lowerCase: true }).getUint8View());
+    return SRgbColor.fromRgbBytes(
+      ByteSequence.parse(rrggbb, { lowerCase: true }).getUint8View(),
+    );
   }
 
   static fromHsl(hsl: Hsl): SRgbColor {
@@ -215,15 +238,18 @@ class SRgbColor implements Rgb {
   }
 
   toHexString(options?: _HexStringOptions): string {
-    const lowerCase = (options?.upperCase !== true);
+    const lowerCase = options?.upperCase !== true;
 
-    const rrggbb: string = ByteSequence.fromArrayBufferView(this.toUint8ClampedArray()).format({ lowerCase });
+    const rrggbb: string = ByteSequence.fromArrayBufferView(
+      this.toUint8ClampedArray(),
+    ).format({ lowerCase });
 
     const shorten = (options?.shorten === true) &&
       /^(?:([0-9a-fA-F])\1)+$/.test(rrggbb);
 
     if (shorten === true) {
-      return "#" + [...rrggbb].reduce((s, c, i) => (i % 2 === 0) ? (s + c) : s, "");
+      return "#" +
+        [...rrggbb].reduce((s, c, i) => (i % 2 === 0) ? (s + c) : s, "");
     }
     return "#" + rrggbb;
   }
@@ -234,72 +260,52 @@ class SRgbColor implements Rgb {
 
   //XXX toJSON
 
+  //XXX equals
+  //XXX clone
+  //XXX mix(blendMode, other: SrgbColor | *)
+
   toHsl(): Hsl {
     return _rgbToHsl(this);
   }
 
-  #setRgb(rgb: Rgb): void {
-    this.#r = rgb.r;
-    this.#g = rgb.b;
-    this.#b = rgb.b;
-  }
-
-  addHue(relativeHue: number): this {
-    if (Number.isFinite(relativeHue) !== true) {
-      throw new TypeError("relativeHue");
-    }
-
-    const hsl = _rgbToHsl(this);
-    hsl.h = hsl.h + relativeHue;
-    this.#setRgb(_hslToRgb(hsl));
-    return this;
-  }
-
-  setHue(absoluteHue: number): this {
+  withHue(absoluteHue: number): SRgbColor {
     if (Number.isFinite(absoluteHue) !== true) {
       throw new TypeError("absoluteHue");
     }
 
-    const hsl = _rgbToHsl(this);
-    hsl.h = absoluteHue;
-    this.#setRgb(_hslToRgb(hsl));
-    return this;
+    const { r, g, b } = _hslToRgb({ h: absoluteHue, s: this.#s, l: this.#l });
+    return new SRgbColor(r, g, b);
   }
 
-  addLightness(relativeLightness: number): this {
-    if (Number.isFinite(relativeLightness) !== true) {
-      throw new TypeError("relativeLightness");
-    }
+  // xxxHue(relativeHue: number): SRgbColor {
 
-    const hsl = _rgbToHsl(this);
-    hsl.l = hsl.l + relativeLightness;
-    this.#setRgb(_hslToRgb(hsl));
-    return this;
-  }
-
-  setLightness(absoluteLightness: number): this {
+  withLightness(absoluteLightness: number): SRgbColor {
     if (Number.isFinite(absoluteLightness) !== true) {
       throw new TypeError("absoluteLightness");
     }
 
-    const hsl = _rgbToHsl(this);
-    hsl.l = absoluteLightness;
-    this.#setRgb(_hslToRgb(hsl));
-    return this;
+    const { r, g, b } = _hslToRgb({
+      h: this.#h,
+      s: this.#s,
+      l: absoluteLightness,
+    });
+    return new SRgbColor(r, g, b);
   }
 
+  // xxxLightness(relativeLightness: number): SRgbColor {
 
-  // addSaturation()
+  withSaturation(absoluteSaturation: number): SRgbColor {
+    if (Number.isFinite(absoluteSaturation) !== true) {
+      throw new TypeError("absoluteSaturation");
+    }
 
-  // setSaturation()
-
-
-
-
-
-
+    const { r, g, b } = _hslToRgb({
+      h: this.#h,
+      s: absoluteSaturation,
+      l: this.#l,
+    });
+    return new SRgbColor(r, g, b);
+  }
 }
 
-export {
-  SRgbColor,
-};
+export { SRgbColor };

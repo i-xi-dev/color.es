@@ -44,8 +44,11 @@ type Hwb = {
 
 export {
   type Hsl,
+  type hue,
   type Hwb,
+  type lightness,
   type Rgb,
   type Rgb24Bit,
   type rgbcomponent,
+  type saturation,
 };

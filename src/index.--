@@ -8,6 +8,9 @@ function _clampeRgb({ r, g, b }: SrgbColor.RgbParams): { r: number, g: number, b
   };
 }
 
+/** Opacity as a real number between 0 and 1 */
+type alpha = number;
+
 function _isHslParams(value: unknown): value is SrgbColor.HslParams {
   const { h, s, l, a } = value as SrgbColor.HslParams;
   const hValid = Number.isFinite(h);
@@ -21,8 +24,6 @@ class SrgbColor {
 
 
   //TODO
-  // 色相セット(absoluteHue): this
-  // 色相加算(relativeHue): this
   // HSL彩度セット(absoluteS): this
   // HSL彩度加算(relativeS): this
   // HSL明度セット(absoluteL): this
@@ -176,3 +177,20 @@ const RGB_NUM_L4L = `rgba?\\(${SP}(${NUM})${CM}(${NUM})${CM}(${NUM})(?:${CM}(${A
 const RGB_PERCENT_L4L = `rgba?\\(${SP}(${PERCENT})${CM}(${PERCENT})${CM}(${PERCENT})(?:${CM}(${ALPHA_L4L}))?${SP}\\)`;
 
 const RGBFUNC = `^(?:${RGB_NUM_L4}|${RGB_PERCENT_L4}|${RGB_NUM_L4L}|${RGB_PERCENT_L4L})$`;
+
+  export const CssFunction = {
+    LEGACY_RGB: "legacy-rgb",
+    LEGACY_HSL: "legacy-hsl",
+    L4_RGB: "l4-rgb",
+    L4_HSL: "l4-hsl",
+    // XXX lab, lch, ...
+  } as const;
+  export type CssFunction = typeof CssFunction[keyof typeof CssFunction];
+
+  export type CssNotation = CssFunction | "hex";
+
+  export type CssOptions = {
+    omitAlpha?: OmitAlpha;
+    type?: CssNotation;
+    //XXX nameIfExists
+  };
