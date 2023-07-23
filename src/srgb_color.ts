@@ -66,6 +66,14 @@ function _rgbToUint8ClampedArray({ r, g, b }: Rgb): Uint8ClampedArray {
   );
 }
 
+function _uint8ClampedArrayToRgb24Bit([r, g, b]: Uint8ClampedArray): Rgb24Bit {
+  return {
+    r,
+    g,
+    b,
+  } as Rgb24Bit;
+}
+
 function _rgbToHsl({ r, g, b }: Rgb): Hsl {
   const maxRgb = Math.max(r, g, b);
   const minRgb = Math.min(r, g, b);
@@ -113,7 +121,8 @@ class SRgbColor implements Rgb {
   readonly #r: rgbcomponent;
   readonly #g: rgbcomponent;
   readonly #b: rgbcomponent;
-  #rgbBytes: [r: uint8, g: uint8, b: uint8];
+  #bytes: Uint8ClampedArray;
+  #rgbBytes: Rgb24Bit;
   #hsl: Hsl;
 
   private constructor(r: rgbcomponent, g: rgbcomponent, b: rgbcomponent) {
@@ -122,7 +131,8 @@ class SRgbColor implements Rgb {
     this.#b = b;
 
     const rgb = { r, g, b };
-    this.#rgbBytes = [..._rgbToUint8ClampedArray(rgb)] as [uint8, uint8, uint8];
+    this.#bytes = _rgbToUint8ClampedArray(rgb);
+    this.#rgbBytes = _uint8ClampedArrayToRgb24Bit(this.#bytes);
     this.#hsl = _rgbToHsl(rgb);
 
     Object.freeze(this);
@@ -150,15 +160,15 @@ class SRgbColor implements Rgb {
   }
 
   get rByte(): uint8 {
-    return this.#rgbBytes[0];
+    return this.#rgbBytes.r;
   }
 
   get gByte(): uint8 {
-    return this.#rgbBytes[1];
+    return this.#rgbBytes.g;
   }
 
   get bByte(): uint8 {
-    return this.#rgbBytes[2];
+    return this.#rgbBytes.b;
   }
 
   get hue(): hue {
@@ -239,20 +249,11 @@ class SRgbColor implements Rgb {
   }
 
   toUint8ClampedArray(): Uint8ClampedArray {
-    return Uint8ClampedArray.of(
-      this.#r * 255,
-      this.#g * 255,
-      this.#b * 255,
-    );
+    return this.#bytes.slice(0);
   }
 
   toRgb24Bit(): Rgb24Bit {
-    const [r, g, b] = this.toUint8ClampedArray();
-    return {
-      r,
-      g,
-      b,
-    } as Rgb24Bit;
+    return Object.assign({}, this.#rgbBytes);
   }
 
   toHexString(options?: _HexStringOptions): string {
