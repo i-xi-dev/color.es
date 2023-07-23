@@ -5,12 +5,12 @@ import {
   type Hwb,
   type lightness,
   type Rgb,
-  type Rgb24Bit,
+  type RgbBytes,
   type rgbcomponent,
   type saturation,
 } from "./color.ts";
 
-function _normalize24BitRgb(value: unknown): Rgb24Bit {
+function _normalizeRgbBytes(value: unknown): RgbBytes {
   let srcR = 0;
   let srcG = 0;
   let srcB = 0;
@@ -26,7 +26,7 @@ function _normalize24BitRgb(value: unknown): Rgb24Bit {
       : 0;
   }
   const [r, g, b] = Uint8ClampedArray.of(srcR, srcG, srcB);
-  return { r, g, b } as Rgb24Bit;
+  return { r, g, b } as RgbBytes;
 }
 
 function _clamp(c: number, min: number, max: number): number {
@@ -66,12 +66,12 @@ function _rgbToUint8ClampedArray({ r, g, b }: Rgb): Uint8ClampedArray {
   );
 }
 
-function _uint8ClampedArrayToRgb24Bit([r, g, b]: Uint8ClampedArray): Rgb24Bit {
+function _uint8ClampedArrayToRgbBytes([r, g, b]: Uint8ClampedArray): RgbBytes {
   return {
     r,
     g,
     b,
-  } as Rgb24Bit;
+  } as RgbBytes;
 }
 
 function _rgbToHsl({ r, g, b }: Rgb): Hsl {
@@ -122,7 +122,7 @@ class SRgbColor implements Rgb {
   readonly #g: rgbcomponent;
   readonly #b: rgbcomponent;
   #bytes: Uint8ClampedArray;
-  #rgbBytes: Rgb24Bit;
+  #rgbBytes: RgbBytes;
   #hsl: Hsl;
 
   private constructor(r: rgbcomponent, g: rgbcomponent, b: rgbcomponent) {
@@ -132,7 +132,7 @@ class SRgbColor implements Rgb {
 
     const rgb = { r, g, b };
     this.#bytes = _rgbToUint8ClampedArray(rgb);
-    this.#rgbBytes = _uint8ClampedArrayToRgb24Bit(this.#bytes);
+    this.#rgbBytes = _uint8ClampedArrayToRgbBytes(this.#bytes);
     this.#hsl = _rgbToHsl(rgb);
 
     Object.freeze(this);
@@ -180,7 +180,7 @@ class SRgbColor implements Rgb {
   static from24BitRgb(
     rgbBytes: { r: number; g: number; b: number },
   ): SRgbColor {
-    const { r: rByte, g: gByte, b: bByte } = _normalize24BitRgb(rgbBytes);
+    const { r: rByte, g: gByte, b: bByte } = _normalizeRgbBytes(rgbBytes);
     const r = rByte / 255;
     const g = gByte / 255;
     const b = bByte / 255;
@@ -252,7 +252,7 @@ class SRgbColor implements Rgb {
     return this.#bytes.slice(0);
   }
 
-  toRgb24Bit(): Rgb24Bit {
+  toRgbBytes(): RgbBytes {
     return Object.assign({}, this.#rgbBytes);
   }
 

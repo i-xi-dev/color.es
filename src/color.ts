@@ -24,7 +24,7 @@ type Rgb = {
   b: rgbcomponent;
 };
 
-type Rgb24Bit = {
+type RgbBytes = {
   r: uint8;
   g: uint8;
   b: uint8;
@@ -48,7 +48,7 @@ export {
   type Hwb,
   type lightness,
   type Rgb,
-  type Rgb24Bit,
+  type RgbBytes,
   type rgbcomponent,
   type saturation,
 };
