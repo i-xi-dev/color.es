@@ -10,7 +10,11 @@ import {
   type saturation,
 } from "./color.ts";
 
-function _normalizeRgbBytes(value: unknown): RgbBytes {
+function _clamp(c: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, c));
+}
+
+function _normalizeRgb(value: unknown): Rgb {
   let srcR = 0;
   let srcG = 0;
   let srcB = 0;
@@ -25,12 +29,35 @@ function _normalizeRgbBytes(value: unknown): RgbBytes {
       ? (value.b as number)
       : 0;
   }
-  const [r, g, b] = Uint8ClampedArray.of(srcR, srcG, srcB);
-  return { r, g, b } as RgbBytes;
+
+  return {
+    r: _clamp(srcR, 0, 1),
+    g: _clamp(srcG, 0, 1),
+    b: _clamp(srcB, 0, 1),
+  };
 }
 
-function _clamp(c: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, c));
+function _normalizeRgbBytes(value: unknown): RgbBytes {
+  let srcRByte = 0;
+  let srcGByte = 0;
+  let srcBByte = 0;
+  if (value && (typeof value === "object")) {
+    srcRByte = (("r" in value) && Number.isFinite(value.r))
+      ? (value.r as number)
+      : 0;
+    srcGByte = (("g" in value) && Number.isFinite(value.g))
+      ? (value.g as number)
+      : 0;
+    srcBByte = (("b" in value) && Number.isFinite(value.b))
+      ? (value.b as number)
+      : 0;
+  }
+  //const [r, g, b] = Uint8ClampedArray.of(srcRByte, srcGByte, srcBByte);
+  return {
+    r: _clamp(Math.round(srcRByte), Uint8.MIN_VALUE, Uint8.MAX_VALUE),
+    g: _clamp(Math.round(srcGByte), Uint8.MIN_VALUE, Uint8.MAX_VALUE),
+    b: _clamp(Math.round(srcBByte), Uint8.MIN_VALUE, Uint8.MAX_VALUE),
+  } as RgbBytes;
 }
 
 function _normalizeHue(h: number): number {
@@ -60,9 +87,9 @@ function _hslToRgb({ h, s, l }: Hsl): Rgb {
 
 function _rgbToUint8ClampedArray({ r, g, b }: Rgb): Uint8ClampedArray {
   return Uint8ClampedArray.of(
-    r * 255,
-    g * 255,
-    b * 255,
+    Math.round(r * 255),
+    Math.round(g * 255),
+    Math.round(b * 255),
   );
 }
 
@@ -126,14 +153,14 @@ class SRgbColor implements Rgb {
   #hsl: Hsl;
 
   private constructor(r: rgbcomponent, g: rgbcomponent, b: rgbcomponent) {
-    this.#r = r;
-    this.#g = g;
-    this.#b = b;
+    const nrmalizedRgb = _normalizeRgb({ r, g, b });
+    this.#r = nrmalizedRgb.r;
+    this.#g = nrmalizedRgb.g;
+    this.#b = nrmalizedRgb.b;
 
-    const rgb = { r, g, b };
-    this.#bytes = _rgbToUint8ClampedArray(rgb);
+    this.#bytes = _rgbToUint8ClampedArray(nrmalizedRgb);
     this.#rgbBytes = _uint8ClampedArrayToRgbBytes(this.#bytes);
-    this.#hsl = _rgbToHsl(rgb);
+    this.#hsl = _rgbToHsl(nrmalizedRgb);
 
     Object.freeze(this);
   }
@@ -177,7 +204,7 @@ class SRgbColor implements Rgb {
 
   //XXX s, l, w, b
 
-  static from24BitRgb(
+  static fromRgbBytes(
     rgbBytes: { r: number; g: number; b: number },
   ): SRgbColor {
     const { r: rByte, g: gByte, b: bByte } = _normalizeRgbBytes(rgbBytes);
@@ -188,7 +215,7 @@ class SRgbColor implements Rgb {
   }
 
   // rgbBytes: Uint8Array | Uint8ClampedArray | Array<uint8>
-  static fromRgbBytes(rgbBytes: Iterable<number>): SRgbColor {
+  static fromRgbBytesX(rgbBytes: Iterable<number>): SRgbColor {
     if (rgbBytes[Symbol.iterator]) {
       const bytes: [number, number, number] = [0, 0, 0];
 
@@ -203,7 +230,7 @@ class SRgbColor implements Rgb {
         i = i + 1;
       }
 
-      return SRgbColor.from24BitRgb({
+      return SRgbColor.fromRgbBytes({
         r: bytes[0],
         g: bytes[1],
         b: bytes[2],
@@ -238,7 +265,7 @@ class SRgbColor implements Rgb {
     }
     rrggbb = rrggbb.toLowerCase();
 
-    return SRgbColor.fromRgbBytes(
+    return SRgbColor.fromRgbBytesX(
       ByteSequence.parse(rrggbb, { lowerCase: true }).getUint8View(),
     );
   }
@@ -284,7 +311,7 @@ class SRgbColor implements Rgb {
   //XXX mix(blendMode, other: SrgbColor | *)
 
   toHsl(): Hsl {
-    return _rgbToHsl(this);
+    return Object.assign({}, this.#hsl);
   }
 
   // withHue(absoluteHue: number): SRgbColor {
