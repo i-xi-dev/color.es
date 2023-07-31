@@ -129,10 +129,11 @@ function _rgbToHsl({ r, g, b }: Rgb): Hsl {
   const l = (minRgb + maxRgb) / 2;
 
   let s = 0;
-  if ((d !== 0) && (l !== 0) && (l !== 1)) {
-    s = (maxRgb - l) / Math.min(l, 1 - l);
+  if (d !== 0) {
+    if ((l !== 0) && (l !== 1)) {
+      s = (maxRgb - l) / Math.min(l, 1 - l);
+    }  
   }
-
   return { h, s, l };
 }
 
@@ -153,14 +154,14 @@ class SRgbColor implements Rgb {
   #hsl: Hsl;
 
   private constructor(r: rgbcomponent, g: rgbcomponent, b: rgbcomponent) {
-    const nrmalizedRgb = _normalizeRgb({ r, g, b });
-    this.#r = nrmalizedRgb.r;
-    this.#g = nrmalizedRgb.g;
-    this.#b = nrmalizedRgb.b;
+    const normalizedRgb = _normalizeRgb({ r, g, b });
+    this.#r = normalizedRgb.r;
+    this.#g = normalizedRgb.g;
+    this.#b = normalizedRgb.b;
 
-    this.#bytes = _rgbToUint8ClampedArray(nrmalizedRgb);
+    this.#bytes = _rgbToUint8ClampedArray(normalizedRgb);
     this.#rgbBytes = _uint8ClampedArrayToRgbBytes(this.#bytes);
-    this.#hsl = _rgbToHsl(nrmalizedRgb);
+    this.#hsl = _rgbToHsl(normalizedRgb);
 
     Object.freeze(this);
   }
