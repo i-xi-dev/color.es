@@ -203,9 +203,17 @@ class SRgbColor implements Rgb {
     return this.#hsl.h;
   }
 
-  //XXX s, l, w, b
+  get saturation(): saturation {
+    return this.#hsl.s;
+  }
 
-  static fromRgbBytes(
+  get lightness(): lightness {
+    return this.#hsl.l;
+  }
+
+  //XXX w, b
+
+  static #fromRgbBytesObject(
     rgbBytes: { r: number; g: number; b: number },
   ): SRgbColor {
     const { r: rByte, g: gByte, b: bByte } = _normalizeRgbBytes(rgbBytes);
@@ -216,7 +224,7 @@ class SRgbColor implements Rgb {
   }
 
   // rgbBytes: Uint8Array | Uint8ClampedArray | Array<uint8>
-  static fromRgbBytesX(rgbBytes: Iterable<number>): SRgbColor {
+  static #fromRgbByteArray(rgbBytes: Iterable<number>): SRgbColor {
     if (rgbBytes[Symbol.iterator]) {
       const bytes: [number, number, number] = [0, 0, 0];
 
@@ -238,6 +246,20 @@ class SRgbColor implements Rgb {
       });
     }
     throw new TypeError("rgbBytes");
+  }
+
+  static fromRgbBytes(
+    rgbBytes: { r: number; g: number; b: number } | Iterable<number>,
+  ): SRgbColor {
+    if (rgbBytes) {
+      if ((rgbBytes instanceof Uint8Array) || (rgbBytes instanceof Uint8ClampedArray)) {
+        return SRgbColor.#fromRgbByteArray(rgbBytes);
+      }
+      if (Symbol.iterator in rgbBytes) {
+        return SRgbColor.#fromRgbByteArray(rgbBytes);
+      }
+    }
+    return SRgbColor.#fromRgbBytesObject(rgbBytes);
   }
 
   static fromHexString(input: string): SRgbColor {
@@ -266,7 +288,7 @@ class SRgbColor implements Rgb {
     }
     rrggbb = rrggbb.toLowerCase();
 
-    return SRgbColor.fromRgbBytesX(
+    return SRgbColor.#fromRgbByteArray(
       ByteSequence.parse(rrggbb, { lowerCase: true }).getUint8View(),
     );
   }

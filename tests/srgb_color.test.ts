@@ -55,6 +55,35 @@ Deno.test("SRgbColor.prototype.bByte", () => {
   assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: -1 }).bByte, 0);
 });
 
+Deno.test("SRgbColor.prototype.hue", () => {
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 0, b: 0 }).hue, 0);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 255, b: 0 }).hue, 120);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 255 }).hue, 240);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0 }).hue, 0);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 255, b: 255 }).hue, 0);
+});
+
+Deno.test("SRgbColor.prototype.saturation", () => {
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 0, b: 0 }).saturation, 1);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0 }).saturation, 0);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 255, b: 255 }).saturation, 0);
+});
+
+Deno.test("SRgbColor.prototype.lightness", () => {
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 0, b: 0 }).lightness, 0.5);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0 }).lightness, 0);
+  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 255, b: 255 }).lightness, 1);
+});
+
+Deno.test("SRgbColor.fromRgbBytes", () => {
+  //TODO
+});
+
+
+
+
+
+
 Deno.test("SRgbColor.prototype.toHsl() R-1", () => {
   const cases = [
     /* ChromeのF12から */
