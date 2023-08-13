@@ -1,257 +1,34 @@
 import { ByteSequence, Uint8, type uint8 } from "../deps.ts";
 import {
+  _hslToRgb,
+  _normalizeHsl,
+  _normalizeRgb,
+  _normalizeRgbBytes,
+  _rgbToHsl,
+  _rgbToUint8ClampedArray,
+  _uint8ClampedArrayToRgbBytes,
   type alpha,
   type Hsl,
   type hue,
   type Hwb,
   type lightness,
-  type Rgb,
+  type NormalizedHsl,
+  type NormalizedRgb,
+  type NormalizedRgbBytes,
   type rgbcomponent,
   type saturation,
 } from "./color.ts";
 
-function _clamp(c: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, c));
-}
-
-function _normalizeRgbComponent(value: unknown): rgbcomponent {
-  if (Number.isFinite(value)) {
-    return _clamp(value as number, 0, 1);
-  }
-  return 0;
-}
-
-function _normalizeAlpha(value: unknown): alpha {
-  if (Number.isFinite(value)) {
-    return _clamp(value as number, 0, 1);
-  }
-  return 1;
-}
-
-type NormalizedRgb = {
-  r: rgbcomponent;
-  g: rgbcomponent;
-  b: rgbcomponent;
-  a: alpha;
-};
-
-function _normalizeRgb(value: unknown): NormalizedRgb {
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  let a = 1;
-  if (value && (typeof value === "object")) {
-    if ("r" in value) {
-      r = _normalizeRgbComponent(value.r);
-    }
-    if ("g" in value) {
-      g = _normalizeRgbComponent(value.g);
-    }
-    if ("b" in value) {
-      b = _normalizeRgbComponent(value.b);
-    }
-    if ("a" in value) {
-      a = _normalizeAlpha(value.a);
-    }
-  }
-  return {
-    r,
-    g,
-    b,
-    a,
+namespace SRgbColor {
+  export type ToOptions = {
+    omitAlphaIfOpaque?: boolean;
+  };
+  
+  export type ToHexStringOptions = ToOptions & {
+    shorten?: boolean;
+    upperCase?: boolean;
   };
 }
-
-function _normalizeRgbByte(value: unknown): uint8 {
-  if (Number.isFinite(value)) {
-    return _clamp(
-      Math.round(value as number),
-      Uint8.MIN_VALUE,
-      Uint8.MAX_VALUE,
-    ) as uint8;
-  }
-  return Uint8.MIN_VALUE;
-}
-
-function _normalizeAlphaByte(value: unknown): uint8 {
-  if (Number.isFinite(value)) {
-    return _clamp(
-      Math.round(value as number),
-      Uint8.MIN_VALUE,
-      Uint8.MAX_VALUE,
-    ) as uint8;
-  }
-  return Uint8.MAX_VALUE;
-}
-
-type NormalizedRgbBytes = {
-  r: uint8;
-  g: uint8;
-  b: uint8;
-  a: uint8;
-};
-
-function _normalizeRgbBytes(value: unknown): NormalizedRgbBytes {
-  let rByte: uint8 = Uint8.MIN_VALUE;
-  let gByte: uint8 = Uint8.MIN_VALUE;
-  let bByte: uint8 = Uint8.MIN_VALUE;
-  let aByte: uint8 = Uint8.MAX_VALUE;
-  if (value && (typeof value === "object")) {
-    if ("r" in value) {
-      rByte = _normalizeRgbByte(value.r);
-    }
-    if ("g" in value) {
-      gByte = _normalizeRgbByte(value.g);
-    }
-    if ("b" in value) {
-      bByte = _normalizeRgbByte(value.b);
-    }
-    if ("a" in value) {
-      aByte = _normalizeAlphaByte(value.a);
-    }
-  }
-  return {
-    r: rByte,
-    g: gByte,
-    b: bByte,
-    a: aByte,
-  };
-}
-
-type NormalizedHsl = {
-  h: hue;
-  s: saturation;
-  l: lightness;
-  a: alpha;
-};
-
-function _normalizeHsl(value: unknown): NormalizedHsl {
-  let h = 0;
-  let s = 0;
-  let l = 0;
-  let a = 1;
-  if (value && (typeof value === "object")) {
-    if ("h" in value) {
-      h = _normalizeHue(value.h);
-    }
-    if ("s" in value) {
-      s = _normalizeSaturation(value.s);
-    }
-    if ("l" in value) {
-      l = _normalizeLightness(value.l);
-    }
-    if ("a" in value) {
-      a = _normalizeAlpha(value.a);
-    }
-  }
-  return {
-    h,
-    s,
-    l,
-    a,
-  };
-}
-
-function _normalizeHue(value: unknown): hue {
-  if (Number.isFinite(value)) {
-    const t = (value as number) % 360;
-    return (t < 0) ? (t + 360) : t;
-  }
-  return 0;
-}
-
-function _normalizeSaturation(value: unknown): saturation {
-  if (Number.isFinite(value)) {
-    return _clamp(value as number, 0, 1);
-  }
-  return 0;
-}
-
-function _normalizeLightness(value: unknown): lightness {
-  if (Number.isFinite(value)) {
-    return _clamp(value as number, 0, 1);
-  }
-  return 0;
-}
-
-function _f(n: number, { h, s, l }: Hsl): number {
-  const k = (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
-}
-
-function _hslToRgb(normalizedHsl: NormalizedHsl): NormalizedRgb {
-  return {
-    r: _f(0, normalizedHsl),
-    g: _f(8, normalizedHsl),
-    b: _f(4, normalizedHsl),
-    a: normalizedHsl.a,
-  };
-}
-
-function _rgbToUint8ClampedArray(
-  { r, g, b, a }: NormalizedRgb,
-): Uint8ClampedArray {
-  return Uint8ClampedArray.of(
-    Math.round(r * 255),
-    Math.round(g * 255),
-    Math.round(b * 255),
-    Math.round(a * 255),
-  );
-}
-
-function _uint8ClampedArrayToRgbBytes(
-  [r, g, b, a]: Uint8ClampedArray,
-): NormalizedRgbBytes {
-  return {
-    r,
-    g,
-    b,
-    a,
-  } as NormalizedRgbBytes;
-}
-
-function _rgbToHsl({ r, g, b, a }: NormalizedRgb): NormalizedHsl {
-  const maxRgb = Math.max(r, g, b);
-  const minRgb = Math.min(r, g, b);
-
-  const d = maxRgb - minRgb;
-
-  let h = 0;
-  if (d !== 0) {
-    switch (maxRgb) {
-      case r:
-        h = (g - b) / d;
-        break;
-
-      case g:
-        h = ((b - r) / d) + 2;
-        break;
-
-      // case b:
-      default:
-        h = ((r - g) / d) + 4;
-        break;
-    }
-    h = _normalizeHue(h * 60);
-  }
-
-  const l = (minRgb + maxRgb) / 2;
-
-  let s = 0;
-  if (d !== 0) {
-    if ((l !== 0) && (l !== 1)) {
-      s = (maxRgb - l) / Math.min(l, 1 - l);
-    }
-  }
-  return { h, s, l, a };
-}
-
-type _HexStringOptions = {
-  omitAlphaIfOpaque?: boolean;
-  shorten?: boolean;
-  upperCase?: boolean;
-};
 
 /**
  * RGBA color in sRGB color space
@@ -329,6 +106,8 @@ class SRgbColor {
   }
 
   //XXX w, b
+
+  //XXX fromRgb
 
   static #fromRgbBytesObject(
     rgbBytes: { r: number; g: number; b: number; a?: number },
@@ -443,22 +222,28 @@ class SRgbColor {
     return new SRgbColor(r, g, b, a);
   }
 
-  //XXX options追加 lengthを3にするか4にするか
-  toUint8ClampedArray(): Uint8ClampedArray {
+  toUint8ClampedArray(options?: SRgbColor.ToOptions): Uint8ClampedArray {
+    if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
+      return this.#bytes.slice(0, 3);
+    }
     return this.#bytes.slice(0);
   }
 
-  //XXX options追加 lengthを3にするか4にするか
-  toUint8Array(): Uint8Array {
+  toUint8Array(options?: SRgbColor.ToOptions): Uint8Array {
+    if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
+      return Uint8Array.from(this.#bytes.subarray(0, 3));
+    }
     return Uint8Array.from(this.#bytes);
   }
+
+  //XXX toRgb
 
   //XXX options追加 aを省くか
   toRgbBytes(): NormalizedRgbBytes {
     return Object.assign({}, this.#rgbBytes);
   }
 
-  toHexString(options?: _HexStringOptions): string {
+  toHexString(options?: SRgbColor.ToHexStringOptions): string {
     const lowerCase = options?.upperCase !== true;
 
     const bytes = this.toUint8ClampedArray();
