@@ -87,13 +87,17 @@ namespace Rgb {
   }
 }
 
+function _clampByte(value: number): uint8 {
+  return _clamp(Math.round(value), Uint8.MIN_VALUE, Uint8.MAX_VALUE) as uint8;
+}
+
 namespace RgbByte {
   export const MIN_VALUE = Uint8.MIN_VALUE;
   export const MAX_VALUE = Uint8.MAX_VALUE;
 
   export function normalize(value: unknown): uint8 {
     if (Number.isFinite(value)) {
-      return _clamp(Math.round(value as number), MIN_VALUE, MAX_VALUE) as uint8;
+      return _clampByte(value as number);
     }
     return MIN_VALUE;
   }
@@ -105,7 +109,7 @@ namespace AlphaByte {
 
   export function normalize(value: unknown): uint8 {
     if (Number.isFinite(value)) {
-      return _clamp(Math.round(value as number), MIN_VALUE, MAX_VALUE) as uint8;
+      return _clampByte(value as number);
     }
     return MAX_VALUE;
   }
@@ -251,21 +255,15 @@ function _hslToRgb(normalizedHsl: Hsl.Normalized): Rgb.Normalized {
   };
 }
 
-function _rgbToUint8ClampedArray(
+function _rgbToRgbBytes(
   { r, g, b, a }: Rgb.Normalized,
-): Uint8ClampedArray {
-  return Uint8ClampedArray.of(
-    Math.round(r * 255),
-    Math.round(g * 255),
-    Math.round(b * 255),
-    Math.round(a * 255),
-  );
-}
-
-function _uint8ClampedArrayToRgbBytes(
-  [r, g, b, a]: Uint8ClampedArray,
 ): RgbBytes.Normalized {
-  return { r, g, b, a } as RgbBytes.Normalized;
+  return {
+    r: _clampByte(r * Uint8.MAX_VALUE),
+    g: _clampByte(g * Uint8.MAX_VALUE),
+    b: _clampByte(b * Uint8.MAX_VALUE),
+    a: _clampByte(a * Uint8.MAX_VALUE),
+  };
 }
 
 function _rgbToHsl({ r, g, b, a }: Rgb.Normalized): Hsl.Normalized {
@@ -307,8 +305,7 @@ function _rgbToHsl({ r, g, b, a }: Rgb.Normalized): Hsl.Normalized {
 export {
   _hslToRgb,
   _rgbToHsl,
-  _rgbToUint8ClampedArray,
-  _uint8ClampedArrayToRgbBytes,
+  _rgbToRgbBytes,
   Alpha,
   Hsl,
   Rgb,

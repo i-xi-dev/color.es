@@ -3,8 +3,7 @@ import { ByteSequence, Uint8, type uint8 } from "../deps.ts";
 import {
   _hslToRgb,
   _rgbToHsl,
-  _rgbToUint8ClampedArray,
-  _uint8ClampedArrayToRgbBytes,
+  _rgbToRgbBytes,
   Alpha,
   Hsl,
   Rgb,
@@ -33,7 +32,6 @@ namespace SRgb {
    */
   export class Color {
     readonly #rgb: Rgb.Normalized;
-    readonly #bytes: Uint8ClampedArray;
     readonly #rgbBytes: RgbBytes.Normalized;
     readonly #hsl: Hsl.Normalized;
 
@@ -44,8 +42,7 @@ namespace SRgb {
       a: alpha,
     ) {
       this.#rgb = Object.freeze(Rgb.normalize({ r, g, b, a }));
-      this.#bytes = _rgbToUint8ClampedArray(this.#rgb);
-      this.#rgbBytes = Object.freeze(_uint8ClampedArrayToRgbBytes(this.#bytes));
+      this.#rgbBytes = Object.freeze(_rgbToRgbBytes(this.#rgb));
       this.#hsl = Object.freeze(_rgbToHsl(this.#rgb));
       Object.freeze(this);
     }
@@ -226,17 +223,19 @@ namespace SRgb {
     }
 
     toUint8ClampedArray(options?: Color.ToOptions): Uint8ClampedArray {
+      const { r, g, b, a } = this.#rgbBytes;
       if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
-        return this.#bytes.slice(0, 3);
+        return Uint8ClampedArray.of(r, g, b);
       }
-      return this.#bytes.slice(0);
+      return Uint8ClampedArray.of(r, g, b, a);
     }
 
     toUint8Array(options?: Color.ToOptions): Uint8Array {
+      const { r, g, b, a } = this.#rgbBytes;
       if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
-        return Uint8Array.from(this.#bytes.subarray(0, 3));
+        return Uint8Array.of(r, g, b);
       }
-      return Uint8Array.from(this.#bytes);
+      return Uint8Array.of(r, g, b, a);
     }
 
     toRgb(options?: Color.ToOptions): Rgb {
@@ -330,8 +329,31 @@ namespace SRgb {
       return new Color(this.red, this.green, this.blue, this.alpha);
     }
 
+    //XXX withHue,plusHue
+
+    //XXX withSaturation,plusSaturation
+
+    //XXX ,plusLightness(lighten?),minusLightness
+
+    withLightness(absoluteLightness: lightness): Color {
+      const { h, s, a } = this.#hsl;
+      return Color.fromHsl({ h, s, l: absoluteLightness, a });
+    }
+
+    plusAlpha(relativeAlpha: alpha): Color {
+      return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, (this.#rgb.a + relativeAlpha));
+    }
+
+    minusAlpha(relativeAlpha: alpha): Color {
+      return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, (this.#rgb.a - relativeAlpha));
+    }
+
+    withAlpha(absoluteAlpha: alpha): Color {
+      return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, absoluteAlpha);
+    }
+
     discardAlpha(): Color {
-      return new Color(this.red, this.green, this.blue, Alpha.MAX_VALUE);
+      return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, Alpha.MAX_VALUE);
     }
 
     //XXX
@@ -345,12 +367,6 @@ namespace SRgb {
     // }
 
     //XXX bytesEquals
-
-    //XXX withHue,plusHue
-
-    //XXX withSaturation,plusSaturation
-
-    //XXX withLightness,plusLightness
 
     //XXX mix(blendMode, other: Color | *)
   }
