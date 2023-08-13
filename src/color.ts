@@ -3,6 +3,9 @@ import { type uint8 } from "../deps.ts";
 // rgbcomponent >= 0 && rgbcomponent <= 1
 type rgbcomponent = number;
 
+// alpha >= 0 && alpha <= 1
+type alpha = number;
+
 // angle
 type hue = number;
 
@@ -22,27 +25,32 @@ type Rgb = {
   r: rgbcomponent;
   g: rgbcomponent;
   b: rgbcomponent;
+  a?: alpha;
 };
 
 type RgbBytes = {
   r: uint8;
   g: uint8;
   b: uint8;
+  a?: uint8;
 };
 
 type Hsl = {
   h: hue;
   s: saturation;
   l: lightness;
+  a?: alpha;
 };
 
 type Hwb = {
   h: hue;
   w: whiteness;
   b: blackness;
+  a?: alpha;
 };
 
 export {
+  type alpha,
   type Hsl,
   type hue,
   type Hwb,
