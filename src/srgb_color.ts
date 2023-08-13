@@ -132,7 +132,7 @@ function _rgbToHsl({ r, g, b }: Rgb): Hsl {
   if (d !== 0) {
     if ((l !== 0) && (l !== 1)) {
       s = (maxRgb - l) / Math.min(l, 1 - l);
-    }  
+    }
   }
   return { h, s, l };
 }
@@ -252,7 +252,10 @@ class SRgbColor implements Rgb {
     rgbBytes: { r: number; g: number; b: number } | Iterable<number>,
   ): SRgbColor {
     if (rgbBytes) {
-      if ((rgbBytes instanceof Uint8Array) || (rgbBytes instanceof Uint8ClampedArray)) {
+      if (
+        (rgbBytes instanceof Uint8Array) ||
+        (rgbBytes instanceof Uint8ClampedArray)
+      ) {
         return SRgbColor.#fromRgbByteArray(rgbBytes);
       }
       if (Symbol.iterator in rgbBytes) {
@@ -266,7 +269,7 @@ class SRgbColor implements Rgb {
     if (typeof input !== "string") {
       throw new TypeError("input");
     }
-    if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})?$/i.test(input) !== true) {
+    if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(input) !== true) {
       throw new RangeError("input");
     }
 
