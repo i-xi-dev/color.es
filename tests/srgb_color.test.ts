@@ -1,198 +1,198 @@
 import { assertStrictEquals, assertThrows } from "./deps.ts";
-import { SRgbColor } from "../mod.ts";
+import { SRgb } from "../mod.ts";
 
-Deno.test("SRgbColor.prototype.r", () => {
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 1000, g: 0, b: 0 }).r, 1);
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 256, g: 0, b: 0 }).r, 1);
+Deno.test("SRgb.Color.prototype.r", () => {
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 1000, g: 0, b: 0 }).r, 1);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 256, g: 0, b: 0 }).r, 1);
   for (let i = 0; i <= 255; i++) {
-    assertStrictEquals(SRgbColor.fromRgbBytes({ r: i, g: 0, b: 0 }).r, i / 255);
+    assertStrictEquals(SRgb.Color.fromRgbBytes({ r: i, g: 0, b: 0 }).r, i / 255);
   }
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: -1, g: 0, b: 0 }).r, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: -1, g: 0, b: 0 }).r, 0);
 });
 
-Deno.test("SRgbColor.prototype.g", () => {
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 1000, b: 0 }).g, 1);
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 256, b: 0 }).g, 1);
+Deno.test("SRgb.Color.prototype.g", () => {
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 1000, b: 0 }).g, 1);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 256, b: 0 }).g, 1);
   for (let i = 0; i <= 255; i++) {
-    assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: i, b: 0 }).g, i / 255);
+    assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: i, b: 0 }).g, i / 255);
   }
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: -1, b: 0 }).g, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: -1, b: 0 }).g, 0);
 });
 
-Deno.test("SRgbColor.prototype.b", () => {
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 1000 }).b, 1);
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 256 }).b, 1);
+Deno.test("SRgb.Color.prototype.b", () => {
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 1000 }).b, 1);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 256 }).b, 1);
   for (let i = 0; i <= 255; i++) {
-    assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: i }).b, i / 255);
+    assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: i }).b, i / 255);
   }
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: -1 }).b, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: -1 }).b, 0);
 });
 
-Deno.test("SRgbColor.prototype.alpha", () => {
+Deno.test("SRgb.Color.prototype.alpha", () => {
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 10, g: 100, b: 1000 }).alpha,
+    SRgb.Color.fromRgbBytes({ r: 10, g: 100, b: 1000 }).alpha,
     1,
   );
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0, a: 256 }).alpha,
+    SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0, a: 256 }).alpha,
     1,
   );
   for (let i = 0; i <= 255; i++) {
     assertStrictEquals(
-      SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0, a: i }).alpha,
+      SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0, a: i }).alpha,
       i / 255,
     );
   }
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0, a: -1 }).alpha,
+    SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0, a: -1 }).alpha,
     0,
   );
 });
 
-Deno.test("SRgbColor.prototype.rByte", () => {
+Deno.test("SRgb.Color.prototype.rByte", () => {
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 1000, g: 0, b: 0 }).rByte,
+    SRgb.Color.fromRgbBytes({ r: 1000, g: 0, b: 0 }).rByte,
     255,
   );
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 256, g: 0, b: 0 }).rByte, 255);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 256, g: 0, b: 0 }).rByte, 255);
   for (let i = 0; i <= 255; i++) {
-    assertStrictEquals(SRgbColor.fromRgbBytes({ r: i, g: 0, b: 0 }).rByte, i);
+    assertStrictEquals(SRgb.Color.fromRgbBytes({ r: i, g: 0, b: 0 }).rByte, i);
   }
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: -1, g: 0, b: 0 }).rByte, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: -1, g: 0, b: 0 }).rByte, 0);
 });
 
-Deno.test("SRgbColor.prototype.gByte", () => {
+Deno.test("SRgb.Color.prototype.gByte", () => {
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 0, g: 1000, b: 0 }).gByte,
+    SRgb.Color.fromRgbBytes({ r: 0, g: 1000, b: 0 }).gByte,
     255,
   );
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 256, b: 0 }).gByte, 255);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 256, b: 0 }).gByte, 255);
   for (let i = 0; i <= 255; i++) {
-    assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: i, b: 0 }).gByte, i);
+    assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: i, b: 0 }).gByte, i);
   }
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: -1, b: 0 }).gByte, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: -1, b: 0 }).gByte, 0);
 });
 
-Deno.test("SRgbColor.prototype.bByte", () => {
+Deno.test("SRgb.Color.prototype.bByte", () => {
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 1000 }).bByte,
+    SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 1000 }).bByte,
     255,
   );
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 256 }).bByte, 255);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 256 }).bByte, 255);
   for (let i = 0; i <= 255; i++) {
-    assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: i }).bByte, i);
+    assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: i }).bByte, i);
   }
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: -1 }).bByte, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: -1 }).bByte, 0);
 });
 
-Deno.test("SRgbColor.prototype.aByte", () => {
+Deno.test("SRgb.Color.prototype.aByte", () => {
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 10, g: 100, b: 1000 }).aByte,
+    SRgb.Color.fromRgbBytes({ r: 10, g: 100, b: 1000 }).aByte,
     255,
   );
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0, a: 256 }).aByte,
+    SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0, a: 256 }).aByte,
     255,
   );
   for (let i = 0; i <= 255; i++) {
     assertStrictEquals(
-      SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0, a: i }).aByte,
+      SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0, a: i }).aByte,
       i,
     );
   }
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0, a: -1 }).aByte,
+    SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0, a: -1 }).aByte,
     0,
   );
 });
 
-Deno.test("SRgbColor.prototype.hue", () => {
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 0, b: 0 }).hue, 0);
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 255, b: 0 }).hue, 120);
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 255 }).hue, 240);
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0 }).hue, 0);
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 255, g: 255, b: 255 }).hue, 0);
+Deno.test("SRgb.Color.prototype.hue", () => {
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 255, g: 0, b: 0 }).hue, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 255, b: 0 }).hue, 120);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 255 }).hue, 240);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0 }).hue, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 255, g: 255, b: 255 }).hue, 0);
 });
 
-Deno.test("SRgbColor.prototype.saturation", () => {
+Deno.test("SRgb.Color.prototype.saturation", () => {
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 255, g: 0, b: 0 }).saturation,
+    SRgb.Color.fromRgbBytes({ r: 255, g: 0, b: 0 }).saturation,
     1,
   );
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0 }).saturation,
+    SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0 }).saturation,
     0,
   );
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 255, g: 255, b: 255 }).saturation,
+    SRgb.Color.fromRgbBytes({ r: 255, g: 255, b: 255 }).saturation,
     0,
   );
 });
 
-Deno.test("SRgbColor.prototype.lightness", () => {
+Deno.test("SRgb.Color.prototype.lightness", () => {
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 255, g: 0, b: 0 }).lightness,
+    SRgb.Color.fromRgbBytes({ r: 255, g: 0, b: 0 }).lightness,
     0.5,
   );
-  assertStrictEquals(SRgbColor.fromRgbBytes({ r: 0, g: 0, b: 0 }).lightness, 0);
+  assertStrictEquals(SRgb.Color.fromRgbBytes({ r: 0, g: 0, b: 0 }).lightness, 0);
   assertStrictEquals(
-    SRgbColor.fromRgbBytes({ r: 255, g: 255, b: 255 }).lightness,
+    SRgb.Color.fromRgbBytes({ r: 255, g: 255, b: 255 }).lightness,
     1,
   );
 });
 
-Deno.test("SRgbColor.fromRgbBytes(Uint8Array)", () => {
-  const c1 = SRgbColor.fromRgbBytes(Uint8Array.of(254, 253, 252));
+Deno.test("SRgb.Color.fromRgbBytes(Uint8Array)", () => {
+  const c1 = SRgb.Color.fromRgbBytes(Uint8Array.of(254, 253, 252));
   assertStrictEquals(c1.rByte, 254);
   assertStrictEquals(c1.gByte, 253);
   assertStrictEquals(c1.bByte, 252);
   assertStrictEquals(c1.aByte, 255);
 
-  const c2 = SRgbColor.fromRgbBytes(Uint8Array.of(255, 254, 253, 252));
+  const c2 = SRgb.Color.fromRgbBytes(Uint8Array.of(255, 254, 253, 252));
   assertStrictEquals(c2.rByte, 255);
   assertStrictEquals(c2.gByte, 254);
   assertStrictEquals(c2.bByte, 253);
   assertStrictEquals(c2.aByte, 252);
 });
 
-Deno.test("SRgbColor.fromRgbBytes(Uint8ClampedArray)", () => {
-  const c1 = SRgbColor.fromRgbBytes(Uint8ClampedArray.of(254, 253, 252));
+Deno.test("SRgb.Color.fromRgbBytes(Uint8ClampedArray)", () => {
+  const c1 = SRgb.Color.fromRgbBytes(Uint8ClampedArray.of(254, 253, 252));
   assertStrictEquals(c1.rByte, 254);
   assertStrictEquals(c1.gByte, 253);
   assertStrictEquals(c1.bByte, 252);
   assertStrictEquals(c1.aByte, 255);
 
-  const c2 = SRgbColor.fromRgbBytes(Uint8ClampedArray.of(255, 254, 253, 252));
+  const c2 = SRgb.Color.fromRgbBytes(Uint8ClampedArray.of(255, 254, 253, 252));
   assertStrictEquals(c2.rByte, 255);
   assertStrictEquals(c2.gByte, 254);
   assertStrictEquals(c2.bByte, 253);
   assertStrictEquals(c2.aByte, 252);
 });
 
-Deno.test("SRgbColor.fromRgbBytes(Array)", () => {
-  const c1 = SRgbColor.fromRgbBytes([255, 254, 253]);
+Deno.test("SRgb.Color.fromRgbBytes(Array)", () => {
+  const c1 = SRgb.Color.fromRgbBytes([255, 254, 253]);
   assertStrictEquals(c1.rByte, 255);
   assertStrictEquals(c1.gByte, 254);
   assertStrictEquals(c1.bByte, 253);
 
-  const c2 = SRgbColor.fromRgbBytes([1000, ""] as Array<number>);
+  const c2 = SRgb.Color.fromRgbBytes([1000, ""] as Array<number>);
   assertStrictEquals(c2.rByte, 255);
   assertStrictEquals(c2.gByte, 0);
   assertStrictEquals(c2.bByte, 0);
 
-  const c3 = SRgbColor.fromRgbBytes(undefined as unknown as Array<number>);
+  const c3 = SRgb.Color.fromRgbBytes(undefined as unknown as Array<number>);
   assertStrictEquals(c3.rByte, 0);
   assertStrictEquals(c3.gByte, 0);
   assertStrictEquals(c3.bByte, 0);
 });
 
-Deno.test("SRgbColor.fromRgbBytes({r, g, b})", () => {
-  const c1 = SRgbColor.fromRgbBytes({ r: 255, g: 254, b: 253 });
+Deno.test("SRgb.Color.fromRgbBytes({r, g, b})", () => {
+  const c1 = SRgb.Color.fromRgbBytes({ r: 255, g: 254, b: 253 });
   assertStrictEquals(c1.rByte, 255);
   assertStrictEquals(c1.gByte, 254);
   assertStrictEquals(c1.bByte, 253);
 
-  const c2 = SRgbColor.fromRgbBytes(
+  const c2 = SRgb.Color.fromRgbBytes(
     { r: 1000, g: "" } as unknown as { r: number; g: number; b: number },
   );
   assertStrictEquals(c2.rByte, 255);
@@ -200,38 +200,38 @@ Deno.test("SRgbColor.fromRgbBytes({r, g, b})", () => {
   assertStrictEquals(c2.bByte, 0);
 });
 
-Deno.test("SRgbColor.fromHexString(string)", () => {
-  const c1 = SRgbColor.fromHexString("#fffefd");
+Deno.test("SRgb.Color.fromHexString(string)", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
   assertStrictEquals(c1.rByte, 255);
   assertStrictEquals(c1.gByte, 254);
   assertStrictEquals(c1.bByte, 253);
   assertStrictEquals(c1.aByte, 255);
 
-  const c1a = SRgbColor.fromHexString("#fffefd00");
+  const c1a = SRgb.Color.fromHexString("#fffefd00");
   assertStrictEquals(c1a.rByte, 255);
   assertStrictEquals(c1a.gByte, 254);
   assertStrictEquals(c1a.bByte, 253);
   assertStrictEquals(c1a.aByte, 0);
 
-  const c1b = SRgbColor.fromHexString("#FFFEFD00");
+  const c1b = SRgb.Color.fromHexString("#FFFEFD00");
   assertStrictEquals(c1b.rByte, 255);
   assertStrictEquals(c1b.gByte, 254);
   assertStrictEquals(c1b.bByte, 253);
   assertStrictEquals(c1b.aByte, 0);
 
-  const c2 = SRgbColor.fromHexString("#fed");
+  const c2 = SRgb.Color.fromHexString("#fed");
   assertStrictEquals(c2.rByte, 255);
   assertStrictEquals(c2.gByte, 238);
   assertStrictEquals(c2.bByte, 221);
   assertStrictEquals(c2.aByte, 255);
 
-  const c2a = SRgbColor.fromHexString("#fed8");
+  const c2a = SRgb.Color.fromHexString("#fed8");
   assertStrictEquals(c2a.rByte, 255);
   assertStrictEquals(c2a.gByte, 238);
   assertStrictEquals(c2a.bByte, 221);
   assertStrictEquals(c2a.aByte, 136);
 
-  const c2b = SRgbColor.fromHexString("#FED8");
+  const c2b = SRgb.Color.fromHexString("#FED8");
   assertStrictEquals(c2b.rByte, 255);
   assertStrictEquals(c2b.gByte, 238);
   assertStrictEquals(c2b.bByte, 221);
@@ -239,7 +239,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString(255 as unknown as string);
+      SRgb.Color.fromHexString(255 as unknown as string);
     },
     TypeError,
     "input",
@@ -247,7 +247,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString("");
+      SRgb.Color.fromHexString("");
     },
     RangeError,
     "input",
@@ -255,7 +255,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString("#");
+      SRgb.Color.fromHexString("#");
     },
     RangeError,
     "input",
@@ -263,7 +263,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString("#1");
+      SRgb.Color.fromHexString("#1");
     },
     RangeError,
     "input",
@@ -271,7 +271,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString("#12");
+      SRgb.Color.fromHexString("#12");
     },
     RangeError,
     "input",
@@ -279,7 +279,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString("#12345");
+      SRgb.Color.fromHexString("#12345");
     },
     RangeError,
     "input",
@@ -287,7 +287,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString("#1234567");
+      SRgb.Color.fromHexString("#1234567");
     },
     RangeError,
     "input",
@@ -295,7 +295,7 @@ Deno.test("SRgbColor.fromHexString(string)", () => {
 
   assertThrows(
     () => {
-      SRgbColor.fromHexString("#123456789");
+      SRgb.Color.fromHexString("#123456789");
     },
     RangeError,
     "input",
@@ -822,9 +822,9 @@ const r2Cases = [
   { x: 255, h: "0.00", s: "0.00", l: "1.0000" },
 ];
 
-Deno.test("SRgbColor.fromHsl({ h, s, l })", () => {
+Deno.test("SRgb.Color.fromHsl({ h, s, l })", () => {
   for (const c of r1Cases) {
-    const c0 = SRgbColor.fromHsl({
+    const c0 = SRgb.Color.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -835,7 +835,7 @@ Deno.test("SRgbColor.fromHsl({ h, s, l })", () => {
   }
 
   for (const c of r2Cases) {
-    const c0 = SRgbColor.fromHsl({
+    const c0 = SRgb.Color.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -846,29 +846,29 @@ Deno.test("SRgbColor.fromHsl({ h, s, l })", () => {
   }
 });
 
-Deno.test("SRgbColor.prototype.toHsl()", () => {
+Deno.test("SRgb.Color.prototype.toHsl()", () => {
   for (const c of r1Cases) {
-    const hsl = SRgbColor.fromRgbBytes({ r: c.r, g: 0, b: 0 }).toHsl();
+    const hsl = SRgb.Color.fromRgbBytes({ r: c.r, g: 0, b: 0 }).toHsl();
     assertStrictEquals(hsl.h.toFixed(2), c.h);
     assertStrictEquals(hsl.s.toFixed(2), c.s);
     assertStrictEquals(hsl.l.toFixed(4), c.l);
   }
 
   for (const c of r2Cases) {
-    const hsl = SRgbColor.fromRgbBytes({ r: 255, g: c.x, b: c.x }).toHsl();
+    const hsl = SRgb.Color.fromRgbBytes({ r: 255, g: c.x, b: c.x }).toHsl();
     assertStrictEquals(hsl.h.toFixed(2), c.h);
     assertStrictEquals(hsl.s.toFixed(2), c.s);
     assertStrictEquals(hsl.l.toFixed(4), c.l);
   }
 
-  const c0 = SRgbColor.fromHexString("#fffefd");
+  const c0 = SRgb.Color.fromHexString("#fffefd");
   const c1 = c0.toHsl();
   c1.h = 120;
   assertStrictEquals(c0.rByte, 255);
 });
 
-Deno.test("SRgbColor.prototype.toUint8ClampedArray()", () => {
-  const c1 = SRgbColor.fromHexString("#fffefd");
+Deno.test("SRgb.Color.prototype.toUint8ClampedArray()", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
   const c1a = c1.toUint8ClampedArray();
   assertStrictEquals(c1a[0], 255);
   assertStrictEquals(c1a[1], 254);
@@ -878,7 +878,7 @@ Deno.test("SRgbColor.prototype.toUint8ClampedArray()", () => {
   c1a[0] = 0;
   assertStrictEquals(c1.rByte, 255);
 
-  const c2 = SRgbColor.fromHexString("#fffefd88");
+  const c2 = SRgb.Color.fromHexString("#fffefd88");
   const c2a = c2.toUint8ClampedArray();
   assertStrictEquals(c2a[0], 255);
   assertStrictEquals(c2a[1], 254);
@@ -887,8 +887,8 @@ Deno.test("SRgbColor.prototype.toUint8ClampedArray()", () => {
   assertStrictEquals(c2a.length, 4);
 });
 
-Deno.test("SRgbColor.prototype.toUint8ClampedArray({})", () => {
-  const c1 = SRgbColor.fromHexString("#fffefd");
+Deno.test("SRgb.Color.prototype.toUint8ClampedArray({})", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
   const c1a = c1.toUint8ClampedArray({ omitAlphaIfOpaque: true });
   assertStrictEquals(c1a[0], 255);
   assertStrictEquals(c1a[1], 254);
@@ -897,7 +897,7 @@ Deno.test("SRgbColor.prototype.toUint8ClampedArray({})", () => {
   c1a[0] = 0;
   assertStrictEquals(c1.rByte, 255);
 
-  const c2 = SRgbColor.fromHexString("#fffefd88");
+  const c2 = SRgb.Color.fromHexString("#fffefd88");
   const c2a = c2.toUint8ClampedArray({ omitAlphaIfOpaque: true });
   assertStrictEquals(c2a[0], 255);
   assertStrictEquals(c2a[1], 254);
@@ -906,8 +906,8 @@ Deno.test("SRgbColor.prototype.toUint8ClampedArray({})", () => {
   assertStrictEquals(c2a.length, 4);
 });
 
-Deno.test("SRgbColor.prototype.toUint8Array()", () => {
-  const c1 = SRgbColor.fromHexString("#fffefd");
+Deno.test("SRgb.Color.prototype.toUint8Array()", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
   const c1a = c1.toUint8Array();
   assertStrictEquals(c1a[0], 255);
   assertStrictEquals(c1a[1], 254);
@@ -917,7 +917,7 @@ Deno.test("SRgbColor.prototype.toUint8Array()", () => {
   c1a[0] = 0;
   assertStrictEquals(c1.rByte, 255);
 
-  const c2 = SRgbColor.fromHexString("#fffefd88");
+  const c2 = SRgb.Color.fromHexString("#fffefd88");
   const c2a = c2.toUint8Array();
   assertStrictEquals(c2a[0], 255);
   assertStrictEquals(c2a[1], 254);
@@ -926,8 +926,8 @@ Deno.test("SRgbColor.prototype.toUint8Array()", () => {
   assertStrictEquals(c2a.length, 4);
 });
 
-Deno.test("SRgbColor.prototype.toUint8Array({})", () => {
-  const c1 = SRgbColor.fromHexString("#fffefd");
+Deno.test("SRgb.Color.prototype.toUint8Array({})", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
   const c1a = c1.toUint8Array({ omitAlphaIfOpaque: true });
   assertStrictEquals(c1a[0], 255);
   assertStrictEquals(c1a[1], 254);
@@ -936,7 +936,7 @@ Deno.test("SRgbColor.prototype.toUint8Array({})", () => {
   c1a[0] = 0;
   assertStrictEquals(c1.rByte, 255);
 
-  const c2 = SRgbColor.fromHexString("#fffefd88");
+  const c2 = SRgb.Color.fromHexString("#fffefd88");
   const c2a = c2.toUint8Array({ omitAlphaIfOpaque: true });
   assertStrictEquals(c2a[0], 255);
   assertStrictEquals(c2a[1], 254);
@@ -945,8 +945,8 @@ Deno.test("SRgbColor.prototype.toUint8Array({})", () => {
   assertStrictEquals(c2a.length, 4);
 });
 
-Deno.test("SRgbColor.prototype.toRgbBytes()", () => {
-  const c0 = SRgbColor.fromHexString("#fffefd");
+Deno.test("SRgb.Color.prototype.toRgbBytes()", () => {
+  const c0 = SRgb.Color.fromHexString("#fffefd");
   const c1 = c0.toRgbBytes();
   assertStrictEquals(c1.r, 255);
   assertStrictEquals(c1.g, 254);
@@ -956,24 +956,24 @@ Deno.test("SRgbColor.prototype.toRgbBytes()", () => {
   assertStrictEquals(c0.rByte, 255);
 });
 
-Deno.test("SRgbColor.prototype.toHexString()", () => {
+Deno.test("SRgb.Color.prototype.toHexString()", () => {
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd").toHexString(),
+    SRgb.Color.fromHexString("#fffefd").toHexString(),
     "#fffefdff",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd").toHexString({ upperCase: true }),
+    SRgb.Color.fromHexString("#fffefd").toHexString({ upperCase: true }),
     "#FFFEFDFF",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd").toHexString({
+    SRgb.Color.fromHexString("#fffefd").toHexString({
       upperCase: true,
       shorten: true,
     }),
     "#FFFEFDFF",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd").toHexString({
+    SRgb.Color.fromHexString("#fffefd").toHexString({
       upperCase: true,
       shorten: true,
       omitAlphaIfOpaque: true,
@@ -981,21 +981,21 @@ Deno.test("SRgbColor.prototype.toHexString()", () => {
     "#FFFEFD",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#ffeedd").toHexString({
+    SRgb.Color.fromHexString("#ffeedd").toHexString({
       upperCase: true,
       shorten: true,
     }),
     "#FEDF",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#ffeedd").toHexString({
+    SRgb.Color.fromHexString("#ffeedd").toHexString({
       upperCase: true,
       shorten: false,
     }),
     "#FFEEDDFF",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#ffeedd").toHexString({
+    SRgb.Color.fromHexString("#ffeedd").toHexString({
       upperCase: false,
       shorten: false,
       omitAlphaIfOpaque: false,
@@ -1004,6 +1004,6 @@ Deno.test("SRgbColor.prototype.toHexString()", () => {
   );
 });
 
-Deno.test("SRgbColor.prototype.toString()", () => {
-  assertStrictEquals(SRgbColor.fromHexString("#fffefd").toString(), "#FFFEFD");
+Deno.test("SRgb.Color.prototype.toString()", () => {
+  assertStrictEquals(SRgb.Color.fromHexString("#fffefd").toString(), "#FFFEFD");
 });
