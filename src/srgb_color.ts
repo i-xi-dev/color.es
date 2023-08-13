@@ -305,6 +305,10 @@ class SRgbColor implements Rgb {
     return this.#bytes.slice(0);
   }
 
+  toUint8Array(): Uint8Array {
+    return Uint8Array.from(this.#bytes);
+  }
+
   toRgbBytes(): RgbBytes {
     return Object.assign({}, this.#rgbBytes);
   }
@@ -330,15 +334,15 @@ class SRgbColor implements Rgb {
     return this.toHexString();
   }
 
+  toHsl(): Hsl {
+    return Object.assign({}, this.#hsl);
+  }
+
   //XXX toJSON
 
   //XXX equals
   //XXX clone
   //XXX mix(blendMode, other: SrgbColor | *)
-
-  toHsl(): Hsl {
-    return Object.assign({}, this.#hsl);
-  }
 
   // withHue(absoluteHue: number): SRgbColor {
   //   if (Number.isFinite(absoluteHue) !== true) {
