@@ -1,16 +1,5 @@
 //
 
-function _clampeRgb({ r, g, b }: SrgbColor.RgbParams): { r: number, g: number, b: number } {
-  return {
-    r: _clamp(r),
-    g: _clamp(g),
-    b: _clamp(b),
-  };
-}
-
-/** Opacity as a real number between 0 and 1 */
-type alpha = number;
-
 function _isHslParams(value: unknown): value is SrgbColor.HslParams {
   const { h, s, l, a } = value as SrgbColor.HslParams;
   const hValid = Number.isFinite(h);
@@ -24,24 +13,6 @@ class SrgbColor {
 
 
   //TODO
-  // HSL彩度セット(absoluteS): this
-  // HSL彩度加算(relativeS): this
-  // HSL明度セット(absoluteL): this
-  // HSL明度加算(relativeL): this
-  // HWB白セット(absoluteW): this
-  // HWB白加算(relativeW): this
-  // HWB黒セット(absoluteB): this
-  // HWB黒加算(relativeB): this
-  // equals(other: SrgbColor | *): boolean
-  // 
-  // clone(): SrgbColor
-  // mix(blendMode, other: SrgbColor | *): this
-
-  //TODO static fromString(): SrgbColor {
-
-  // toJSON(): Color.Rgb {
-  //   return this.toRgb();
-  // }
 
   toCssString(options: SrgbColor.Format.CssOptions = {}): string {
     const omitAlphaMode = options.omitAlpha ? options.omitAlpha : SrgbColor.Format.OmitAlpha.IF_OPAQUE;

@@ -8,6 +8,8 @@ import {
   type NormalizedHsl,
   type NormalizedRgb,
   type NormalizedRgbBytes,
+  type Rgb,
+  type RgbBytes,
   type rgbcomponent,
   type saturation,
 } from "./types.ts";
@@ -27,7 +29,7 @@ namespace SRgb {
     export type ToOptions = {
       omitAlphaIfOpaque?: boolean;
     };
-    
+
     export type ToHexStringOptions = ToOptions & {
       shorten?: boolean;
       upperCase?: boolean;
@@ -59,21 +61,21 @@ namespace SRgb {
     /**
      * The red component value.
      */
-    get r(): rgbcomponent {
+    get red(): rgbcomponent {
       return this.#rgb.r;
     }
 
     /**
      * The green component value.
      */
-    get g(): rgbcomponent {
+    get green(): rgbcomponent {
       return this.#rgb.g;
     }
 
     /**
      * The blue component value.
      */
-    get b(): rgbcomponent {
+    get blue(): rgbcomponent {
       return this.#rgb.b;
     }
 
@@ -111,7 +113,10 @@ namespace SRgb {
 
     //XXX w, b
 
-    //XXX fromRgb
+    static fromRgb(rgb: Rgb): Color {
+      const { r, g, b, a } = _normalizeRgb(rgb);
+      return new Color(r, g, b, a);
+    }
 
     static #fromRgbBytesObject(
       rgbBytes: { r: number; g: number; b: number; a?: number },
@@ -180,7 +185,9 @@ namespace SRgb {
       if (typeof input !== "string") {
         throw new TypeError("input");
       }
-      if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(input) !== true) {
+      if (
+        /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(input) !== true
+      ) {
         throw new RangeError("input");
       }
 
@@ -242,9 +249,20 @@ namespace SRgb {
 
     //XXX toRgb
 
-    //XXX options追加 aを省くか
-    toRgbBytes(): NormalizedRgbBytes {
-      return Object.assign({}, this.#rgbBytes);
+    toRgbBytes(options?: Color.ToOptions): RgbBytes {
+      if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
+        return {
+          r: this.#rgbBytes.r,
+          g: this.#rgbBytes.g,
+          b: this.#rgbBytes.b,
+        };
+      }
+      return {
+        r: this.#rgbBytes.r,
+        g: this.#rgbBytes.g,
+        b: this.#rgbBytes.b,
+        a: this.#rgbBytes.a,
+      };
     }
 
     toHexString(options?: Color.ToHexStringOptions): string {
@@ -275,6 +293,22 @@ namespace SRgb {
       return "#" + rrggbbaaOrRrggbb;
     }
 
+    toHsl(options?: Color.ToOptions): Hsl {
+      if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
+        return {
+          h: this.#hsl.h,
+          s: this.#hsl.s,
+          l: this.#hsl.l,
+        };
+      }
+      return {
+        h: this.#hsl.h,
+        s: this.#hsl.s,
+        l: this.#hsl.l,
+        a: this.#hsl.a,
+      };
+    }
+
     toString(): string {
       return this.toHexString({
         omitAlphaIfOpaque: true,
@@ -282,59 +316,32 @@ namespace SRgb {
       });
     }
 
-    toHsl(): NormalizedHsl {
-      return Object.assign({}, this.#hsl);
-    }
+    //XXX toJSON
+
+    //XXX
+    // equals(rgb: Rgb | Color): boolean {
+    //   if (rgb instanceof Color) {
+    //     return (this.red === rgb.red) && (this.green === rgb.green) && (this.blue === rgb.blue) && (this.alpha === rgb.alpha);
+    //   }
+    //   else  {
+
+    //   }
+    // }
+
+    //XXX bytesEquals
+
+    //XXX clone
+
+    //XXX discardAlpha
+
+    //XXX withHue,plusHue
+
+    //XXX withSaturation,plusSaturation
+
+    //XXX withLightness,plusLightness
+
+    //XXX mix(blendMode, other: Color | *)
   }
-
 }
-
-
-
-  //XXX toJSON
-
-  //XXX equals
-  //XXX clone
-  //XXX mix(blendMode, other: SrgbColor | *)
-  //XXX discardAlpha
-
-  // withHue(absoluteHue: number): SRgb {
-  //   if (Number.isFinite(absoluteHue) !== true) {
-  //     throw new TypeError("absoluteHue");
-  //   }
-
-  //   const { r, g, b } = _hslToRgb({ h: absoluteHue, s: this.#s, l: this.#l });
-  //   return new SRgb(r, g, b);
-  // }
-
-  // xxxHue(relativeHue: number): SRgb {
-
-  // withLightness(absoluteLightness: number): SRgb {
-  //   if (Number.isFinite(absoluteLightness) !== true) {
-  //     throw new TypeError("absoluteLightness");
-  //   }
-
-  //   const { r, g, b } = _hslToRgb({
-  //     h: this.#h,
-  //     s: this.#s,
-  //     l: absoluteLightness,
-  //   });
-  //   return new SRgb(r, g, b);
-  // }
-
-  // xxxLightness(relativeLightness: number): SRgb {
-
-  // withSaturation(absoluteSaturation: number): SRgb {
-  //   if (Number.isFinite(absoluteSaturation) !== true) {
-  //     throw new TypeError("absoluteSaturation");
-  //   }
-
-  //   const { r, g, b } = _hslToRgb({
-  //     h: this.#h,
-  //     s: absoluteSaturation,
-  //     l: this.#l,
-  //   });
-  //   return new SRgb(r, g, b);
-  // }
 
 export { SRgb };

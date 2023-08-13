@@ -79,6 +79,7 @@ export {
   type NormalizedHsl,
   type NormalizedRgb,
   type NormalizedRgbBytes,
+  type Rgb,
   type RgbBytes,
   type rgbcomponent,
   type saturation,
