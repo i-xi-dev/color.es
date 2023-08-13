@@ -1,28 +1,20 @@
 import { ByteSequence, Uint8, type uint8 } from "../deps.ts";
-import {
-  type alpha,
-  type Hsl,
-  type hue,
-  type Hwb,
-  type lightness,
-  type NormalizedHsl,
-  type NormalizedRgb,
-  type NormalizedRgbBytes,
-  type Rgb,
-  type RgbBytes,
-  type rgbcomponent,
-  type saturation,
-} from "./types.ts";
 
 import {
   _hslToRgb,
-  _normalizeHsl,
-  _normalizeRgb,
-  _normalizeRgbBytes,
   _rgbToHsl,
   _rgbToUint8ClampedArray,
   _uint8ClampedArrayToRgbBytes,
-} from "./utils.ts";
+  Alpha,
+  Hsl,
+  Rgb,
+  RgbBytes,
+  type alpha,
+  type hue,
+  type lightness,
+  type rgbcomponent,
+  type saturation,
+} from "./types.ts";
 
 namespace SRgb {
   export namespace Color {
@@ -40,10 +32,10 @@ namespace SRgb {
    * RGBA color in sRGB color space
    */
   export class Color {
-    readonly #rgb: NormalizedRgb;
+    readonly #rgb: Rgb.Normalized;
     readonly #bytes: Uint8ClampedArray;
-    readonly #rgbBytes: NormalizedRgbBytes;
-    readonly #hsl: NormalizedHsl;
+    readonly #rgbBytes: RgbBytes.Normalized;
+    readonly #hsl: Hsl.Normalized;
 
     private constructor(
       r: rgbcomponent,
@@ -51,7 +43,7 @@ namespace SRgb {
       b: rgbcomponent,
       a: alpha,
     ) {
-      this.#rgb = Object.freeze(_normalizeRgb({ r, g, b, a }));
+      this.#rgb = Object.freeze(Rgb.normalize({ r, g, b, a }));
       this.#bytes = _rgbToUint8ClampedArray(this.#rgb);
       this.#rgbBytes = Object.freeze(_uint8ClampedArrayToRgbBytes(this.#bytes));
       this.#hsl = Object.freeze(_rgbToHsl(this.#rgb));
@@ -114,14 +106,14 @@ namespace SRgb {
     //XXX w, b
 
     static fromRgb(rgb: Rgb): Color {
-      const { r, g, b, a } = _normalizeRgb(rgb);
+      const { r, g, b, a } = Rgb.normalize(rgb);
       return new Color(r, g, b, a);
     }
 
     static #fromRgbBytesObject(
       rgbBytes: { r: number; g: number; b: number; a?: number },
     ): Color {
-      const { r: rByte, g: gByte, b: bByte, a: aByte } = _normalizeRgbBytes(
+      const { r: rByte, g: gByte, b: bByte, a: aByte } = RgbBytes.normalize(
         rgbBytes,
       );
       const r = rByte / 255;
@@ -229,7 +221,7 @@ namespace SRgb {
     }
 
     static fromHsl(hsl: Hsl): Color {
-      const { r, g, b, a } = _hslToRgb(_normalizeHsl(hsl));
+      const { r, g, b, a } = _hslToRgb(Hsl.normalize(hsl));
       return new Color(r, g, b, a);
     }
 
@@ -330,8 +322,16 @@ namespace SRgb {
       });
     }
 
-    toJSON(): NormalizedRgb {
-      return this.toRgb() as NormalizedRgb;
+    toJSON(): Rgb.Normalized {
+      return this.toRgb() as Rgb.Normalized;
+    }
+
+    clone(): Color {
+      return new Color(this.red, this.green, this.blue, this.alpha);
+    }
+
+    discardAlpha(): Color {
+      return new Color(this.red, this.green, this.blue, Alpha.MAX_VALUE);
     }
 
     //XXX
@@ -345,10 +345,6 @@ namespace SRgb {
     // }
 
     //XXX bytesEquals
-
-    //XXX clone
-
-    //XXX discardAlpha
 
     //XXX withHue,plusHue
 
