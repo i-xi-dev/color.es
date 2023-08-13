@@ -993,6 +993,60 @@ Deno.test("SRgb.Color.prototype.toUint8Array({})", () => {
   assertStrictEquals(c2a.length, 4);
 });
 
+Deno.test("SRgb.Color.prototype.toRgb()", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
+  const c1a = c1.toRgb();
+  assertStrictEquals(c1a.r, 1);
+  assertStrictEquals(c1a.g, 254 / 255);
+  assertStrictEquals(c1a.b, 253 / 255);
+  assertStrictEquals(c1a.a, 1);
+  c1a.r = 0;
+  assertStrictEquals(c1.rByte, 255);
+
+  const c2 = SRgb.Color.fromHexString("#01020388");
+  const c2a = c2.toRgb();
+  assertStrictEquals(c2a.r, 1 / 255);
+  assertStrictEquals(c2a.g, 2 / 255);
+  assertStrictEquals(c2a.b, 3 / 255);
+  assertStrictEquals(c2a.a, 136 / 255);
+});
+
+Deno.test("SRgb.Color.prototype.toRgb({})", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
+  const c1a = c1.toRgb({ omitAlphaIfOpaque: true });
+  assertStrictEquals(c1a.r, 1);
+  assertStrictEquals(c1a.g, 254 / 255);
+  assertStrictEquals(c1a.b, 253 / 255);
+  assertStrictEquals("a" in c1a, false);
+  c1a.r = 0;
+  assertStrictEquals(c1.rByte, 255);
+
+  const c2 = SRgb.Color.fromHexString("#01020388");
+  const c2a = c2.toRgb({ omitAlphaIfOpaque: true });
+  assertStrictEquals(c2a.r, 1 / 255);
+  assertStrictEquals(c2a.g, 2 / 255);
+  assertStrictEquals(c2a.b, 3 / 255);
+  assertStrictEquals(c2a.a, 136 / 255);
+});
+
+Deno.test("SRgb.Color.prototype.toJSON()", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
+  const c1a = c1.toJSON();
+  assertStrictEquals(c1a.r, 1);
+  assertStrictEquals(c1a.g, 254 / 255);
+  assertStrictEquals(c1a.b, 253 / 255);
+  assertStrictEquals(c1a.a, 1);
+  c1a.r = 0;
+  assertStrictEquals(c1.rByte, 255);
+
+  const c2 = SRgb.Color.fromHexString("#01020388");
+  const c2a = c2.toJSON();
+  assertStrictEquals(c2a.r, 1 / 255);
+  assertStrictEquals(c2a.g, 2 / 255);
+  assertStrictEquals(c2a.b, 3 / 255);
+  assertStrictEquals(c2a.a, 136 / 255);
+});
+
 Deno.test("SRgb.Color.prototype.toRgbBytes()", () => {
   const c1 = SRgb.Color.fromHexString("#fffefd");
   const c1a = c1.toRgbBytes();

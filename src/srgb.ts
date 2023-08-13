@@ -247,7 +247,21 @@ namespace SRgb {
       return Uint8Array.from(this.#bytes);
     }
 
-    //XXX toRgb
+    toRgb(options?: Color.ToOptions): Rgb {
+      if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
+        return {
+          r: this.#rgb.r,
+          g: this.#rgb.g,
+          b: this.#rgb.b,
+        };
+      }
+      return {
+        r: this.#rgb.r,
+        g: this.#rgb.g,
+        b: this.#rgb.b,
+        a: this.#rgb.a,
+      };
+    }
 
     toRgbBytes(options?: Color.ToOptions): RgbBytes {
       if ((options?.omitAlphaIfOpaque === true) && (this.#rgb.a === 1)) {
@@ -316,7 +330,9 @@ namespace SRgb {
       });
     }
 
-    //XXX toJSON
+    toJSON(): NormalizedRgb {
+      return this.toRgb() as NormalizedRgb;
+    }
 
     //XXX
     // equals(rgb: Rgb | Color): boolean {
