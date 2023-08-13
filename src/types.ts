@@ -87,17 +87,13 @@ namespace Rgb {
   }
 }
 
-function _clampByte(value: number): uint8 {
-  return _clamp(Math.round(value), Uint8.MIN_VALUE, Uint8.MAX_VALUE) as uint8;
-}
-
 namespace RgbByte {
   export const MIN_VALUE = Uint8.MIN_VALUE;
   export const MAX_VALUE = Uint8.MAX_VALUE;
 
   export function normalize(value: unknown): uint8 {
     if (Number.isFinite(value)) {
-      return _clampByte(value as number);
+      return Uint8.clamp(value as number);
     }
     return MIN_VALUE;
   }
@@ -109,7 +105,7 @@ namespace AlphaByte {
 
   export function normalize(value: unknown): uint8 {
     if (Number.isFinite(value)) {
-      return _clampByte(value as number);
+      return Uint8.clamp(value as number);
     }
     return MAX_VALUE;
   }
@@ -259,10 +255,10 @@ function _rgbToRgbBytes(
   { r, g, b, a }: Rgb.Normalized,
 ): RgbBytes.Normalized {
   return {
-    r: _clampByte(r * Uint8.MAX_VALUE),
-    g: _clampByte(g * Uint8.MAX_VALUE),
-    b: _clampByte(b * Uint8.MAX_VALUE),
-    a: _clampByte(a * Uint8.MAX_VALUE),
+    r: Uint8.clamp(r * Uint8.MAX_VALUE),
+    g: Uint8.clamp(g * Uint8.MAX_VALUE),
+    b: Uint8.clamp(b * Uint8.MAX_VALUE),
+    a: Uint8.clamp(a * Uint8.MAX_VALUE),
   };
 }
 
