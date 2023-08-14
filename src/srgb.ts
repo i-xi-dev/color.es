@@ -333,12 +333,28 @@ namespace SRgb {
 
     //XXX withSaturation,plusSaturation
 
-    //XXX ,plusLightness(lighten?),minusLightness
+    plusLightness(relativeLightness: lightness): Color {
+      const { h, s, l, a } = this.#hsl;
+      return Color.fromHsl({ h, s, l: (l + relativeLightness), a });
+    }
+
+    minusLightness(relativeLightness: lightness): Color {
+      const { h, s, l, a } = this.#hsl;
+      return Color.fromHsl({ h, s, l: (l - relativeLightness), a });
+    }
 
     withLightness(absoluteLightness: lightness): Color {
       const { h, s, a } = this.#hsl;
       return Color.fromHsl({ h, s, l: absoluteLightness, a });
     }
+
+    //XXX +10%とか？
+    // lighten(): Color {
+    // }
+
+    //XXX -10%とか？
+    // darken(): Color {
+    // }
 
     plusAlpha(relativeAlpha: alpha): Color {
       return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, (this.#rgb.a + relativeAlpha));
