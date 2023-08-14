@@ -331,7 +331,12 @@ namespace SRgb {
 
     //XXX withHue,plusHue
 
-    //XXX withSaturation,plusSaturation
+    //XXX ,plusSaturation
+
+    withSaturation(absoluteSaturation: saturation): Color {
+      const { h, l, a } = this.#hsl;
+      return Color.fromHsl({ h, s: absoluteSaturation, l, a });
+    }
 
     plusLightness(relativeLightness: lightness): Color {
       const { h, s, l, a } = this.#hsl;
