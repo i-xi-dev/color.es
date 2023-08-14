@@ -1151,11 +1151,6 @@ Deno.test("SRgb.Color.prototype.clone()", () => {
   assertStrictEquals(c2a.alpha, 136 / 255);
 });
 
-
-
-
-
-
 Deno.test("SRgb.Color.prototype.withHue()", () => {
   const c1 = SRgb.Color.fromHexString("#fffefd88");
   const c1a = c1.withHue(0);
@@ -1206,9 +1201,12 @@ Deno.test("SRgb.Color.prototype.plusSaturation()", () => {
 
   const c3 = SRgb.Color.fromHexString("#030203");
   const c3a = c3.plusSaturation(0.5);
-  assertStrictEquals(c3a.lightness, c3.lightness );
+  assertStrictEquals(c3a.lightness, c3.lightness);
   assertStrictEquals(c3a.hue, c3.hue);
-  assertStrictEquals(c3a.saturation.toFixed(6), (c3.saturation + 0.5).toFixed(6));
+  assertStrictEquals(
+    c3a.saturation.toFixed(6),
+    (c3.saturation + 0.5).toFixed(6),
+  );
   assertStrictEquals(c3a.alpha, c3.alpha);
 });
 
@@ -1237,9 +1235,12 @@ Deno.test("SRgb.Color.prototype.minusSaturation()", () => {
 
   const c3 = SRgb.Color.fromHexString("#ff0203");
   const c3a = c3.minusSaturation(0.5);
-  assertStrictEquals(c3a.lightness, c3.lightness );
+  assertStrictEquals(c3a.lightness, c3.lightness);
   assertStrictEquals(c3a.hue, c3.hue);
-  assertStrictEquals(c3a.saturation.toFixed(6), (c3.saturation - 0.5).toFixed(6));
+  assertStrictEquals(
+    c3a.saturation.toFixed(6),
+    (c3.saturation - 0.5).toFixed(6),
+  );
   assertStrictEquals(c3a.alpha, c3.alpha);
 });
 
@@ -1397,7 +1398,7 @@ Deno.test("SRgb.Color.prototype.plusAlpha()", () => {
   assertStrictEquals(c3a.alpha, 1);
 
   const c3x = SRgb.Color.fromHexString("#01020388");
-  const c3xa = c3x.plusAlpha((0x44 / 255));
+  const c3xa = c3x.plusAlpha(0x44 / 255);
   assertStrictEquals(c3xa.red, 1 / 255);
   assertStrictEquals(c3xa.green, 2 / 255);
   assertStrictEquals(c3xa.blue, 3 / 255);
@@ -1434,7 +1435,7 @@ Deno.test("SRgb.Color.prototype.minusAlpha()", () => {
   assertStrictEquals(c3a.alpha, 0);
 
   const c3x = SRgb.Color.fromHexString("#01020388");
-  const c3xa = c3x.minusAlpha((0x44 / 255));
+  const c3xa = c3x.minusAlpha(0x44 / 255);
   assertStrictEquals(c3xa.red, 1 / 255);
   assertStrictEquals(c3xa.green, 2 / 255);
   assertStrictEquals(c3xa.blue, 3 / 255);
@@ -1464,18 +1465,18 @@ Deno.test("SRgb.Color.prototype.withAlpha()", () => {
   assertStrictEquals(c3a.alpha, 1);
 });
 
-// Deno.test("SRgb.Color.prototype.discardAlpha()", () => {
-//   const c1 = SRgb.Color.fromHexString("#fffefd");
-//   const c1a = c1.discardAlpha();
-//   assertStrictEquals(c1a.red, 1);
-//   assertStrictEquals(c1a.green, 254 / 255);
-//   assertStrictEquals(c1a.blue, 253 / 255);
-//   assertStrictEquals(c1a.alpha, 1);
+Deno.test("SRgb.Color.prototype.opaque()", () => {
+  const c1 = SRgb.Color.fromHexString("#fffefd");
+  const c1a = c1.opaque();
+  assertStrictEquals(c1a.red, 1);
+  assertStrictEquals(c1a.green, 254 / 255);
+  assertStrictEquals(c1a.blue, 253 / 255);
+  assertStrictEquals(c1a.alpha, 1);
 
-//   const c2 = SRgb.Color.fromHexString("#01020388");
-//   const c2a = c2.discardAlpha();
-//   assertStrictEquals(c2a.red, 1 / 255);
-//   assertStrictEquals(c2a.green, 2 / 255);
-//   assertStrictEquals(c2a.blue, 3 / 255);
-//   assertStrictEquals(c2a.alpha, 1);
-// });
+  const c2 = SRgb.Color.fromHexString("#01020388");
+  const c2a = c2.opaque();
+  assertStrictEquals(c2a.red, 1 / 255);
+  assertStrictEquals(c2a.green, 2 / 255);
+  assertStrictEquals(c2a.blue, 3 / 255);
+  assertStrictEquals(c2a.alpha, 1);
+});

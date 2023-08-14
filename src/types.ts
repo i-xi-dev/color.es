@@ -226,7 +226,7 @@ namespace Hsl {
       }
     }
     return { h, s, l, a };
-  }  
+  }
 }
 
 type Hwb = {
@@ -303,12 +303,12 @@ export {
   _rgbToHsl,
   _rgbToRgbBytes,
   Alpha,
-  Hsl,
-  Rgb,
-  RgbBytes,
   type alpha,
+  Hsl,
   type hue,
   type lightness,
+  Rgb,
+  RgbBytes,
   type rgbcomponent,
   type saturation,
 };

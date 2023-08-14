@@ -5,12 +5,12 @@ import {
   _rgbToHsl,
   _rgbToRgbBytes,
   Alpha,
-  Hsl,
-  Rgb,
-  RgbBytes,
   type alpha,
+  Hsl,
   type hue,
   type lightness,
+  Rgb,
+  RgbBytes,
   type rgbcomponent,
   type saturation,
 } from "./types.ts";
@@ -102,6 +102,7 @@ namespace SRgb {
 
     //XXX w, b
 
+    //XXX options.discardAlpha
     static fromRgb(rgb: Rgb): Color {
       const { r, g, b, a } = Rgb.normalize(rgb);
       return new Color(r, g, b, a);
@@ -151,6 +152,7 @@ namespace SRgb {
       throw new TypeError("rgbBytes");
     }
 
+    //XXX options.discardAlpha
     static fromRgbBytes(
       rgbBytes:
         | { r: number; g: number; b: number; a?: number }
@@ -170,6 +172,7 @@ namespace SRgb {
       return Color.#fromRgbBytesObject(rgbBytes);
     }
 
+    //XXX options.discardAlpha
     static fromHexString(input: string): Color {
       if (typeof input !== "string") {
         throw new TypeError("input");
@@ -217,6 +220,7 @@ namespace SRgb {
       );
     }
 
+    //XXX options.discardAlpha
     static fromHsl(hsl: Hsl): Color {
       const { r, g, b, a } = _hslToRgb(Hsl.normalize(hsl));
       return new Color(r, g, b, a);
@@ -332,9 +336,6 @@ namespace SRgb {
 
     //XXX ,plusHue
 
-
-
-
     withHue(absoluteHue: hue): Color {
       const { s, l, a } = this.#hsl;
       return Color.fromHsl({ h: absoluteHue, s, l, a });
@@ -371,39 +372,46 @@ namespace SRgb {
     }
 
     plusAlpha(relativeAlpha: alpha): Color {
-      return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, (this.#rgb.a + relativeAlpha));
+      return new Color(
+        this.#rgb.r,
+        this.#rgb.g,
+        this.#rgb.b,
+        this.#rgb.a + relativeAlpha,
+      );
     }
 
     minusAlpha(relativeAlpha: alpha): Color {
-      return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, (this.#rgb.a - relativeAlpha));
+      return new Color(
+        this.#rgb.r,
+        this.#rgb.g,
+        this.#rgb.b,
+        this.#rgb.a - relativeAlpha,
+      );
     }
 
     withAlpha(absoluteAlpha: alpha): Color {
       return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, absoluteAlpha);
     }
 
-    //XXX opaque()の方が良いか？
-    // discardAlpha(): Color {
-    //   return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, Alpha.MAX_VALUE);
-    // }
+    opaque(): Color {
+      return this.withAlpha(Alpha.MAX_VALUE);
+    }
 
     //XXX complementaryColor() 補色を返す
 
-    //XXX 彩度0
+    // lighter(percentage): Color {
+    // }
+
+    // darker(percentage): Color {
+    // }
+
+    // contrast,saturate,sepia,...
+
     // grayscale(): Color {
     // }
 
-    //XXX +10%とか？
-    // lighten(): Color {
+    // invert(): Color {
     // }
-
-    //XXX -10%とか？
-    // darken(): Color {
-    // }
-
-
-
-
 
     //XXX
     // equals(rgb: Rgb | Color): boolean {
