@@ -1,5 +1,4 @@
-import { ByteSequence, Uint8, type uint8 } from "../deps.ts";
-
+import { ByteSequence, Uint8 } from "../deps.ts";
 import {
   _hslToRgb,
   _rgbToHsl,
@@ -76,21 +75,21 @@ namespace SRgb {
       return this.#rgb.a;
     }
 
-    get rByte(): uint8 {
-      return this.#rgbBytes.r;
-    }
+    // get rByte(): uint8 {
+    //   return this.#rgbBytes.r;
+    // }
 
-    get gByte(): uint8 {
-      return this.#rgbBytes.g;
-    }
+    // get gByte(): uint8 {
+    //   return this.#rgbBytes.g;
+    // }
 
-    get bByte(): uint8 {
-      return this.#rgbBytes.b;
-    }
+    // get bByte(): uint8 {
+    //   return this.#rgbBytes.b;
+    // }
 
-    get aByte(): uint8 {
-      return this.#rgbBytes.a;
-    }
+    // get aByte(): uint8 {
+    //   return this.#rgbBytes.a;
+    // }
 
     get hue(): hue {
       return this.#hsl.h;
