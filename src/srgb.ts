@@ -326,10 +326,19 @@ namespace SRgb {
     }
 
     clone(): Color {
-      return new Color(this.red, this.green, this.blue, this.alpha);
+      const { r, g, b, a } = this.#rgb;
+      return new Color(r, g, b, a);
     }
 
-    //XXX withHue,plusHue
+    //XXX ,plusHue
+
+
+
+
+    withHue(absoluteHue: hue): Color {
+      const { s, l, a } = this.#hsl;
+      return Color.fromHsl({ h: absoluteHue, s, l, a });
+    }
 
     plusSaturation(relativeSaturation: saturation): Color {
       const { h, s, l, a } = this.#hsl;
@@ -346,10 +355,6 @@ namespace SRgb {
       return Color.fromHsl({ h, s: absoluteSaturation, l, a });
     }
 
-    //XXX 彩度0
-    // grayscale(): Color {
-    // }
-
     plusLightness(relativeLightness: lightness): Color {
       const { h, s, l, a } = this.#hsl;
       return Color.fromHsl({ h, s, l: (l + relativeLightness), a });
@@ -364,14 +369,6 @@ namespace SRgb {
       const { h, s, a } = this.#hsl;
       return Color.fromHsl({ h, s, l: absoluteLightness, a });
     }
-
-    //XXX +10%とか？
-    // lighten(): Color {
-    // }
-
-    //XXX -10%とか？
-    // darken(): Color {
-    // }
 
     plusAlpha(relativeAlpha: alpha): Color {
       return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, (this.#rgb.a + relativeAlpha));
@@ -388,6 +385,20 @@ namespace SRgb {
     //XXX opaque()の方が良いか？
     // discardAlpha(): Color {
     //   return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, Alpha.MAX_VALUE);
+    // }
+
+    //XXX complementaryColor() 補色を返す
+
+    //XXX 彩度0
+    // grayscale(): Color {
+    // }
+
+    //XXX +10%とか？
+    // lighten(): Color {
+    // }
+
+    //XXX -10%とか？
+    // darken(): Color {
     // }
 
 
