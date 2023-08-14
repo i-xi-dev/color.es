@@ -116,7 +116,7 @@ namespace SRgb {
 
     static #fromRgbBytesObject(
       rgbBytes: { r: number; g: number; b: number; a?: number },
-      options?: Color.FromOptions
+      options?: Color.FromOptions,
     ): Color {
       const { r: rByte, g: gByte, b: bByte, a: aByte } = RgbBytes.normalize(
         rgbBytes,
@@ -124,12 +124,17 @@ namespace SRgb {
       const r = rByte / 255;
       const g = gByte / 255;
       const b = bByte / 255;
-      const a = (options?.discardAlpha === true) ? Alpha.MAX_VALUE : (aByte / 255);
+      const a = (options?.discardAlpha === true)
+        ? Alpha.MAX_VALUE
+        : (aByte / 255);
       return new Color(r, g, b, a);
     }
 
     // rgbBytes: Uint8Array | Uint8ClampedArray | Array<uint8>
-    static #fromRgbByteArray(rgbBytes: Iterable<number>, options?: Color.FromOptions): Color {
+    static #fromRgbByteArray(
+      rgbBytes: Iterable<number>,
+      options?: Color.FromOptions,
+    ): Color {
       if (rgbBytes[Symbol.iterator]) {
         const bytes: [number, number, number, number] = [
           Uint8.MIN_VALUE,
@@ -163,7 +168,7 @@ namespace SRgb {
       rgbBytes:
         | { r: number; g: number; b: number; a?: number }
         | Iterable<number>,
-      options?: Color.FromOptions
+      options?: Color.FromOptions,
     ): Color {
       if (rgbBytes) {
         if (
@@ -223,11 +228,15 @@ namespace SRgb {
 
       return Color.#fromRgbByteArray(
         ByteSequence.parse(rrggbb + aa, { lowerCase: true }).getUint8View(),
+        options,
       );
     }
 
     static fromHsl(hsl: Hsl, options?: Color.FromOptions): Color {
       const { r, g, b, a } = _hslToRgb(Hsl.normalize(hsl));
+      if (options?.discardAlpha === true) {
+        return new Color(r, g, b, Alpha.MAX_VALUE);
+      }
       return new Color(r, g, b, a);
     }
 
