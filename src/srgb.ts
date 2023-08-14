@@ -25,6 +25,10 @@ namespace SRgb {
       shorten?: boolean;
       upperCase?: boolean;
     };
+
+    export type FromOptions = {
+      discardAlpha?: boolean;
+    };
   }
 
   /**
@@ -102,14 +106,17 @@ namespace SRgb {
 
     //XXX w, b
 
-    //XXX options.discardAlpha
-    static fromRgb(rgb: Rgb): Color {
+    static fromRgb(rgb: Rgb, options?: Color.FromOptions): Color {
       const { r, g, b, a } = Rgb.normalize(rgb);
+      if (options?.discardAlpha === true) {
+        return new Color(r, g, b, Alpha.MAX_VALUE);
+      }
       return new Color(r, g, b, a);
     }
 
     static #fromRgbBytesObject(
       rgbBytes: { r: number; g: number; b: number; a?: number },
+      options?: Color.FromOptions
     ): Color {
       const { r: rByte, g: gByte, b: bByte, a: aByte } = RgbBytes.normalize(
         rgbBytes,
@@ -117,12 +124,12 @@ namespace SRgb {
       const r = rByte / 255;
       const g = gByte / 255;
       const b = bByte / 255;
-      const a = aByte / 255;
+      const a = (options?.discardAlpha === true) ? Alpha.MAX_VALUE : (aByte / 255);
       return new Color(r, g, b, a);
     }
 
     // rgbBytes: Uint8Array | Uint8ClampedArray | Array<uint8>
-    static #fromRgbByteArray(rgbBytes: Iterable<number>): Color {
+    static #fromRgbByteArray(rgbBytes: Iterable<number>, options?: Color.FromOptions): Color {
       if (rgbBytes[Symbol.iterator]) {
         const bytes: [number, number, number, number] = [
           Uint8.MIN_VALUE,
@@ -147,33 +154,32 @@ namespace SRgb {
           g: bytes[1],
           b: bytes[2],
           a: bytes[3],
-        });
+        }, options);
       }
       throw new TypeError("rgbBytes");
     }
 
-    //XXX options.discardAlpha
     static fromRgbBytes(
       rgbBytes:
         | { r: number; g: number; b: number; a?: number }
         | Iterable<number>,
+      options?: Color.FromOptions
     ): Color {
       if (rgbBytes) {
         if (
           (rgbBytes instanceof Uint8Array) ||
           (rgbBytes instanceof Uint8ClampedArray)
         ) {
-          return Color.#fromRgbByteArray(rgbBytes);
+          return Color.#fromRgbByteArray(rgbBytes, options);
         }
         if (Symbol.iterator in rgbBytes) {
-          return Color.#fromRgbByteArray(rgbBytes);
+          return Color.#fromRgbByteArray(rgbBytes, options);
         }
       }
-      return Color.#fromRgbBytesObject(rgbBytes);
+      return Color.#fromRgbBytesObject(rgbBytes, options);
     }
 
-    //XXX options.discardAlpha
-    static fromHexString(input: string): Color {
+    static fromHexString(input: string, options?: Color.FromOptions): Color {
       if (typeof input !== "string") {
         throw new TypeError("input");
       }
@@ -220,8 +226,7 @@ namespace SRgb {
       );
     }
 
-    //XXX options.discardAlpha
-    static fromHsl(hsl: Hsl): Color {
+    static fromHsl(hsl: Hsl, options?: Color.FromOptions): Color {
       const { r, g, b, a } = _hslToRgb(Hsl.normalize(hsl));
       return new Color(r, g, b, a);
     }
@@ -393,7 +398,7 @@ namespace SRgb {
       return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, absoluteAlpha);
     }
 
-    opaque(): Color {
+    withoutAlpha(): Color {
       return this.withAlpha(Alpha.MAX_VALUE);
     }
 
