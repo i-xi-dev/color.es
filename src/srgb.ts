@@ -331,12 +331,24 @@ namespace SRgb {
 
     //XXX withHue,plusHue
 
-    //XXX ,plusSaturation
+    plusSaturation(relativeSaturation: saturation): Color {
+      const { h, s, l, a } = this.#hsl;
+      return Color.fromHsl({ h, s: (s + relativeSaturation), l, a });
+    }
+
+    minusSaturation(relativeSaturation: saturation): Color {
+      const { h, s, l, a } = this.#hsl;
+      return Color.fromHsl({ h, s: (s - relativeSaturation), l, a });
+    }
 
     withSaturation(absoluteSaturation: saturation): Color {
       const { h, l, a } = this.#hsl;
       return Color.fromHsl({ h, s: absoluteSaturation, l, a });
     }
+
+    //XXX 彩度0
+    // grayscale(): Color {
+    // }
 
     plusLightness(relativeLightness: lightness): Color {
       const { h, s, l, a } = this.#hsl;
@@ -373,9 +385,14 @@ namespace SRgb {
       return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, absoluteAlpha);
     }
 
-    discardAlpha(): Color {
-      return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, Alpha.MAX_VALUE);
-    }
+    //XXX opaque()の方が良いか？
+    // discardAlpha(): Color {
+    //   return new Color(this.#rgb.r, this.#rgb.g, this.#rgb.b, Alpha.MAX_VALUE);
+    // }
+
+
+
+
 
     //XXX
     // equals(rgb: Rgb | Color): boolean {
