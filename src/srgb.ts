@@ -347,21 +347,19 @@ namespace SRgb {
       return new Color(r, g, b, a);
     }
 
-    //XXX ,plusHue
+    rotateHue(relativeHue: number): Color {
+      const { h, s, l, a } = this.#hsl;
+      return Color.fromHsl({ h: (h + relativeHue), s, l, a });
+    }
 
     withHue(absoluteHue: hue): Color {
       const { s, l, a } = this.#hsl;
       return Color.fromHsl({ h: absoluteHue, s, l, a });
     }
 
-    plusSaturation(relativeSaturation: saturation): Color {
+    plusSaturation(relativeSaturation: number): Color {
       const { h, s, l, a } = this.#hsl;
       return Color.fromHsl({ h, s: (s + relativeSaturation), l, a });
-    }
-
-    minusSaturation(relativeSaturation: saturation): Color {
-      const { h, s, l, a } = this.#hsl;
-      return Color.fromHsl({ h, s: (s - relativeSaturation), l, a });
     }
 
     withSaturation(absoluteSaturation: saturation): Color {
@@ -369,14 +367,9 @@ namespace SRgb {
       return Color.fromHsl({ h, s: absoluteSaturation, l, a });
     }
 
-    plusLightness(relativeLightness: lightness): Color {
+    plusLightness(relativeLightness: number): Color {
       const { h, s, l, a } = this.#hsl;
       return Color.fromHsl({ h, s, l: (l + relativeLightness), a });
-    }
-
-    minusLightness(relativeLightness: lightness): Color {
-      const { h, s, l, a } = this.#hsl;
-      return Color.fromHsl({ h, s, l: (l - relativeLightness), a });
     }
 
     withLightness(absoluteLightness: lightness): Color {
@@ -384,22 +377,9 @@ namespace SRgb {
       return Color.fromHsl({ h, s, l: absoluteLightness, a });
     }
 
-    plusAlpha(relativeAlpha: alpha): Color {
-      return new Color(
-        this.#rgb.r,
-        this.#rgb.g,
-        this.#rgb.b,
-        this.#rgb.a + relativeAlpha,
-      );
-    }
-
-    minusAlpha(relativeAlpha: alpha): Color {
-      return new Color(
-        this.#rgb.r,
-        this.#rgb.g,
-        this.#rgb.b,
-        this.#rgb.a - relativeAlpha,
-      );
+    plusAlpha(relativeAlpha: number): Color {
+      const { r, g, b, a } = this.#rgb;
+      return new Color(r, g, b, a + relativeAlpha);
     }
 
     withAlpha(absoluteAlpha: alpha): Color {
@@ -409,6 +389,10 @@ namespace SRgb {
     withoutAlpha(): Color {
       return this.withAlpha(Alpha.MAX_VALUE);
     }
+
+    //XXX
+    // xxxHsl(func): Iterable<hsl>
+    // xxxRgb(func): Iterable<rgb>
 
     //XXX complementaryColor() 補色を返す
 
