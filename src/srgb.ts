@@ -21,17 +21,6 @@ function _f(n: number, { h, s, l }: SRgb.Hsl.Normalized): number {
   return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
 }
 
-function _rgbToRgbBytes(
-  { r, g, b, a }: SRgb.Rgb.Normalized,
-): SRgb.RgbBytes.Normalized {
-  return {
-    r: Uint8.clamp(r * Uint8.MAX_VALUE),
-    g: Uint8.clamp(g * Uint8.MAX_VALUE),
-    b: Uint8.clamp(b * Uint8.MAX_VALUE),
-    a: Uint8.clamp(a * Uint8.MAX_VALUE),
-  };
-}
-
 function _hslToRgb(normalizedHsl: SRgb.Hsl.Normalized): SRgb.Rgb.Normalized {
   return {
     r: _f(0, normalizedHsl),
@@ -165,6 +154,26 @@ namespace SRgb {
         a: aByte,
       };
     }
+
+    export function fromRgb(rgb: Color.Rgb): Normalized {
+      const normalizedRgb = Rgb.normalize(rgb);
+      return {
+        r: Uint8.clamp(normalizedRgb.r * Uint8.MAX_VALUE),
+        g: Uint8.clamp(normalizedRgb.g * Uint8.MAX_VALUE),
+        b: Uint8.clamp(normalizedRgb.b * Uint8.MAX_VALUE),
+        a: Uint8.clamp(normalizedRgb.a * Uint8.MAX_VALUE),
+      };
+    }
+
+    export function toRgb(rgbBytes: RgbBytes): Rgb.Normalized {
+      const normalizedRgbBytes = normalize(rgbBytes);
+      return {
+        r: normalizedRgbBytes.r / Uint8.MAX_VALUE,
+        g: normalizedRgbBytes.g / Uint8.MAX_VALUE,
+        b: normalizedRgbBytes.b / Uint8.MAX_VALUE,
+        a: normalizedRgbBytes.a / Uint8.MAX_VALUE,
+      };
+    }
   }
 
   // angle
@@ -286,7 +295,7 @@ namespace SRgb {
       a: Color.Alpha,
     ) {
       this.#rgb = Object.freeze(Rgb.normalize({ r, g, b, a }));
-      this.#rgbBytes = Object.freeze(_rgbToRgbBytes(this.#rgb));
+      this.#rgbBytes = Object.freeze(RgbBytes.fromRgb(this.#rgb));
       this.#hsl = Object.freeze(_rgbToHsl(this.#rgb));
       Object.freeze(this);
     }
@@ -342,15 +351,11 @@ namespace SRgb {
       rgbBytes: { r: number; g: number; b: number; a?: number },
       options?: Color.FromOptions,
     ): SRgbColor {
-      const { r: rByte, g: gByte, b: bByte, a: aByte } = RgbBytes.normalize(
-        rgbBytes,
-      );
-      const r = rByte / 255;
-      const g = gByte / 255;
-      const b = bByte / 255;
-      const a = (options?.discardAlpha === true)
-        ? Color.Alpha.MAX_VALUE
-        : (aByte / 255);
+      const { r, g, b, a } = RgbBytes.toRgb(rgbBytes);
+
+      if (options?.discardAlpha === true) {
+        return new SRgbColor(r, g, b, Color.Alpha.MAX_VALUE);
+      }
       return new SRgbColor(r, g, b, a);
     }
 
