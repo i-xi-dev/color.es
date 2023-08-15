@@ -21,51 +21,6 @@ function _f(n: number, { h, s, l }: SRgb.Hsl.Normalized): number {
   return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
 }
 
-function _hslToRgb(normalizedHsl: SRgb.Hsl.Normalized): SRgb.Rgb.Normalized {
-  return {
-    r: _f(0, normalizedHsl),
-    g: _f(8, normalizedHsl),
-    b: _f(4, normalizedHsl),
-    a: normalizedHsl.a,
-  };
-}
-
-function _rgbToHsl({ r, g, b, a }: SRgb.Rgb.Normalized): SRgb.Hsl.Normalized {
-  const maxRgb = Math.max(r, g, b);
-  const minRgb = Math.min(r, g, b);
-
-  const d = maxRgb - minRgb;
-
-  let h = SRgb.Hue.ZERO_TURN;
-  if (d !== 0) {
-    switch (maxRgb) {
-      case r:
-        h = (g - b) / d;
-        break;
-
-      case g:
-        h = ((b - r) / d) + 2;
-        break;
-
-      // case b:
-      default:
-        h = ((r - g) / d) + 4;
-        break;
-    }
-    h = SRgb.Hue.normalize(h * 60);
-  }
-
-  const l = (minRgb + maxRgb) / 2;
-
-  let s = 0;
-  if (d !== 0) {
-    if ((l !== 0) && (l !== 1)) {
-      s = (maxRgb - l) / Math.min(l, 1 - l);
-    }
-  }
-  return { h, s, l, a };
-}
-
 namespace SRgb {
   // RgbComponent >= 0 && RgbComponent <= 1
   export type RgbComponent = number;
@@ -155,6 +110,7 @@ namespace SRgb {
       };
     }
 
+    //XXX options.引数1はnormalize済
     export function fromRgb(rgb: Color.Rgb): Normalized {
       const normalizedRgb = Rgb.normalize(rgb);
       return {
@@ -165,6 +121,7 @@ namespace SRgb {
       };
     }
 
+    //XXX options.引数1はnormalize済
     export function toRgb(rgbBytes: RgbBytes): Rgb.Normalized {
       const normalizedRgbBytes = normalize(rgbBytes);
       return {
@@ -258,6 +215,56 @@ namespace SRgb {
       }
       return { h, s, l, a };
     }
+
+    //XXX options.引数1はnormalize済
+    export function fromRgb(rgb: Color.Rgb): Normalized {
+      const { r, g, b, a } = Rgb.normalize(rgb);
+
+      const maxRgb = Math.max(r, g, b);
+      const minRgb = Math.min(r, g, b);
+
+      const d = maxRgb - minRgb;
+
+      let h = SRgb.Hue.ZERO_TURN;
+      if (d !== 0) {
+        switch (maxRgb) {
+          case r:
+            h = (g - b) / d;
+            break;
+
+          case g:
+            h = ((b - r) / d) + 2;
+            break;
+
+          // case b:
+          default:
+            h = ((r - g) / d) + 4;
+            break;
+        }
+        h = SRgb.Hue.normalize(h * 60);
+      }
+
+      const l = (minRgb + maxRgb) / 2;
+
+      let s = 0;
+      if (d !== 0) {
+        if ((l !== 0) && (l !== 1)) {
+          s = (maxRgb - l) / Math.min(l, 1 - l);
+        }
+      }
+      return { h, s, l, a };
+    }
+
+    //XXX options.引数1はnormalize済
+    export function toRgb(hsl: Hsl): Rgb.Normalized {
+      const normalizedHsl = normalize(hsl);
+      return {
+        r: _f(0, normalizedHsl),
+        g: _f(8, normalizedHsl),
+        b: _f(4, normalizedHsl),
+        a: normalizedHsl.a,
+      };
+    }
   }
 
   // // Whiteness >= 0 && Whiteness <= 1
@@ -296,7 +303,7 @@ namespace SRgb {
     ) {
       this.#rgb = Object.freeze(Rgb.normalize({ r, g, b, a }));
       this.#rgbBytes = Object.freeze(RgbBytes.fromRgb(this.#rgb));
-      this.#hsl = Object.freeze(_rgbToHsl(this.#rgb));
+      this.#hsl = Object.freeze(Hsl.fromRgb(this.#rgb));
       Object.freeze(this);
     }
 
@@ -465,7 +472,7 @@ namespace SRgb {
     }
 
     static fromHsl(hsl: Hsl, options?: Color.FromOptions): SRgbColor {
-      const { r, g, b, a } = _hslToRgb(Hsl.normalize(hsl));
+      const { r, g, b, a } = Hsl.toRgb(hsl);
       if (options?.discardAlpha === true) {
         return new SRgbColor(r, g, b, Color.Alpha.MAX_VALUE);
       }
