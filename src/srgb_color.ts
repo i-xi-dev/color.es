@@ -66,7 +66,7 @@ class SRgbColor {
 
   //TODO SRgbColor.Rgb.normalize を2回実行するパスがある
 
-  static fromRgb(rgb: { r: number; g: number; b: number }): SRgbColor {
+  static fromRgb(rgb: Color.Rgb): SRgbColor {
     const { r, g, b } = SRgbColor.Rgb.normalize(rgb);
     return new SRgbColor(r, g, b, Color.Alpha.MAX_VALUE);
   }
@@ -79,7 +79,7 @@ class SRgbColor {
     };
   }
 
-  static fromRgba(rgba: { r: number; g: number; b: number; a: number }): SRgbColor {
+  static fromRgba(rgba: Color.Rgba): SRgbColor {
     const { r, g, b } = SRgbColor.Rgb.normalize(rgba);
     const a = Color.Alpha.normalize(rgba.a);
     return new SRgbColor(r, g, b, a);
@@ -94,7 +94,7 @@ class SRgbColor {
     };
   }
 
-  static fromRgbBytes(rgbBytes: { r: number; g: number; b: number }): SRgbColor {
+  static fromRgbBytes(rgbBytes: Color.Rgb): SRgbColor {
     const { r, g, b } = SRgbColor.RgbBytes.toRgb(rgbBytes);
     return new SRgbColor(r, g, b, Color.Alpha.MAX_VALUE);
   }
@@ -107,7 +107,7 @@ class SRgbColor {
     };
   }
 
-  static fromRgbaBytes(rgbaBytes: { r: number; g: number; b: number; a: number }): SRgbColor {
+  static fromRgbaBytes(rgbaBytes: Color.Rgba): SRgbColor {
     const { r, g, b } = SRgbColor.RgbBytes.toRgb(rgbaBytes);
     if (Uint8.isUint8(rgbaBytes.a)) {
       return new SRgbColor(r, g, b, rgbaBytes.a / Uint8.MAX_VALUE);
@@ -124,7 +124,7 @@ class SRgbColor {
     };
   }
 
-  static fromRgbBytesWithAlpha(rgbBytesWithAlpha: { r: number; g: number; b: number; a: number }): SRgbColor {
+  static fromRgbBytesWithAlpha(rgbBytesWithAlpha: Color.Rgba): SRgbColor {
     const { r, g, b } = SRgbColor.RgbBytes.toRgb(rgbBytesWithAlpha);
     const a = Color.Alpha.normalize(rgbBytesWithAlpha.a);
     return new SRgbColor(r, g, b, a);
@@ -253,7 +253,7 @@ class SRgbColor {
     return "#" + rrggbbaaOrRrggbb;
   }
 
-  static fromHsl(hsl: { h: number; s: number; l: number }): SRgbColor {
+  static fromHsl(hsl: Color.Hsl): SRgbColor {
     const { r, g, b } = SRgbColor.Hsl.toRgb(hsl);
     return new SRgbColor(r, g, b, Color.Alpha.MAX_VALUE);
   }
@@ -266,7 +266,7 @@ class SRgbColor {
     };
   }
 
-  static fromHsla(hsla: { h: number; s: number; l: number, a: number }): SRgbColor {
+  static fromHsla(hsla: Color.Hsla): SRgbColor {
     const { r, g, b } = SRgbColor.Hsl.toRgb(hsla);
     const a = Color.Alpha.normalize(hsla.a);
     return new SRgbColor(r, g, b, a);

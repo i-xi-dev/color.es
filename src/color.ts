@@ -16,7 +16,7 @@ namespace Color {
     }
   }
 
-  export type Alpha = number;
+  export type Alpha = Component;
 
   export namespace Alpha {
     export const MIN_VALUE = 0;
@@ -45,25 +45,31 @@ namespace Color {
     }
   }
 
-
-
-
-
-
   export type Rgb = {
     r: number;
     g: number;
     b: number;
   };
 
-  // export namespace Rgb {
-  //   export type Source = {
-  //     r: number;
-  //     g: number;
-  //     b: number;
-  //     a?: number;
-  //   };
-  // }
+  export type Rgba = {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  };
+
+  export type Hsl = {
+    h: number;
+    s: number;
+    l: number;
+  };
+
+  export type Hsla = {
+    h: number;
+    s: number;
+    l: number;
+    a: number;
+  };
 
 
 }
