@@ -1,7 +1,21 @@
-import { NumberUtils } from "../deps.ts";
+import { Angle, NumberUtils } from "../deps.ts";
 
 namespace Color {
-  // Alpha >= 0 && Alpha <= 1
+  // x >= 0 && x <= 1
+  export type Component = number;
+
+  export namespace Component {
+    export const MIN_VALUE = 0;
+    export const MAX_VALUE = 1;
+
+    export function normalize(value: unknown): Component {
+      if (Number.isFinite(value)) {
+        return NumberUtils.clamp((value as number), MIN_VALUE, MAX_VALUE);
+      }
+      return MIN_VALUE;
+    }
+  }
+
   export type Alpha = number;
 
   export namespace Alpha {
@@ -10,26 +24,48 @@ namespace Color {
 
     export function normalize(value: unknown): Alpha {
       if (Number.isFinite(value)) {
-        return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
+        return NumberUtils.clamp((value as number), MIN_VALUE, MAX_VALUE);
       }
       return MAX_VALUE;
     }
   }
 
+  export type Hue = Angle.Degrees;
+
+  // 何度が何色かは色空間による
+  // 彩度0はNaNで表す
+  export namespace Hue {
+    export const ZERO_TURN = 0;
+
+    export function normalize(value: unknown): Hue {
+      if (Number.isFinite(value)) {
+        return Angle.Degrees.normalize(value as number);
+      }
+      return Number.NaN;
+    }
+  }
+
+
+
+
+
+
   export type Rgb = {
     r: number;
     g: number;
     b: number;
-    a?: number;
   };
 
-  export type FromOptions = {
-    discardAlpha?: boolean;
-  };
+  // export namespace Rgb {
+  //   export type Source = {
+  //     r: number;
+  //     g: number;
+  //     b: number;
+  //     a?: number;
+  //   };
+  // }
 
-  export type ToOptions = {
-    omitAlphaIfOpaque?: boolean;
-  };
+
 }
 
 export { Color };
