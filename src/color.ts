@@ -10,7 +10,7 @@ namespace Color {
 
     export function normalize(value: unknown): Component {
       if (Number.isFinite(value)) {
-        return NumberUtils.clamp((value as number), MIN_VALUE, MAX_VALUE);
+        return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
       }
       return MIN_VALUE;
     }
@@ -24,7 +24,7 @@ namespace Color {
 
     export function normalize(value: unknown): Alpha {
       if (Number.isFinite(value)) {
-        return NumberUtils.clamp((value as number), MIN_VALUE, MAX_VALUE);
+        return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
       }
       return MAX_VALUE;
     }
@@ -49,29 +49,15 @@ namespace Color {
     r: number;
     g: number;
     b: number;
-  };
-
-  export type Rgba = {
-    r: number;
-    g: number;
-    b: number;
-    a: number;
+    a?: number;
   };
 
   export type Hsl = {
     h: number;
     s: number;
     l: number;
+    a?: number;
   };
-
-  export type Hsla = {
-    h: number;
-    s: number;
-    l: number;
-    a: number;
-  };
-
-
 }
 
 export { Color };
