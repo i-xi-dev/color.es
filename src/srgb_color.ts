@@ -170,6 +170,7 @@ class SRgbColor {
     ) {
       throw new RangeError("input");
     }
+    //XXX 他のfromXXXに合わせるなら無視して0扱い
 
     const inputHex = input.substring(1);
     let rrggbb: string;
