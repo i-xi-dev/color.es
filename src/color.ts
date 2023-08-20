@@ -33,7 +33,7 @@ namespace Color {
   export type Hue = Angle.Degrees;
 
   // 何度が何色かは色空間による
-  // 彩度0はNaNで表す
+  // 彩度0の色相は0で表す
   export namespace Hue {
     export const ZERO_TURN = 0;
 
@@ -41,7 +41,7 @@ namespace Color {
       if (Number.isFinite(value)) {
         return Angle.Degrees.normalize(value as number);
       }
-      return Number.NaN;
+      return ZERO_TURN;// Number.NaN;
     }
   }
 

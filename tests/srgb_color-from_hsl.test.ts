@@ -1,4 +1,4 @@
-import { assertStrictEquals, assertThrows } from "./deps.ts";
+import { assertStrictEquals } from "./deps.ts";
 import { SRgbColor } from "../mod.ts";
 import { r1Cases, r2Cases } from "./data.ts";
 

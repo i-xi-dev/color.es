@@ -250,7 +250,7 @@ class SRgbColor {
 
   toString(): string {
     return this.toHexString({
-      discardAlpha: true,
+      // omitAlphaIfOpaque: true,
       upperCase: true,
     });
   }
@@ -262,47 +262,54 @@ class SRgbColor {
   }
 
   plusHue(relativeHue: number): SRgbColor {
-    const { h, s, l, a } = this.toHsl();
+    const { h, s, l } = this.#hsl;
+    const a = this.#alpha;
     return SRgbColor.fromHsl({ h: (h + relativeHue), s, l, a });
   }
 
   withHue(absoluteHue: number): SRgbColor {
-    const { s, l, a } = this.toHsl();
+    const { s, l } = this.#hsl;
+    const a = this.#alpha;
     return SRgbColor.fromHsl({ h: absoluteHue, s, l, a });
   }
 
   plusSaturation(relativeSaturation: number): SRgbColor {
-    const { h, s, l, a } = this.toHsl();
+    const { h, s, l } = this.#hsl;
+    const a = this.#alpha;
     return SRgbColor.fromHsl({ h, s: (s + relativeSaturation), l, a });
   }
 
   withSaturation(absoluteSaturation: number): SRgbColor {
-    const { h, l, a } = this.toHsl();
+    const { h, l } = this.#hsl;
+    const a = this.#alpha;
     return SRgbColor.fromHsl({ h, s: absoluteSaturation, l, a });
   }
 
   plusLightness(relativeLightness: number): SRgbColor {
-    const { h, s, l, a } = this.toHsl();
+    const { h, s, l } = this.#hsl;
+    const a = this.#alpha;
     return SRgbColor.fromHsl({ h, s, l: (l + relativeLightness), a });
   }
 
   withLightness(absoluteLightness: number): SRgbColor {
-    const { h, s, a } = this.toHsl();
+    const { h, s } = this.#hsl;
+    const a = this.#alpha;
     return SRgbColor.fromHsl({ h, s, l: absoluteLightness, a });
   }
 
   plusAlpha(relativeAlpha: number): SRgbColor {
-    const { r, g, b, a } = this.toRgb();
+    const { r, g, b } = this.#rgb;
+    const a = this.#alpha;
     return new SRgbColor(r, g, b, (a as number) + relativeAlpha);
   }
 
   withAlpha(absoluteAlpha: number): SRgbColor {
-    const { r, g, b } = this.toRgb();
+    const { r, g, b } = this.#rgb;
     return new SRgbColor(r, g, b, absoluteAlpha);
   }
 
   withoutAlpha(): SRgbColor {
-    const { r, g, b } = this.toRgb();
+    const { r, g, b } = this.#rgb;
     return new SRgbColor(r, g, b, Color.Alpha.MAX_VALUE);
   }
 
@@ -493,7 +500,7 @@ namespace _Hsl {
 
     const d = maxRgb - minRgb;
 
-    let h = Color.Hue.ZERO_TURN;
+    let h = Color.Hue.ZERO_TURN;// Number.NaN;
     if (d !== 0) {
       switch (maxRgb) {
         case r:
