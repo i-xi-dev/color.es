@@ -362,6 +362,9 @@ namespace SRgbColor {
   export type ToUint8ArrayOptions = {
     discardAlpha?: boolean;
   };
+
+  //XXX FromOptions
+  // ignoreAlpha: boolean
 }
 
 namespace _Rgb {

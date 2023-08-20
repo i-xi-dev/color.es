@@ -124,6 +124,18 @@ Deno.test("SRgbColor.fromRgb({}, {}) - mode:precision", () => {
 
   const c9 = SRgbColor.fromRgb({ r: 1, g: 1, b: 1, a: 0.5 }, op);
   assertStrictEquals(c9.alpha, 0.5);
+
+  const c10 = SRgbColor.fromRgb({ r: 0.11, g: 0.12, b: 0.13 }, op);
+  assertStrictEquals(c10.red, 0.11);
+  assertStrictEquals(c10.green, 0.12);
+  assertStrictEquals(c10.blue, 0.13);
+  assertStrictEquals(c10.alpha, 1);
+
+  const c12 = SRgbColor.fromRgb({ r: 0.11, g: 0.12, b: 0.13, a: 0.14 }, op);
+  assertStrictEquals(c12.red, 0.11);
+  assertStrictEquals(c12.green, 0.12);
+  assertStrictEquals(c12.blue, 0.13);
+  assertStrictEquals(c12.alpha, 0.14);
 });
 
 Deno.test("SRgbColor.fromRgb({}, {}) - mode:uint8", () => {
