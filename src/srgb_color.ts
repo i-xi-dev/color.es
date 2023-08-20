@@ -75,8 +75,7 @@ class SRgbColor {
       if (options?.mode === "uint8") {
         if (Number.isFinite(rgb.a)) {
           a = Uint8.clamp(rgb.a) / Uint8.MAX_VALUE;
-        }
-        else {
+        } else {
           a = Color.Alpha.MAX_VALUE;
         }
       } else {
