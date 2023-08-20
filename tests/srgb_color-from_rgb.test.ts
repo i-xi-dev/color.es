@@ -40,6 +40,29 @@ Deno.test("SRgbColor.fromRgb({})", () => {
 
   const c9 = SRgbColor.fromRgb({ r: 1, g: 1, b: 1, a: 0.5 });
   assertStrictEquals(c9.alpha, 0.5);
+
+  const x1 = SRgbColor.fromRgb(
+    { r: 2, g: 128 } as { r: number; g: number; b: number },
+  );
+  const x1r = x1.toRgb();
+  assertStrictEquals(x1r.r, 2);
+  assertStrictEquals(x1r.g, 128);
+  assertStrictEquals(x1r.b, 0);
+  assertStrictEquals(x1r.a, 1);
+
+  const x2 = SRgbColor.fromRgb({ r: 2 } as { r: number; g: number; b: number });
+  const x2r = x2.toRgb();
+  assertStrictEquals(x2r.r, 2);
+  assertStrictEquals(x2r.g, 0);
+  assertStrictEquals(x2r.b, 0);
+  assertStrictEquals(x2r.a, 1);
+
+  const x3 = SRgbColor.fromRgb({} as { r: number; g: number; b: number });
+  const x3r = x3.toRgb();
+  assertStrictEquals(x3r.r, 0);
+  assertStrictEquals(x3r.g, 0);
+  assertStrictEquals(x3r.b, 0);
+  assertStrictEquals(x3r.a, 1);
 });
 
 Deno.test("SRgbColor.fromRgb({}, {}) - mode:auto", () => {

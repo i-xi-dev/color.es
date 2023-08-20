@@ -88,6 +88,8 @@ Deno.test("SRgbColor.prototype.toRgb() - mode:uint8", () => {
   assertStrictEquals(c1r.g, 128);
   assertStrictEquals(c1r.b, 64);
   assertStrictEquals(c1r.a, 255);
+  c1r.r = 255;
+  assertStrictEquals(c1.red, 0);
 
   const c2 = SRgbColor.fromRgb({ r: 0, g: 128, b: 64, a: 0.6 });
   const c2r = c2.toRgb({ mode: "uint8" });

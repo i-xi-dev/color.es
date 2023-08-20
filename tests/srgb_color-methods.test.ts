@@ -2,8 +2,14 @@ import { assertStrictEquals } from "./deps.ts";
 import { SRgbColor } from "../mod.ts";
 
 Deno.test("SRgbColor.prototype.toString()", () => {
-  assertStrictEquals(SRgbColor.fromHexString("#fffefd").toString(), "#FFFEFDFF");
-  assertStrictEquals(SRgbColor.fromHexString("#fffefd88").toString(), "#FFFEFD88");
+  assertStrictEquals(
+    SRgbColor.fromHexString("#fffefd").toString(),
+    "#FFFEFDFF",
+  );
+  assertStrictEquals(
+    SRgbColor.fromHexString("#fffefd88").toString(),
+    "#FFFEFD88",
+  );
 });
 
 Deno.test("SRgbColor.prototype.toJSON()", () => {

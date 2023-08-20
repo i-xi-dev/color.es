@@ -41,7 +41,7 @@ namespace Color {
       if (Number.isFinite(value)) {
         return Angle.Degrees.normalize(value as number);
       }
-      return ZERO_TURN;// Number.NaN;
+      return ZERO_TURN; // Number.NaN;
     }
   }
 

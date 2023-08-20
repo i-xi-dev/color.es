@@ -500,7 +500,7 @@ namespace _Hsl {
 
     const d = maxRgb - minRgb;
 
-    let h = Color.Hue.ZERO_TURN;// Number.NaN;
+    let h = Color.Hue.ZERO_TURN; // Number.NaN;
     if (d !== 0) {
       switch (maxRgb) {
         case r:
