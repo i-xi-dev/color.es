@@ -71,9 +71,14 @@ class SRgbColor {
       return new SRgbColor(r, g, b, a);
     } else {
       const { r, g, b } = _RgbBytes.toRgb(rgb);
-      let a = Color.Alpha.MAX_VALUE;
+      let a: number;
       if (options?.mode === "uint8") {
-        a = Uint8.clamp(rgb.a) / Uint8.MAX_VALUE;
+        if (Number.isFinite(rgb.a)) {
+          a = Uint8.clamp(rgb.a) / Uint8.MAX_VALUE;
+        }
+        else {
+          a = Color.Alpha.MAX_VALUE;
+        }
       } else {
         a = Color.Alpha.normalize(rgb.a);
       }
