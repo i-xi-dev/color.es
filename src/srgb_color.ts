@@ -363,6 +363,8 @@ namespace SRgbColor {
     discardAlpha?: boolean;
   };
 
+  //XXX ToOptions
+  // omitAlphaIfOpaque: boolean
   //XXX FromOptions
   // ignoreAlpha: boolean
 }

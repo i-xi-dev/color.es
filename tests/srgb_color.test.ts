@@ -7,6 +7,7 @@ import { SRgbColor } from "../mod.ts";
 
 
 
+
 // Deno.test("SRgb.SRgbColor.prototype.red", () => {
 //   assertStrictEquals(SRgb.SRgbColor.fromRgbBytes({ r: 1000, g: 0, b: 0 }).red, 1);
 //   assertStrictEquals(SRgb.SRgbColor.fromRgbBytes({ r: 256, g: 0, b: 0 }).red, 1);
@@ -861,116 +862,6 @@ import { SRgbColor } from "../mod.ts";
 //   assertStrictEquals("a" in c2a, false);
 // });
 
-// Deno.test("SRgb.SRgbColor.prototype.toUint8ClampedArray()", () => {
-//   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
-//   const c1a = c1.toUint8ClampedArray();
-//   assertStrictEquals(c1a[0], 255);
-//   assertStrictEquals(c1a[1], 254);
-//   assertStrictEquals(c1a[2], 253);
-//   assertStrictEquals(c1a[3], 255);
-//   assertStrictEquals(c1a.length, 4);
-//   c1a[0] = 0;
-//   assertStrictEquals(c1.red, 1);
-
-//   const c2 = SRgb.SRgbColor.fromHexString("#fffefd88");
-//   const c2a = c2.toUint8ClampedArray();
-//   assertStrictEquals(c2a[0], 255);
-//   assertStrictEquals(c2a[1], 254);
-//   assertStrictEquals(c2a[2], 253);
-//   assertStrictEquals(c2a[3], 136);
-//   assertStrictEquals(c2a.length, 4);
-// });
-
-// Deno.test("SRgb.SRgbColor.prototype.toUint8ClampedArray({}) - omitAlphaIfOpaque", () => {
-//   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
-//   const c1a = c1.toUint8ClampedArray({ omitAlphaIfOpaque: true });
-//   assertStrictEquals(c1a[0], 255);
-//   assertStrictEquals(c1a[1], 254);
-//   assertStrictEquals(c1a[2], 253);
-//   assertStrictEquals(c1a.length, 3);
-//   c1a[0] = 0;
-//   assertStrictEquals(c1.red, 1);
-
-//   const c2 = SRgb.SRgbColor.fromHexString("#fffefd88");
-//   const c2a = c2.toUint8ClampedArray({ omitAlphaIfOpaque: true });
-//   assertStrictEquals(c2a[0], 255);
-//   assertStrictEquals(c2a[1], 254);
-//   assertStrictEquals(c2a[2], 253);
-//   assertStrictEquals(c2a[3], 136);
-//   assertStrictEquals(c2a.length, 4);
-// });
-
-// Deno.test("SRgb.SRgbColor.prototype.toUint8ClampedArray({}) - discardAlpha", () => {
-//   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
-//   const c1a = c1.toUint8ClampedArray({ discardAlpha: true });
-//   assertStrictEquals(c1a[0], 255);
-//   assertStrictEquals(c1a[1], 254);
-//   assertStrictEquals(c1a[2], 253);
-//   assertStrictEquals(c1a.length, 3);
-
-//   const c2 = SRgb.SRgbColor.fromHexString("#fffefd88");
-//   const c2a = c2.toUint8ClampedArray({ discardAlpha: true });
-//   assertStrictEquals(c2a[0], 255);
-//   assertStrictEquals(c2a[1], 254);
-//   assertStrictEquals(c2a[2], 253);
-//   assertStrictEquals(c2a.length, 3);
-// });
-
-// Deno.test("SRgb.SRgbColor.prototype.toUint8Array()", () => {
-//   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
-//   const c1a = c1.toUint8Array();
-//   assertStrictEquals(c1a[0], 255);
-//   assertStrictEquals(c1a[1], 254);
-//   assertStrictEquals(c1a[2], 253);
-//   assertStrictEquals(c1a[3], 255);
-//   assertStrictEquals(c1a.length, 4);
-//   c1a[0] = 0;
-//   assertStrictEquals(c1.red, 1);
-
-//   const c2 = SRgb.SRgbColor.fromHexString("#fffefd88");
-//   const c2a = c2.toUint8Array();
-//   assertStrictEquals(c2a[0], 255);
-//   assertStrictEquals(c2a[1], 254);
-//   assertStrictEquals(c2a[2], 253);
-//   assertStrictEquals(c2a[3], 136);
-//   assertStrictEquals(c2a.length, 4);
-// });
-
-// Deno.test("SRgb.SRgbColor.prototype.toUint8Array({}) - omitAlphaIfOpaque", () => {
-//   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
-//   const c1a = c1.toUint8Array({ omitAlphaIfOpaque: true });
-//   assertStrictEquals(c1a[0], 255);
-//   assertStrictEquals(c1a[1], 254);
-//   assertStrictEquals(c1a[2], 253);
-//   assertStrictEquals(c1a.length, 3);
-//   c1a[0] = 0;
-//   assertStrictEquals(c1.red, 1);
-
-//   const c2 = SRgb.SRgbColor.fromHexString("#fffefd88");
-//   const c2a = c2.toUint8Array({ omitAlphaIfOpaque: true });
-//   assertStrictEquals(c2a[0], 255);
-//   assertStrictEquals(c2a[1], 254);
-//   assertStrictEquals(c2a[2], 253);
-//   assertStrictEquals(c2a[3], 136);
-//   assertStrictEquals(c2a.length, 4);
-// });
-
-// Deno.test("SRgb.SRgbColor.prototype.toUint8Array({}) - discardAlpha", () => {
-//   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
-//   const c1a = c1.toUint8Array({ discardAlpha: true });
-//   assertStrictEquals(c1a[0], 255);
-//   assertStrictEquals(c1a[1], 254);
-//   assertStrictEquals(c1a[2], 253);
-//   assertStrictEquals(c1a.length, 3);
-
-//   const c2 = SRgb.SRgbColor.fromHexString("#fffefd88");
-//   const c2a = c2.toUint8Array({ discardAlpha: true });
-//   assertStrictEquals(c2a[0], 255);
-//   assertStrictEquals(c2a[1], 254);
-//   assertStrictEquals(c2a[2], 253);
-//   assertStrictEquals(c2a.length, 3);
-// });
-
 // Deno.test("SRgb.SRgbColor.prototype.toRgb()", () => {
 //   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
 //   const c1a = c1.toRgb();
@@ -1168,22 +1059,6 @@ import { SRgbColor } from "../mod.ts";
 
 // Deno.test("SRgb.SRgbColor.prototype.toString()", () => {
 //   assertStrictEquals(SRgb.SRgbColor.fromHexString("#fffefd").toString(), "#FFFEFD");
-// });
-
-// Deno.test("SRgb.SRgbColor.prototype.clone()", () => {
-//   const c1 = SRgb.SRgbColor.fromHexString("#fffefd");
-//   const c1a = c1.clone();
-//   assertStrictEquals(c1a.red, 1);
-//   assertStrictEquals(c1a.green, 254 / 255);
-//   assertStrictEquals(c1a.blue, 253 / 255);
-//   assertStrictEquals(c1a.alpha, 1);
-
-//   const c2 = SRgb.SRgbColor.fromHexString("#01020388");
-//   const c2a = c2.clone();
-//   assertStrictEquals(c2a.red, 1 / 255);
-//   assertStrictEquals(c2a.green, 2 / 255);
-//   assertStrictEquals(c2a.blue, 3 / 255);
-//   assertStrictEquals(c2a.alpha, 136 / 255);
 // });
 
 // Deno.test("SRgb.SRgbColor.prototype.rotateHue()", () => {
