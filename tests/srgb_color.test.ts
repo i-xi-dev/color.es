@@ -7,6 +7,7 @@ import { SRgbColor } from "../mod.ts";
 
 
 
+
 // Deno.test("SRgb.SRgbColor.prototype.red", () => {
 //   assertStrictEquals(SRgb.SRgbColor.fromRgbBytes({ r: 1000, g: 0, b: 0 }).red, 1);
 //   assertStrictEquals(SRgb.SRgbColor.fromRgbBytes({ r: 256, g: 0, b: 0 }).red, 1);
@@ -859,79 +860,6 @@ import { SRgbColor } from "../mod.ts";
 //   assertStrictEquals(c2a.g, 2);
 //   assertStrictEquals(c2a.b, 3);
 //   assertStrictEquals("a" in c2a, false);
-// });
-
-// Deno.test("SRgb.SRgbColor.prototype.toHexString()", () => {
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#fffefd").toHexString(),
-//     "#fffefdff",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#fffefd").toHexString({ upperCase: true }),
-//     "#FFFEFDFF",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#fffefd").toHexString({
-//       upperCase: true,
-//       shorten: true,
-//     }),
-//     "#FFFEFDFF",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#fffefd").toHexString({
-//       upperCase: true,
-//       shorten: true,
-//       omitAlphaIfOpaque: true,
-//     }),
-//     "#FFFEFD",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#fffefd").toHexString({
-//       upperCase: true,
-//       shorten: true,
-//       discardAlpha: true,
-//     }),
-//     "#FFFEFD",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#fffefd88").toHexString({
-//       upperCase: true,
-//       shorten: true,
-//       omitAlphaIfOpaque: true,
-//       discardAlpha: true,
-//     }),
-//     "#FFFEFD",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#ffeedd").toHexString({
-//       upperCase: true,
-//       shorten: true,
-//     }),
-//     "#FEDF",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#ffeedd").toHexString({
-//       upperCase: true,
-//       shorten: false,
-//     }),
-//     "#FFEEDDFF",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#ffeedd").toHexString({
-//       upperCase: false,
-//       shorten: false,
-//       omitAlphaIfOpaque: false,
-//     }),
-//     "#ffeeddff",
-//   );
-//   assertStrictEquals(
-//     SRgb.SRgbColor.fromHexString("#ffeedd").toHexString({
-//       upperCase: false,
-//       shorten: false,
-//       discardAlpha: false,
-//     }),
-//     "#ffeeddff",
-//   );
 // });
 
 // Deno.test("SRgb.SRgbColor.prototype.toString()", () => {
