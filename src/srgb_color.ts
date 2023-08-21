@@ -349,31 +349,29 @@ class SRgbColor {
 }
 
 namespace SRgbColor {
+  //XXX
+  // export type FromOptions = {
+  //   ignoreAlpha: boolean;
+  // }
+
+  export type ToOptions = {
+    discardAlpha?: boolean;
+    //XXX omitAlphaIfOpaque: boolean
+  };
+
   export type RgbOptions = {
     mode?: "auto" | "uint8" | "precision";
   };
 
-  export type ToRgbOptions = RgbOptions & {
-    discardAlpha?: boolean;
-  };
+  export type ToRgbOptions = RgbOptions & ToOptions;
 
-  export type ToHslOptions = {
-    discardAlpha?: boolean;
-  };
+  export type ToHslOptions = ToOptions;
 
   export type ToHexStringOptions = {
-    discardAlpha?: boolean;
     upperCase?: boolean;
-  };
+  } & ToOptions;
 
-  export type ToUint8ArrayOptions = {
-    discardAlpha?: boolean;
-  };
-
-  //XXX ToOptions
-  // omitAlphaIfOpaque: boolean
-  //XXX FromOptions
-  // ignoreAlpha: boolean
+  export type ToUint8ArrayOptions = ToOptions;
 }
 
 namespace _Rgb {
@@ -546,18 +544,51 @@ namespace _Hsl {
   }
 }
 
-// namespace _Hwb {
-//   // Whiteness >= 0 && Whiteness <= 1
-//   export type Whiteness = number;
+namespace _Hwb {
+  // Whiteness >= 0 && Whiteness <= 1
+  export type Whiteness = Color.Component;
 
-//   // Blackness >= 0 && Blackness <= 1
-//   export type Blackness = number;
+  // Blackness >= 0 && Blackness <= 1
+  export type Blackness = Color.Component;
 
-//   export type Normalized = {
-//     h: Color.Hue;
-//     w: Whiteness;
-//     b: Blackness;
-//   };
-// }
+  export type Normalized = {
+    h: Color.Hue;
+    w: Whiteness;
+    b: Blackness;
+  };
+
+  export function normalize(value: unknown): Normalized {
+    let h: unknown = undefined;
+    let w: unknown = undefined;
+    let b: unknown = undefined;
+    if (value && (typeof value === "object")) {
+      if ("h" in value) {
+        h = value.h;
+      }
+      if ("w" in value) {
+        w = value.w;
+      }
+      if ("b" in value) {
+        b = value.b;
+      }
+    }
+    return {
+      h: Color.Hue.normalize(h),
+      w: Color.Component.normalize(w),
+      b: Color.Component.normalize(b),
+    };
+  }
+
+  export function fromRgb(rgb: unknown): Normalized {
+    const { r, g, b } = _Rgb.normalize(rgb);
+    const { h } = _Hsl.fromRgb(rgb);
+    const w = Math.min(r, g, b);
+    const blackness = Math.min(r, g, b);
+    return { h, w, b: blackness };
+  }
+
+  // export function toRgb(hwb: unknown): _Rgb.Normalized {
+  // }
+}
 
 export { SRgbColor };
