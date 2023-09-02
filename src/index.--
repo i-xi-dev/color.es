@@ -1,14 +1,5 @@
 //
 
-function _isHslParams(value: unknown): value is SrgbColor.HslParams {
-  const { h, s, l, a } = value as SrgbColor.HslParams;
-  const hValid = Number.isFinite(h);
-  const sValid = Number.isFinite(s);
-  const lValid = Number.isFinite(l);
-  const aValid = Number.isFinite(a) || (a === undefined);
-  return (hValid && sValid && lValid && aValid);
-}
-
 class SrgbColor {
 
 
@@ -66,23 +57,6 @@ class SrgbColor {
   }
 
 }
-
-namespace SrgbColor {
-
-  export type HwbParams = {
-    h: hue, // angle
-    w: hwb_w, // 0-1
-    b: hwb_b, // 0-1
-    a?: alpha, // 0-1
-  };
-
-
-
-
-}
-
-
-
 
 /*
 static fromCssString(cssString: string): RgbColor {

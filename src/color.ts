@@ -58,6 +58,13 @@ namespace Color {
     l: number;
     a?: number;
   };
+
+  export type Hwb = {
+    h: number;
+    w: number;
+    b: number;
+    a?: number;
+  };
 }
 
 export { Color };

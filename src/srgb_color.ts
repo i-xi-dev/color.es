@@ -10,6 +10,7 @@ class SRgbColor {
   readonly #rgbBytes: _RgbBytes.Normalized;
   readonly #alphaByte: Uint8;
   readonly #hsl: _Hsl.Normalized;
+  readonly #hwb: _Hwb.Normalized;
 
   private constructor(
     r: _Rgb.Component,
@@ -22,6 +23,7 @@ class SRgbColor {
     this.#rgbBytes = Object.freeze(_RgbBytes.fromRgb(this.#rgb));
     this.#alphaByte = Uint8.clamp(this.#alpha * Uint8.MAX_VALUE);
     this.#hsl = Object.freeze(_Hsl.fromRgb(this.#rgb));
+    this.#hwb = Object.freeze(_Hwb.fromRgb(this.#rgb));
     Object.freeze(this);
   }
 
@@ -62,7 +64,13 @@ class SRgbColor {
     return this.#hsl.l;
   }
 
-  //XXX w, b
+  get whiteness(): _Hwb.Whiteness {
+    return this.#hwb.w;
+  }
+
+  get blackness(): _Hwb.Blackness {
+    return this.#hwb.b;
+  }
 
   static fromRgb(rgb: Color.Rgb, options?: SRgbColor.RgbOptions): SRgbColor {
     if (options?.mode === "precision") {
@@ -248,6 +256,20 @@ class SRgbColor {
     return { h, s, l, a: this.#alpha };
   }
 
+  static fromHwb(hwb: Color.Hwb): SRgbColor {
+    const { r, g, b } = _Hwb.toRgb(hwb);
+    const a = Color.Alpha.normalize(hwb.a);
+    return new SRgbColor(r, g, b, a);
+  }
+
+  toHwb(options?: SRgbColor.ToHwbOptions): Color.Hwb {
+    const { h, w, b } = this.#hwb;
+    if (options?.discardAlpha === true) {
+      return { h, w, b };
+    }
+    return { h, w, b, a: this.#alpha };
+  }
+
   toString(): string {
     return this.toHexString({
       // omitAlphaIfOpaque: true,
@@ -367,6 +389,8 @@ namespace SRgbColor {
 
   export type ToHslOptions = ToOptions;
 
+  export type ToHwbOptions = ToOptions;
+
   export type ToHexStringOptions = {
     upperCase?: boolean;
   } & ToOptions;
@@ -384,7 +408,7 @@ namespace _Rgb {
     b: Component;
   };
 
-  export function normalize(value: unknown): Normalized {
+  export function normalize(value: unknown): Normalized {//TODO unknownやめる（処理内容は変えない）
     let r: unknown = undefined;
     let g: unknown = undefined;
     let b: unknown = undefined;
@@ -583,12 +607,27 @@ namespace _Hwb {
     const { r, g, b } = _Rgb.normalize(rgb);
     const { h } = _Hsl.fromRgb(rgb);
     const w = Math.min(r, g, b);
-    const blackness = Math.min(r, g, b);
+    const blackness = 1 - Math.max(r, g, b);
     return { h, w, b: blackness };
   }
 
-  // export function toRgb(hwb: unknown): _Rgb.Normalized {
-  // }
+  export function toRgb(hwb: unknown): _Rgb.Normalized {
+    const { h, w, b } = normalize(hwb);
+    if (w + b >= 1) {
+      const g = w / (w + b);
+      return {
+        r: g,
+        g: g,
+        b: g,
+      };
+    }
+
+    const rgb = _Hsl.toRgb({ h, s: 1, l: 0.5 });
+    rgb.r = (rgb.r * (1 - w - b)) + w;
+    rgb.g = (rgb.g * (1 - w - b)) + w;
+    rgb.b = (rgb.b * (1 - w - b)) + w;
+    return rgb;
+  }
 }
 
 export { SRgbColor };
