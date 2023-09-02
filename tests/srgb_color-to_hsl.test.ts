@@ -20,8 +20,8 @@ Deno.test("SRgbColor.prototype.toHsl()", () => {
   for (const c of r3Cases) {
     const hsl = SRgbColor.fromRgb({ r: c.r, g: c.g, b: c.b }).toHsl();
     assertStrictEquals(hsl.h.toFixed(2), c.h);
-    assertStrictEquals(hsl.s.toFixed(0), c.s);
-    assertStrictEquals(hsl.l.toFixed(1), c.l);
+    assertStrictEquals(hsl.s.toFixed(4), c.s);
+    assertStrictEquals(hsl.l.toFixed(4), c.l);
   }
 
   const c0 = SRgbColor.fromHexString("#fffefd");

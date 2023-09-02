@@ -1,6 +1,6 @@
 import { assertStrictEquals } from "./deps.ts";
 import { SRgbColor } from "../mod.ts";
-import { r1Cases, r2Cases } from "./data.ts";
+import { r1Cases, r2Cases, r3Cases } from "./data.ts";
 
 Deno.test("SRgbColor.prototype.toHwb()", () => {
   for (const c of r1Cases) {
@@ -12,6 +12,13 @@ Deno.test("SRgbColor.prototype.toHwb()", () => {
 
   for (const c of r2Cases) {
     const hsl = SRgbColor.fromRgb({ r: 255, g: c.x, b: c.x }).toHwb();
+    assertStrictEquals(hsl.h.toFixed(2), c.h);
+    assertStrictEquals(hsl.w.toFixed(4), c.wt);
+    assertStrictEquals(hsl.b.toFixed(4), c.bk);
+  }
+
+  for (const c of r3Cases) {
+    const hsl = SRgbColor.fromRgb({ r: c.r, g: c.g, b: c.b }).toHwb();
     assertStrictEquals(hsl.h.toFixed(2), c.h);
     assertStrictEquals(hsl.w.toFixed(4), c.wt);
     assertStrictEquals(hsl.b.toFixed(4), c.bk);

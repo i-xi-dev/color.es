@@ -1,10 +1,9 @@
 import { assertStrictEquals } from "./deps.ts";
 import { SRgbColor } from "../mod.ts";
-import { r1Cases, r2Cases } from "./data.ts";
+import { r1Cases, r2Cases, r3Cases } from "./data.ts";
 
 Deno.test("SRgbColor.fromHwb({ h, w, b })", () => {
   for (const c of r1Cases) {
-    console.log(c)
     const c0 = SRgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
@@ -25,6 +24,18 @@ Deno.test("SRgbColor.fromHwb({ h, w, b })", () => {
     assertStrictEquals(c0.red, 1);
     assertStrictEquals(c0.green.toFixed(3).substring(0, 4), (c.x / 255).toFixed(3).substring(0, 4));
     assertStrictEquals(c0.blue.toFixed(3).substring(0, 4), (c.x / 255).toFixed(3).substring(0, 4));
+    assertStrictEquals(c0.alpha, 1);
+  }
+
+  for (const c of r3Cases) {
+    const c0 = SRgbColor.fromHwb({
+      h: Number(c.h),
+      w: Number(c.wt),
+      b: Number(c.bk),
+    });
+    assertStrictEquals(c0.red.toFixed(3).substring(0, 4), (c.r / 255).toFixed(3).substring(0, 4));
+    assertStrictEquals(c0.green.toFixed(3).substring(0, 4), (c.g / 255).toFixed(3).substring(0, 4));
+    assertStrictEquals(c0.blue.toFixed(3).substring(0, 4), (c.b / 255).toFixed(3).substring(0, 4));
     assertStrictEquals(c0.alpha, 1);
   }
 });
