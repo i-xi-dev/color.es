@@ -139,3 +139,39 @@ const RGBFUNC = `^(?:${RGB_NUM_L4}|${RGB_PERCENT_L4}|${RGB_NUM_L4L}|${RGB_PERCEN
     type?: CssNotation;
     //XXX nameIfExists
   };
+
+
+
+    //XXX
+  // xxxHsl(func): Iterable<hsl>
+  // xxxRgb(func): Iterable<rgb>
+
+  //XXX complementaryColor() 補色を返す
+
+  // lighter(percentage): SRgbColor {
+  // }
+
+  // darker(percentage): SRgbColor {
+  // }
+
+  // contrast,saturate,sepia,...
+
+  // grayscale(): SRgbColor {
+  // }
+
+  // invert(): SRgbColor {
+  // }
+
+  //XXX
+  // equals(rgb: Rgb | SRgbColor): boolean {
+  //   if (rgb instanceof SRgbColor) {
+  //     return (this.red === rgb.red) && (this.green === rgb.green) && (this.blue === rgb.blue) && (this.alpha === rgb.alpha);
+  //   }
+  //   else  {
+
+  //   }
+  // }
+
+  //XXX bytesEquals
+
+  //XXX mix(blendMode, other: SRgbColor | *)

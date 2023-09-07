@@ -1,1 +1,1 @@
-export * from "./src/srgb_color.ts";
+export * from "./src/color.ts";
