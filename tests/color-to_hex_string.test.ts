@@ -1,45 +1,45 @@
 import { assertStrictEquals } from "./deps.ts";
-import { SRgbColor } from "../mod.ts";
+import { Color } from "../mod.ts";
 
-Deno.test("SRgbColor.prototype.toHexString()", () => {
+Deno.test("Color.prototype.toHexString()", () => {
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd").toHexString(),
+    Color.fromHexString("#fffefd").toHexString(),
     "#fffefdff",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd").toHexString({ upperCase: true }),
+    Color.fromHexString("#fffefd").toHexString({ upperCase: true }),
     "#FFFEFDFF",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd").toHexString({
+    Color.fromHexString("#fffefd").toHexString({
       upperCase: true,
       discardAlpha: true,
     }),
     "#FFFEFD",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#fffefd88").toHexString({
+    Color.fromHexString("#fffefd88").toHexString({
       upperCase: true,
       discardAlpha: true,
     }),
     "#FFFEFD",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#ffeedd").toHexString({
+    Color.fromHexString("#ffeedd").toHexString({
       upperCase: true,
       discardAlpha: false,
     }),
     "#FFEEDDFF",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#ffeedd").toHexString({
+    Color.fromHexString("#ffeedd").toHexString({
       upperCase: false,
       discardAlpha: false,
     }),
     "#ffeeddff",
   );
   assertStrictEquals(
-    SRgbColor.fromHexString("#ffeedd88").toHexString({
+    Color.fromHexString("#ffeedd88").toHexString({
       upperCase: false,
       discardAlpha: false,
     }),
