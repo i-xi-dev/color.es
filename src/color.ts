@@ -51,13 +51,13 @@ namespace _SRgb {
   export namespace Rgb {
     // sRGBでは 0～1
     export type Component = _Component;
-  
+
     export type Normalized = {
       r: Component;
       g: Component;
       b: Component;
     };
-  
+
     export function normalize(value: Color.Rgb): Normalized {
       let r: unknown = undefined;
       let g: unknown = undefined;
@@ -160,23 +160,23 @@ namespace _SRgb {
 
     export function fromRgb(rgb: Color.Rgb): Normalized {
       const { r, g, b } = Rgb.normalize(rgb);
-  
+
       const maxRgb = Math.max(r, g, b);
       const minRgb = Math.min(r, g, b);
-  
+
       const d = maxRgb - minRgb;
-  
+
       let h = _HUE_ZERO; //XXX Number.NaN;
       if (d !== 0) {
         switch (maxRgb) {
           case r:
             h = (g - b) / d;
             break;
-  
+
           case g:
             h = ((b - r) / d) + 2;
             break;
-  
+
           // case b:
           default:
             h = ((r - g) / d) + 4;
@@ -184,9 +184,9 @@ namespace _SRgb {
         }
         h = _normalizeHue(h * 60);
       }
-  
+
       const l = (minRgb + maxRgb) / 2;
-  
+
       let s = 0;
       if (d !== 0) {
         if ((l !== 0) && (l !== 1)) {
@@ -204,7 +204,7 @@ namespace _SRgb {
         b: _f(4, normalizedHsl),
       };
     }
-  
+
     function _f(n: number, { h, s, l }: Normalized): number {
       const k = (n + h / 30) % 12;
       const a = s * Math.min(l, 1 - l);
@@ -260,7 +260,7 @@ namespace _SRgb {
           b: g,
         };
       }
-  
+
       const rgb = _SRgb.Hsl.toRgb({ h, s: 1, l: 0.5 });
       rgb.r = (rgb.r * (1 - w - b)) + w;
       rgb.g = (rgb.g * (1 - w - b)) + w;
@@ -654,7 +654,7 @@ class Color {
   }
 
   plusAlpha(relativeAlpha: number): Color {
-    return new Color(this.#r, this.#g, this.#b, (this.#a + relativeAlpha));
+    return new Color(this.#r, this.#g, this.#b, this.#a + relativeAlpha);
   }
 
   withAlpha(absoluteAlpha: number): Color {
@@ -664,13 +664,9 @@ class Color {
   withoutAlpha(): Color {
     return new Color(this.#r, this.#g, this.#b, _ALPHA_MAX);
   }
-
-
-
 }
 
 namespace Color {
-
   // 以下いずれか
   // ・r,g,bはバイト表現 0～255、aは0～1（多分一般的VuetifyとかReactの形式）
   // ・r,g,b,aすべてバイト表現 0～255
@@ -727,9 +723,6 @@ namespace Color {
   export type ToHexStringOptions = {
     upperCase?: boolean;
   } & ToOptions;
-
 }
 
-export {
-  Color,
-};
+export { Color };
