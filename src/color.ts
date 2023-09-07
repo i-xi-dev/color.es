@@ -654,11 +654,16 @@ class Color {
   }
 
   plusAlpha(relativeAlpha: number): Color {
-    return new Color(this.#r, this.#g, this.#b, this.#a + relativeAlpha);
+    return new Color(
+      this.#r,
+      this.#g,
+      this.#b,
+      _normalizeAlpha(this.#a + relativeAlpha),
+    );
   }
 
   withAlpha(absoluteAlpha: number): Color {
-    return new Color(this.#r, this.#g, this.#b, absoluteAlpha);
+    return new Color(this.#r, this.#g, this.#b, _normalizeAlpha(absoluteAlpha));
   }
 
   withoutAlpha(): Color {
