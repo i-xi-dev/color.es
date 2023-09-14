@@ -33,6 +33,22 @@ Deno.test("Color.prototype.toRgb({}) - discardAlpha:true", () => {
   assertStrictEquals("a" in c2r, false);
 });
 
+Deno.test("Color.prototype.toRgb({}) - omitAlphaIfOpaque:true", () => {
+  const c1 = Color.fromRgb({ r: 0, g: 128, b: 64 });
+  const c1r = c1.toRgb({ omitAlphaIfOpaque: true });
+  assertStrictEquals(c1r.r, 0);
+  assertStrictEquals(c1r.g, 128);
+  assertStrictEquals(c1r.b, 64);
+  assertStrictEquals("a" in c1r, false);
+
+  const c2 = Color.fromRgb({ r: 0, g: 128, b: 64, a: 0.6 });
+  const c2r = c2.toRgb({ omitAlphaIfOpaque: true });
+  assertStrictEquals(c2r.r, 0);
+  assertStrictEquals(c2r.g, 128);
+  assertStrictEquals(c2r.b, 64);
+  assertStrictEquals(c2r.a, 0.6);
+});
+
 Deno.test("Color.prototype.toRgb() - mode:auto", () => {
   const c1 = Color.fromRgb({ r: 0, g: 128, b: 64 });
   const c1r = c1.toRgb({ mode: "compat" });

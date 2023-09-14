@@ -270,6 +270,16 @@ namespace _SRgb {
   }
 }
 
+function _isRequiredAlpha(alpha: _Alpha, options?: Color.ToOptions): boolean {
+  if (options?.discardAlpha === true) {
+    return false;
+  }
+  if ((options?.omitAlphaIfOpaque === true) && (alpha === _ALPHA_MAX)) {
+    return false;
+  }
+  return true;
+}
+
 /**
  * A color in sRGB color space
  */
@@ -517,42 +527,42 @@ class Color {
       }
     }
 
-    if (options?.discardAlpha === true) {
-      return { r, g, b };
+    if (_isRequiredAlpha(this.#a, options)) {
+      return { r, g, b, a };
     }
-    return { r, g, b, a };
+    return { r, g, b };
   }
 
   toHsl(options?: Color.ToHslOptions): Color.Hsl {
     const { h, s, l } = this.#hsl;
-    if (options?.discardAlpha === true) {
-      return { h, s, l };
+    if (_isRequiredAlpha(this.#a, options)) {
+      return { h, s, l, a: this.#a };
     }
-    return { h, s, l, a: this.#a };
+    return { h, s, l };
   }
 
   toHwb(options?: Color.ToHwbOptions): Color.Hwb {
     const { h, w, b } = this.#hwb;
-    if (options?.discardAlpha === true) {
-      return { h, w, b };
+    if (_isRequiredAlpha(this.#a, options)) {
+      return { h, w, b, a: this.#a };
     }
-    return { h, w, b, a: this.#a };
+    return { h, w, b };
   }
 
   toUint8Array(options?: Color.ToUint8ArrayOptions): Uint8Array {
     const { r, g, b } = this.#rgbBytes;
-    if (options?.discardAlpha === true) {
-      return Uint8Array.of(r, g, b);
+    if (_isRequiredAlpha(this.#a, options)) {
+      return Uint8Array.of(r, g, b, this.#alphaByte);
     }
-    return Uint8Array.of(r, g, b, this.#alphaByte);
+    return Uint8Array.of(r, g, b);
   }
 
   toUint8ClampedArray(options?: Color.ToUint8ArrayOptions): Uint8ClampedArray {
     const { r, g, b } = this.#rgbBytes;
-    if (options?.discardAlpha === true) {
-      return Uint8ClampedArray.of(r, g, b);
+    if (_isRequiredAlpha(this.#a, options)) {
+      return Uint8ClampedArray.of(r, g, b, this.#alphaByte);
     }
-    return Uint8ClampedArray.of(r, g, b, this.#alphaByte);
+    return Uint8ClampedArray.of(r, g, b);
   }
 
   toHexString(options?: Color.ToHexStringOptions): string {
@@ -562,7 +572,7 @@ class Color {
     const rrggbbaa: string = bytes.format({ lowerCase });
 
     let rrggbbaaOrRrggbb = rrggbbaa;
-    if (options?.discardAlpha === true) {
+    if (_isRequiredAlpha(this.#a, options) !== true) {
       rrggbbaaOrRrggbb = rrggbbaaOrRrggbb.substring(0, 6);
     }
 
@@ -708,7 +718,7 @@ namespace Color {
 
   export type ToOptions = {
     discardAlpha?: boolean;
-    //XXX omitAlphaIfOpaque?: boolean
+    omitAlphaIfOpaque?: boolean;
   };
 
   export type RgbOptions = {

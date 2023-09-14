@@ -39,3 +39,13 @@ Deno.test("Color.prototype.toHwb({}) - discardAlpha", () => {
   const c2a = c2.toHwb({ discardAlpha: true });
   assertStrictEquals("a" in c2a, false);
 });
+
+Deno.test("Color.prototype.toHwb({}) - omitAlphaIfOpaque", () => {
+  const c1 = Color.fromHexString("#fffefd");
+  const c1a = c1.toHwb({ omitAlphaIfOpaque: true });
+  assertStrictEquals("a" in c1a, false);
+
+  const c2 = Color.fromHexString("#fffefd88");
+  const c2a = c2.toHwb({ omitAlphaIfOpaque: true });
+  assertStrictEquals(c2a.a, 136 / 255);
+});

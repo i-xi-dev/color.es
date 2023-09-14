@@ -18,11 +18,41 @@ Deno.test("Color.prototype.toHexString()", () => {
     "#FFFEFD",
   );
   assertStrictEquals(
+    Color.fromHexString("#fffefd").toHexString({
+      upperCase: true,
+      omitAlphaIfOpaque: true,
+    }),
+    "#FFFEFD",
+  );
+  assertStrictEquals(
+    Color.fromHexString("#fffefd").toHexString({
+      upperCase: true,
+      discardAlpha: true,
+      omitAlphaIfOpaque: true,
+    }),
+    "#FFFEFD",
+  );
+  assertStrictEquals(
     Color.fromHexString("#fffefd88").toHexString({
       upperCase: true,
       discardAlpha: true,
     }),
     "#FFFEFD",
+  );
+  assertStrictEquals(
+    Color.fromHexString("#fffefd88").toHexString({
+      upperCase: true,
+      discardAlpha: true,
+      omitAlphaIfOpaque: true,
+    }),
+    "#FFFEFD",
+  );
+  assertStrictEquals(
+    Color.fromHexString("#fffefd88").toHexString({
+      upperCase: true,
+      omitAlphaIfOpaque: true,
+    }),
+    "#FFFEFD88",
   );
   assertStrictEquals(
     Color.fromHexString("#ffeedd").toHexString({
