@@ -14,6 +14,14 @@ Deno.test("Color.fromUint8Array(Uint8Array)", () => {
   assertStrictEquals(c2.blue, 253 / 255);
   assertStrictEquals(c2.alpha, 252 / 255);
 
+  const c2b = Color.fromUint8Array(Uint8Array.of(255, 254, 253, 252), {
+    ignoreAlpha: true,
+  });
+  assertStrictEquals(c2b.red, 255 / 255);
+  assertStrictEquals(c2b.green, 254 / 255);
+  assertStrictEquals(c2b.blue, 253 / 255);
+  assertStrictEquals(c2b.alpha, 255 / 255);
+
   const c3 = Color.fromUint8Array(Uint8Array.of(254, 253));
   assertStrictEquals(c3.red, 254 / 255);
   assertStrictEquals(c3.green, 253 / 255);
@@ -45,4 +53,12 @@ Deno.test("Color.fromUint8Array(Uint8ClampedArray)", () => {
   assertStrictEquals(c2.green, 254 / 255);
   assertStrictEquals(c2.blue, 253 / 255);
   assertStrictEquals(c2.alpha, 252 / 255);
+
+  const c3 = Color.fromUint8Array(Uint8ClampedArray.of(255, 254, 253, 252), {
+    ignoreAlpha: true,
+  });
+  assertStrictEquals(c3.red, 255 / 255);
+  assertStrictEquals(c3.green, 254 / 255);
+  assertStrictEquals(c3.blue, 253 / 255);
+  assertStrictEquals(c3.alpha, 255 / 255);
 });

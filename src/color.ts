@@ -270,7 +270,20 @@ namespace _SRgb {
   }
 }
 
-function _isRequiredAlpha(alpha: _Alpha, options?: Color.ToOptions): boolean {
+type _FromOptions = {
+  ignoreAlpha?: boolean;
+};
+
+type _ToOptions = {
+  discardAlpha?: boolean;
+  omitAlphaIfOpaque?: boolean;
+};
+
+type _RgbOptions = {
+  mode?: "compat" | "bytes" | "precision";
+};
+
+function _isRequiredAlpha(alpha: _Alpha, options?: _ToOptions): boolean {
   if (options?.discardAlpha === true) {
     return false;
   }
@@ -392,42 +405,51 @@ class Color {
     return { ...this.#hwbCache };
   }
 
-  static fromRgb(rgba: Color.Rgb, options?: Color.RgbOptions): Color {
+  static fromRgb(rgba: Color.Rgb, options?: Color.FromRgbOptions): Color {
     // sRGB固定
 
     if (options?.mode === "precision") {
       const { r, g, b } = _SRgb.Rgb.normalize(rgba);
-      const a = _normalizeAlpha(rgba.a);
+      const a = (options?.ignoreAlpha === true)
+        ? _ALPHA_MAX
+        : _normalizeAlpha(rgba.a);
       return new Color(r, g, b, a);
     } else {
       const { r, g, b } = _SRgb.RgbBytes.toRgb(rgba);
-      let a: number;
-      if (options?.mode === "bytes") {
-        if (Number.isFinite(rgba.a)) {
-          a = Uint8.clamp(rgba.a) / Uint8.MAX_VALUE;
+      let a: number = _ALPHA_MAX;
+      if (options?.ignoreAlpha !== true) {
+        if (options?.mode === "bytes") {
+          if (Number.isFinite(rgba.a)) {
+            a = Uint8.clamp(rgba.a) / Uint8.MAX_VALUE;
+          }
         } else {
-          a = _ALPHA_MAX;
+          a = _normalizeAlpha(rgba.a);
         }
-      } else {
-        a = _normalizeAlpha(rgba.a);
       }
       return new Color(r, g, b, a);
     }
   }
 
-  static fromHsl(hsla: Color.Hsl): Color {
+  static fromHsl(hsla: Color.Hsl, options?: Color.FromHslOptions): Color {
     const { r, g, b } = _SRgb.Hsl.toRgb(hsla);
-    const a = _normalizeAlpha(hsla.a);
+    const a = (options?.ignoreAlpha === true)
+      ? _ALPHA_MAX
+      : _normalizeAlpha(hsla.a);
     return new Color(r, g, b, a);
   }
 
-  static fromHwb(hwba: Color.Hwb): Color {
+  static fromHwb(hwba: Color.Hwb, options?: Color.FromHwbOptions): Color {
     const { r, g, b } = _SRgb.Hwb.toRgb(hwba);
-    const a = _normalizeAlpha(hwba.a);
+    const a = (options?.ignoreAlpha === true)
+      ? _ALPHA_MAX
+      : _normalizeAlpha(hwba.a);
     return new Color(r, g, b, a);
   }
 
-  static fromUint8Array(rgbaBytes: Uint8Array | Uint8ClampedArray): Color {
+  static fromUint8Array(
+    rgbaBytes: Uint8Array | Uint8ClampedArray,
+    options?: Color.FromUint8ArrayOptions,
+  ): Color {
     if (rgbaBytes[Symbol.iterator]) {
       const bytes: [number, number, number, number] = [
         Uint8.MIN_VALUE,
@@ -438,6 +460,9 @@ class Color {
 
       let i = 0;
       for (const byte of rgbaBytes) {
+        if ((options?.ignoreAlpha === true) && (i >= 3)) {
+          break;
+        }
         if (i >= 4) {
           break;
         }
@@ -457,7 +482,10 @@ class Color {
     throw new TypeError("rgbaBytes");
   }
 
-  static fromHexString(hexString: string): Color {
+  static fromHexString(
+    hexString: string,
+    options?: Color.FromHexStringOptions,
+  ): Color {
     if (typeof hexString !== "string") {
       throw new TypeError("hexString");
     }
@@ -499,7 +527,7 @@ class Color {
         break;
     }
     rrggbb = rrggbb.toLowerCase();
-    aa = aa.toLowerCase();
+    aa = (options?.ignoreAlpha === true) ? "ff" : aa.toLowerCase();
 
     return Color.fromUint8Array(
       ByteSequence.parse(rrggbb + aa, { lowerCase: true }).getUint8View(),
@@ -709,35 +737,29 @@ namespace Color {
     a?: number;
   };
 
-  //XXX
-  // export type FromOptions = {
-  //   ignoreAlpha: boolean;
-  // }
-
   //XXX space?: "srgb";
 
-  export type ToOptions = {
-    discardAlpha?: boolean;
-    omitAlphaIfOpaque?: boolean;
-  };
+  export type FromRgbOptions = _RgbOptions & _FromOptions;
 
-  export type RgbOptions = {
-    mode?: "compat" | "bytes" | "precision";
-  };
+  export type ToRgbOptions = _RgbOptions & _ToOptions;
 
-  export type FromRgbOptions = RgbOptions;
+  export type FromHslOptions = _FromOptions;
 
-  export type ToRgbOptions = RgbOptions & ToOptions;
+  export type ToHslOptions = _ToOptions;
 
-  export type ToHslOptions = ToOptions;
+  export type FromHwbOptions = _FromOptions;
 
-  export type ToHwbOptions = ToOptions;
+  export type ToHwbOptions = _ToOptions;
 
-  export type ToUint8ArrayOptions = ToOptions;
+  export type FromUint8ArrayOptions = _FromOptions;
+
+  export type ToUint8ArrayOptions = _ToOptions;
+
+  export type FromHexStringOptions = _FromOptions;
 
   export type ToHexStringOptions = {
     upperCase?: boolean;
-  } & ToOptions;
+  } & _ToOptions;
 }
 
 export { Color };

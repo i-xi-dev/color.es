@@ -14,6 +14,12 @@ Deno.test("Color.fromHexString(string)", () => {
   assertStrictEquals(c1a.blue, 253 / 255);
   assertStrictEquals(c1a.alpha, 0 / 255);
 
+  const c1a2 = Color.fromHexString("#fffefd00", { ignoreAlpha: true });
+  assertStrictEquals(c1a2.red, 255 / 255);
+  assertStrictEquals(c1a2.green, 254 / 255);
+  assertStrictEquals(c1a2.blue, 253 / 255);
+  assertStrictEquals(c1a2.alpha, 255 / 255);
+
   const c1b = Color.fromHexString("#FFFEFD00");
   assertStrictEquals(c1b.red, 255 / 255);
   assertStrictEquals(c1b.green, 254 / 255);
