@@ -57,7 +57,7 @@ Deno.test("CssColorFormat.parse(string) - hex", () => {
       CssColorFormat.parse("#");
     },
     RangeError,
-    "hexString",
+    "source",
   );
 
   assertThrows(
@@ -65,7 +65,7 @@ Deno.test("CssColorFormat.parse(string) - hex", () => {
       CssColorFormat.parse("#1");
     },
     RangeError,
-    "hexString",
+    "source",
   );
 
   assertThrows(
@@ -73,7 +73,7 @@ Deno.test("CssColorFormat.parse(string) - hex", () => {
       CssColorFormat.parse("#12");
     },
     RangeError,
-    "hexString",
+    "source",
   );
 
   assertThrows(
@@ -81,7 +81,7 @@ Deno.test("CssColorFormat.parse(string) - hex", () => {
       CssColorFormat.parse("#12345");
     },
     RangeError,
-    "hexString",
+    "source",
   );
 
   assertThrows(
@@ -89,7 +89,7 @@ Deno.test("CssColorFormat.parse(string) - hex", () => {
       CssColorFormat.parse("#1234567");
     },
     RangeError,
-    "hexString",
+    "source",
   );
 
   assertThrows(
@@ -97,6 +97,6 @@ Deno.test("CssColorFormat.parse(string) - hex", () => {
       CssColorFormat.parse("#123456789");
     },
     RangeError,
-    "hexString",
+    "source",
   );
 });

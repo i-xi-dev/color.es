@@ -63,14 +63,8 @@ static fromCssString(cssString: string): RgbColor {
   // computed valueを使うならrgb(a)関数以外の値にはならないはず
   if (typeof cssString === "string") {
     const trimmed = cssString.trim().toLowerCase();
-    if (trimmed.startsWith("#")) {
-      return RgbColor.#parseCssHexColor(trimmed);
-    }
-    else if (trimmed === "transparent") {
+    if (trimmed === "transparent") {
       return RgbColor.fromRgb(0, 0, 0); // XXX グラデーションやアニメーションで補完されるときはalpha以外無視する仕様
-    }
-    else if (trimmed.startsWith("rgb(") || trimmed.startsWith("rgba(")) {
-      return RgbColor.#parseCssRgbFunction(trimmed);
     }
     else if (trimmed.startsWith("hsl(") || trimmed.startsWith("hsla(")) {
       return RgbColor.#parseCssHslFunction(trimmed);
@@ -88,35 +82,12 @@ static fromCssString(cssString: string): RgbColor {
   throw new TypeError("cssString");
 }
 
-static #parseCssRgbFunction(cssString: string): RgbColor {
-  const result = (new RegExp(RGBFUNC, "i")).exec(cssString);
-  
-}
-
 static #parseCssHslFunction(cssString: string): RgbColor {
   void cssString;
   throw new Error("not implemented");
 }
 */
 // }
-
-const SP = "[\\u0009\\u000A\\u000D\\u0020]*";
-const CM = `${SP},${SP}`;
-const SL = `${SP}/${SP}`;
-const NUM = `\\-?(?:[0-9]*\\.)?[0-9]+`;
-const PERCENT = `\\-?(?:[0-9]*\\.)?[0-9]+%`;
-const NUM_L4 = `(?:\\-?(?:[0-9]*\\.)?[0-9]+|none)`;
-const PERCENT_L4 = `(?:\\-?(?:[0-9]*\\.)?[0-9]+%|none)`;
-const ALPHA_L4 = `(?:\\-?(?:[0-9]*\\.)?[0-9]+%?|none)`;
-const ALPHA_L4L = `(?:\\-?(?:[0-9]*\\.)?[0-9]+%?)`;
-
-const RGB_NUM_L4 = `rgb\\(${SP}(${NUM_L4})${SP}(${NUM_L4})${SP}(${NUM_L4})(?:${SL}(${ALPHA_L4}))?${SP}\\)`;
-const RGB_PERCENT_L4 = `rgb\\(${SP}(${PERCENT_L4})${SP}(${PERCENT_L4})${SP}(${PERCENT_L4})(?:${SL}(${ALPHA_L4}))?${SP}\\)`;
-
-const RGB_NUM_L4L = `rgba?\\(${SP}(${NUM})${CM}(${NUM})${CM}(${NUM})(?:${CM}(${ALPHA_L4L}))?${SP}\\)`;
-const RGB_PERCENT_L4L = `rgba?\\(${SP}(${PERCENT})${CM}(${PERCENT})${CM}(${PERCENT})(?:${CM}(${ALPHA_L4L}))?${SP}\\)`;
-
-const RGBFUNC = `^(?:${RGB_NUM_L4}|${RGB_PERCENT_L4}|${RGB_NUM_L4L}|${RGB_PERCENT_L4L})$`;
 
   export const CssFunction = {
     LEGACY_RGB: "legacy-rgb",

@@ -13,7 +13,7 @@ namespace CssColorFormat {
   */
 
   export type FormatOptions = /* Options & */ {
-    notation?: "hex";
+    notation?: "hex" | "rgb";
     upperCase?: boolean;
     shortenIfPossible?: boolean;
     //legacy?: boolean;
@@ -25,7 +25,9 @@ namespace CssColorFormat {
     }
 
     if (colorString.startsWith("#")) {
-      return _parseHexString(colorString);
+      return _parseHex(colorString);
+    } else if (/^rgba?\(/i.test(colorString)) {
+      return _parseRgb(colorString);
     }
 
     throw new Error("not implemented");
@@ -43,22 +45,138 @@ namespace CssColorFormat {
   }
 }
 
-function _parseHexString(hexString: string): Color {
+// 以下、全般的にコメントには対応しない
+
+// ドラフトを参照しているものは注意（意外と頻繁に変わる）
+
+// ws* https://drafts.csswg.org/css-syntax-3/#ws*-diagram
+// const _WS = `[\\u0009\\u000A\\u0020]*`;
+//XXX U+000C,U+000D はCSSの解析器によってU+000A に変換されるので上記仕様では除外されているが、
+//    当処理はCSS解析器を通しているわけではないので U+000C,U+000D も含めることにする
+const _WHITESPACE = `[\\u0009\\u000A\\u000C\\u000D\\u0020]`;
+const _WS = `${_WHITESPACE}*`;
+
+// <number> https://drafts.csswg.org/css-syntax-3/#number-token-diagram
+const _NUM = `[-+]?(?:[0-9]*\\.)?[0-9]+`;
+//XXX 指数表記は現バージョンでは対応しない
+
+// <percentage> https://drafts.csswg.org/css-syntax-3/#percentage-token-diagram
+const _PERC = `${_NUM}%`;
+
+const _CMS = `${_WS},${_WS}`;
+
+// 以下は https://drafts.csswg.org/css-color-4/#rgb-functions
+
+// <alpha-value> https://drafts.csswg.org/css-color-4/#typedef-alpha-value
+const _ALPHA = `${_NUM}%?`;
+
+// <legacy-rgb-syntax> https://drafts.csswg.org/css-color-4/#typedef-legacy-rgb-syntax
+// <legacy-rgba-syntax> https://drafts.csswg.org/css-color-4/#typedef-legacy-rgba-syntax
+const _L_RGB_N =
+  `rgba?\\(${_WS}${_NUM}(?:${_CMS}${_NUM}){2}(?:${_CMS}${_ALPHA})?${_WS}\\)`;
+const _L_RGB_P =
+  `rgba?\\(${_WS}${_PERC}(?:${_CMS}${_PERC}){2}(?:${_CMS}${_ALPHA})?${_WS}\\)`;
+const _L_RGB = `(?:${_L_RGB_N}|${_L_RGB_P})`;
+
+// <modern-rgb-syntax> https://drafts.csswg.org/css-color-4/#typedef-modern-rgb-syntax
+// <modern-rgba-syntax> https://drafts.csswg.org/css-color-4/#typedef-modern-rgba-syntax
+const _NP = `${_NUM}%?`;
+const _SLS = `${_WS}\\/${_WS}`;
+const _M_RGB = `rgba?\\(${_WS}(?:${_NP}){3}(?:${_SLS}${_ALPHA})?${_WS}\\)`;
+//XXX `none`は現バージョンでは対応しない
+
+let _mRgbRegex: RegExp;
+function _matchesModernRgb(test: string): boolean {
+  if (!_mRgbRegex) {
+    _mRgbRegex = new RegExp(_M_RGB, "i");
+  }
+  return _mRgbRegex.test(test);
+}
+
+let _lRgbRegex: RegExp;
+//XXX String.prototype.trim でも別に問題ない
+function _matchesLegacyRgb(test: string): boolean {
+  if (!_lRgbRegex) {
+    _lRgbRegex = new RegExp(_L_RGB, "i");
+  }
+  return _lRgbRegex.test(test);
+}
+
+let _eWsRegex: RegExp;
+function _trim(input: string): string {
+  if (!_eWsRegex) {
+    _eWsRegex = new RegExp(`(?:^${_WHITESPACE}+|${_WHITESPACE}+$)`, "g");
+  }
+  return input.replaceAll(_eWsRegex, "");
+}
+
+let _iWsRegex: RegExp;
+function _normalizeWs(input: string): string {
+  if (!_iWsRegex) {
+    _iWsRegex = new RegExp(`${_WHITESPACE}+`, "g");
+  }
+  return input.replaceAll(_iWsRegex, " ");
+}
+
+function _parseRgb(source: string): Color {
+  if (_matchesModernRgb(source)) {
+    return _parseModernRgb(source);
+  } else if (_matchesLegacyRgb(source)) {
+    return _parseLegacyRgb(source);
+  }
+  throw new RangeError("source");
+}
+
+function _parseModernRgb(source: string): Color {
+  const temp = source.replace(/^rgba?\(/i, "").replace(/\)$/, "");
+  const [rgbStr, aStr] = temp.split("/").map((c) => _trim(c));
+  const [rStr, gStr, bStr] = _normalizeWs(rgbStr).split(" ");
+
+  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr));
+}
+
+function _parseRgbComponents(
+  rStr: string,
+  gStr: string,
+  bStr: string,
+  aStr: string,
+): Color.Rgb {
+  const r = Number.parseFloat(rStr) / (rStr.endsWith("%") ? 100 : 255);
+  const g = Number.parseFloat(gStr) / (gStr.endsWith("%") ? 100 : 255);
+  const b = Number.parseFloat(bStr) / (bStr.endsWith("%") ? 100 : 255);
+  let a = 1;
+  if (aStr) {
+    a = Number.parseFloat(aStr);
+    if (aStr.endsWith("%")) {
+      a = a / 100;
+    }
+  }
+  return { r, g, b, a };
+}
+
+function _parseLegacyRgb(source: string): Color {
+  const temp = source.replace(/^rgba?\(/i, "").replace(/\)$/, "");
+  const [rStr, gStr, bStr, aStr] = temp.split(",").map((c) => _trim(c));
+
+  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr));
+}
+
+function _parseHex(source: string): Color {
   if (
-    /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(hexString) !== true
+    /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(source) !== true
   ) {
-    throw new RangeError("hexString");
+    throw new RangeError("source");
   }
 
-  if ((hexString.length === 9) || (hexString.length === 7)) {
-    return Color.fromHexString(hexString);
+  if ((source.length === 9) || (source.length === 7)) {
+    return Color.fromHexString(source);
   }
 
   // #[0-9a-f]{3,4}
-  const r = hexString.charAt(1);
-  const g = hexString.charAt(2);
-  const b = hexString.charAt(3);
-  const a = (hexString.length === 5) ? hexString.charAt(4) : "f";
+  const r = source.charAt(1);
+  const g = source.charAt(2);
+  const b = source.charAt(3);
+  const a = (source.length === 5) ? source.charAt(4) : "f";
   return Color.fromHexString(
     `#${r.repeat(2)}${g.repeat(2)}${b.repeat(2)}${a.repeat(2)}`,
   );
