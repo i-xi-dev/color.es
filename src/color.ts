@@ -279,10 +279,6 @@ type _ToOptions = {
   omitAlphaIfOpaque?: boolean;
 };
 
-type _RgbOptions = {
-  mode?: "compat" | "bytes" | "precision";
-};
-
 function _isRequiredAlpha(alpha: _Alpha, options?: _ToOptions): boolean {
   if (options?.discardAlpha === true) {
     return false;
@@ -489,48 +485,33 @@ class Color {
     if (typeof hexString !== "string") {
       throw new TypeError("hexString");
     }
-    if (
-      /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(hexString) !== true
-    ) {
-      throw new RangeError("hexString");
+
+    let rr = "00";
+    let gg = "00";
+    let bb = "00";
+    let aa = "ff";
+    if (options?.order === "argb") {
+      if (/^#[0-9a-f]{8}$/i.test(hexString)) {
+        if (options?.ignoreAlpha !== true) {
+          aa = hexString.substring(1, 3);
+        }
+        rr = hexString.substring(3, 5);
+        gg = hexString.substring(5, 7);
+        bb = hexString.substring(7, 9);
+      }
+    } else {
+      if (/^#(?:[0-9a-f]{6}|[0-9a-f]{8})$/i.test(hexString)) {
+        rr = hexString.substring(1, 3);
+        gg = hexString.substring(3, 5);
+        bb = hexString.substring(5, 7);
+        if ((hexString.length === 9) && (options?.ignoreAlpha !== true)) {
+          aa = hexString.substring(7, 9);
+        }
+      }
     }
-    // 他のfromXXXに合わせるなら無視して0扱い？
-    // → と思ったが、3,4,6,8桁のうちどれなのかを判別する必要があるのでエラーとする
-
-    const inputHex = hexString.substring(1);
-    let rrggbb: string;
-    let aa: string;
-    switch (inputHex.length) {
-      case 8:
-        rrggbb = inputHex.substring(0, 6);
-        aa = inputHex.substring(6, 8);
-        break;
-
-      case 6:
-        rrggbb = inputHex.substring(0, 6);
-        aa = "ff";
-        break;
-
-      case 4:
-        rrggbb = [...inputHex].map((h, index) => {
-          return (index <= 2) ? h.repeat(2) : "";
-        }).join("");
-        aa = inputHex.substring(3, 4).repeat(2);
-        break;
-
-      // case 3:
-      default:
-        rrggbb = [...inputHex].map((h, index) => {
-          return (index <= 2) ? h.repeat(2) : "";
-        }).join("");
-        aa = "ff";
-        break;
-    }
-    rrggbb = rrggbb.toLowerCase();
-    aa = (options?.ignoreAlpha === true) ? "ff" : aa.toLowerCase();
 
     return Color.fromUint8Array(
-      ByteSequence.parse(rrggbb + aa, { lowerCase: true }).getUint8View(),
+      ByteSequence.parse(rr + gg + bb + aa).getUint8View(),
     );
   }
 
@@ -598,24 +579,17 @@ class Color {
 
     const bytes = ByteSequence.fromArrayBufferView(this.toUint8Array());
     const rrggbbaa: string = bytes.format({ lowerCase });
+    const rrggbb = rrggbbaa.substring(0, 6);
+    const aa = rrggbbaa.substring(6);
 
-    let rrggbbaaOrRrggbb = rrggbbaa;
     if (_isRequiredAlpha(this.#a, options) !== true) {
-      rrggbbaaOrRrggbb = rrggbbaaOrRrggbb.substring(0, 6);
+      return "#" + rrggbb;
     }
 
-    //TODO ColorCssFormatに移す fromHexStringの3,4桁も移す？
-    // if (options?.shorten === true) {
-    //   if (/^(?:([0-9a-fA-F])\1)+$/.test(rrggbbaaOrRrggbb)) {
-    //     return "#" +
-    //       [...rrggbbaaOrRrggbb].reduce(
-    //         (s, c, i) => (i % 2 === 0) ? (s + c) : s,
-    //         "",
-    //       );
-    //   }
-    // }
-
-    return "#" + rrggbbaaOrRrggbb;
+    if (options?.order === "argb") {
+      return "#" + aa + rrggbb;
+    }
+    return "#" + rrggbb + aa;
   }
 
   toString(): string {
@@ -711,7 +685,7 @@ class Color {
 
 namespace Color {
   // 以下いずれか
-  // ・r,g,bはバイト表現 0～255、aは0～1（多分一般的VuetifyとかReactの形式）
+  // ・r,g,bはバイト表現 0～255、aは0～1（多分一般的。VuetifyとかReactの形式）
   // ・r,g,b,aすべてバイト表現 0～255
   // ・r,g,b,aすべて0～1
   export type Rgb = {
@@ -721,7 +695,6 @@ namespace Color {
     a?: number;
   };
 
-  //TODO s,lは0～1が一般的？
   export type Hsl = {
     h: number;
     s: number;
@@ -729,7 +702,6 @@ namespace Color {
     a?: number;
   };
 
-  //TODO w,bは0～1が一般的？
   export type Hwb = {
     h: number;
     w: number;
@@ -739,9 +711,17 @@ namespace Color {
 
   //XXX space?: "srgb";
 
-  export type FromRgbOptions = _RgbOptions & _FromOptions;
+  type RgbOptions = {
+    mode?: "compat" | "bytes" | "precision";
+  };
 
-  export type ToRgbOptions = _RgbOptions & _ToOptions;
+  type HexStringOptions = {
+    order?: "rgba" | "argb";
+  };
+
+  export type FromRgbOptions = RgbOptions & _FromOptions;
+
+  export type ToRgbOptions = RgbOptions & _ToOptions;
 
   export type FromHslOptions = _FromOptions;
 
@@ -755,9 +735,9 @@ namespace Color {
 
   export type ToUint8ArrayOptions = _ToOptions;
 
-  export type FromHexStringOptions = _FromOptions;
+  export type FromHexStringOptions = HexStringOptions & _FromOptions;
 
-  export type ToHexStringOptions = {
+  export type ToHexStringOptions = HexStringOptions & {
     upperCase?: boolean;
   } & _ToOptions;
 }
