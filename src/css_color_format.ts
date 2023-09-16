@@ -16,7 +16,7 @@ namespace CssColorFormat {
     notation?: "hex" | "rgb";
     upperCase?: boolean;
     shortenIfPossible?: boolean;
-    //legacy?: boolean;
+    legacy?: boolean;
   };
 
   export function parse(colorString: string): Color {
@@ -39,8 +39,11 @@ namespace CssColorFormat {
     }
 
     switch (options?.notation) {
+      case "rgb":
+        return _formatRgb(color, options);
+
       default:
-        return _formatHexString(color, options);
+        return _formatHex(color, options);
     }
   }
 }
@@ -161,6 +164,51 @@ function _parseLegacyRgb(source: string): Color {
   return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr));
 }
 
+function _stringify(input: number): string {
+  if (Number.isFinite(input)) {
+    if (Number.isInteger(input)) {
+      return input.toString(10);
+    }
+    return input.toFixed(4);
+  }
+  throw new RangeError("input");
+}
+
+//XXX 小数点以下桁数を指定可能にする？
+//XXX shortenIfPossible と alpha省略を分離する？
+//XXX numberかpercentageか指定可能にする？
+//XXX r,g,bを整数に丸めるか指定可能にする？
+function _formatRgb(
+  color: Color,
+  options?: CssColorFormat.FormatOptions,
+): string {
+  let result: string;
+  if (options?.legacy === true) {
+    // level 4 の定義では r,g,b が整数でなくても良いが、level 3 では整数なので整数に丸める
+
+    const [r, g, b] = color.toUint8Array();
+    const a = color.alpha;
+
+    if ((options?.shortenIfPossible === true) && (a === 1)) {
+      result = `rgb(${r}, ${g}, ${b})`;
+    } else {
+      result = `rgba(${r}, ${g}, ${b}, ${_stringify(a as number)})`;
+    }
+  } else {
+    const { r, g, b, a } = color.toRgb({ mode: "precision" });
+    const rS = _stringify(r * 255);
+    const gS = _stringify(g * 255);
+    const bS = _stringify(b * 255);
+
+    if ((options?.shortenIfPossible === true) && (a === 1)) {
+      result = `rgb(${rS} ${gS} ${bS})`;
+    } else {
+      result = `rgb(${rS} ${gS} ${bS} / ${_stringify(a as number)})`;
+    }
+  }
+  return (options?.upperCase === true) ? result.toUpperCase() : result;
+}
+
 function _parseHex(source: string): Color {
   if (
     /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(source) !== true
@@ -182,7 +230,7 @@ function _parseHex(source: string): Color {
   );
 }
 
-function _formatHexString(
+function _formatHex(
   color: Color,
   options?: CssColorFormat.FormatOptions,
 ): string {
