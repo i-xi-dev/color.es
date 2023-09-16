@@ -1,5 +1,5 @@
-import { assertStrictEquals } from "./deps.ts";
-import { Color } from "../mod.ts";
+import { assertStrictEquals } from "../deps.ts";
+import { Color } from "../../mod.ts";
 
 Deno.test("Color.prototype.toUint8Array()", () => {
   const c1 = Color.fromHexString("#fffefd");

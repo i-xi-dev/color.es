@@ -1,6 +1,6 @@
-import { assertStrictEquals } from "./deps.ts";
-import { Color } from "../mod.ts";
-import { r1Cases, r2Cases, r3Cases } from "./data.ts";
+import { assertStrictEquals } from "../deps.ts";
+import { Color } from "../../mod.ts";
+import { r1Cases, r2Cases, r3Cases } from "../data.ts";
 
 Deno.test("Color.prototype.toHwb()", () => {
   for (const c of r1Cases) {

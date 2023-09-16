@@ -1,5 +1,5 @@
-import { assertStrictEquals } from "./deps.ts";
-import { Color } from "../mod.ts";
+import { assertStrictEquals } from "../deps.ts";
+import { Color } from "../../mod.ts";
 
 Deno.test("Color.fromUint8Array(Uint8Array)", () => {
   const c1 = Color.fromUint8Array(Uint8Array.of(254, 253, 252));

@@ -1,5 +1,5 @@
-import { assertStrictEquals } from "./deps.ts";
-import { Color } from "../mod.ts";
+import { assertStrictEquals } from "../deps.ts";
+import { Color } from "../../mod.ts";
 
 Deno.test("Color.prototype.toRgb()", () => {
   const c1 = Color.fromRgb({ r: 0, g: 128, b: 64 });
