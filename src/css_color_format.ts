@@ -1,7 +1,7 @@
 import { StringUtils } from "../deps.ts";
 import { Color } from "./color.ts";
 
-namespace CssColor {
+namespace CssColorFormat {
   /*
   export type Options = {
 
@@ -14,6 +14,8 @@ namespace CssColor {
 
   export type FormatOptions = /* Options & */ {
     notation?: "hex";
+    upperCase?: boolean;
+    shortenIfPossible?: boolean;
     //legacy?: boolean;
   };
 
@@ -29,8 +31,16 @@ namespace CssColor {
     throw new Error("not implemented");
   }
 
-  //   export function format(options?: Options): string {
-  //   }
+  export function format(color: Color, options?: FormatOptions): string {
+    if ((color instanceof Color) !== true) {
+      throw new TypeError("color");
+    }
+
+    switch (options?.notation) {
+      default:
+        return _formatHexString(color, options);
+    }
+  }
 }
 
 function _parseHexString(hexString: string): Color {
@@ -54,18 +64,27 @@ function _parseHexString(hexString: string): Color {
   );
 }
 
-// function _formatHexString(): string {
-//       //TODO ColorCssFormatに移す fromHexStringの3,4桁も移す？
-//     // if (options?.shorten === true) {
-//     //   if (/^(?:([0-9a-fA-F])\1)+$/.test(rrggbbaaOrRrggbb)) {
-//     //     return "#" +
-//     //       [...rrggbbaaOrRrggbb].reduce(
-//     //         (s, c, i) => (i % 2 === 0) ? (s + c) : s,
-//     //         "",
-//     //       );
-//     //   }
-//     // }
+function _formatHexString(
+  color: Color,
+  options?: CssColorFormat.FormatOptions,
+): string {
+  let hex = color.toHexString({ upperCase: options?.upperCase });
+  if (options?.shortenIfPossible === true) {
+    // 不透明の場合、alphaを省略
+    if (/[fF]{2}$/.test(hex)) {
+      hex = hex.substring(0, 7);
+    }
 
-// }
+    // r, g, b (, a) のすべてについて1桁目と2桁目が等しい場合、略記（ex. #00112233 → #0123）
+    if (/^#(?:([0-9a-fA-F])\1)+$/.test(hex)) {
+      return `#${hex.charAt(1)}${hex.charAt(3)}${hex.charAt(5)}${
+        hex.charAt(7)
+      }`;
+    }
+    return hex;
+  } else {
+    return hex;
+  }
+}
 
-export { CssColor };
+export { CssColorFormat };
