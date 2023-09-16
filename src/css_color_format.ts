@@ -210,6 +210,8 @@ function _formatRgb(
   color: Color,
   options?: CssColorFormat.FormatOptions,
 ): string {
+  const shortenIfPossible = options?.shortenIfPossible === true;
+
   let result: string;
   if (options?.legacy === true) {
     // level 4 の定義では r,g,b が整数でなくても良いが、level 3 では整数なので整数に丸める
@@ -217,7 +219,7 @@ function _formatRgb(
     const [r, g, b] = color.toUint8Array();
     const a = color.alpha;
 
-    if ((options?.shortenIfPossible === true) && (a === 1)) {
+    if ((shortenIfPossible === true) && (a === 1)) {
       result = `rgb(${r}, ${g}, ${b})`;
     } else {
       result = `rgba(${r}, ${g}, ${b}, ${_stringify(a as number)})`;
@@ -228,7 +230,7 @@ function _formatRgb(
     const gS = _stringify(g * 255);
     const bS = _stringify(b * 255);
 
-    if ((options?.shortenIfPossible === true) && (a === 1)) {
+    if ((shortenIfPossible === true) && (a === 1)) {
       result = `rgb(${rS} ${gS} ${bS})`;
     } else {
       result = `rgb(${rS} ${gS} ${bS} / ${_stringify(a as number)})`;
@@ -292,12 +294,36 @@ function _parseHsl(source: string): Color {
   throw new Error("not implemented");
 }
 
+//XXX !legacy の場合に s,l を<number>にする記法は chrome が未実装なので、現バージョンでは対応しない
 function _formatHsl(
   color: Color,
   options?: CssColorFormat.FormatOptions,
 ): string {
-  //TODO
-  throw new Error("not implemented");
+  const shortenIfPossible = options?.shortenIfPossible === true;
+
+  const { h, s, l, a } = color.toHsl();
+  const hS = (shortenIfPossible === true)
+    ? _stringify(h)
+    : `${_stringify(h)}deg`;
+  const spS = `${_stringify(s * 100)}%`;
+  const lpS = `${_stringify(l * 100)}%`;
+  const aS = _stringify(a as number);
+
+  let result: string;
+  if (options?.legacy === true) {
+    if ((shortenIfPossible === true) && (a === 1)) {
+      result = `hsl(${hS}, ${spS}, ${lpS})`;
+    } else {
+      result = `hsla(${hS}, ${spS}, ${lpS}, ${aS})`;
+    }
+  } else {
+    if ((shortenIfPossible === true) && (a === 1)) {
+      result = `hsl(${hS} ${spS} ${lpS})`;
+    } else {
+      result = `hsl(${hS} ${spS} ${lpS} / ${aS})`;
+    }
+  }
+  return (options?.upperCase === true) ? result.toUpperCase() : result;
 }
 
 export { CssColorFormat };
