@@ -88,11 +88,6 @@ static fromCssString(cssString: string): RgbColor {
   throw new TypeError("cssString");
 }
 
-static #parseCssHexColor(cssString: string): RgbColor {
-  void cssString;
-  throw new Error("not implemented");
-}
-
 static #parseCssRgbFunction(cssString: string): RgbColor {
   const result = (new RegExp(RGBFUNC, "i")).exec(cssString);
   
