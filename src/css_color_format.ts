@@ -76,16 +76,16 @@ const _ALPHA = `${_NUM}%?`;
 // <legacy-rgb-syntax> https://drafts.csswg.org/css-color-4/#typedef-legacy-rgb-syntax
 // <legacy-rgba-syntax> https://drafts.csswg.org/css-color-4/#typedef-legacy-rgba-syntax
 const _L_RGB_N =
-  `rgba?\\(${_WS}${_NUM}(?:${_CMS}${_NUM}){2}(?:${_CMS}${_ALPHA})?${_WS}\\)`;
+  `^rgba?\\(${_WS}${_NUM}(?:${_CMS}${_NUM}){2}(?:${_CMS}${_ALPHA})?${_WS}\\)$`;
 const _L_RGB_P =
-  `rgba?\\(${_WS}${_PERC}(?:${_CMS}${_PERC}){2}(?:${_CMS}${_ALPHA})?${_WS}\\)`;
+  `^rgba?\\(${_WS}${_PERC}(?:${_CMS}${_PERC}){2}(?:${_CMS}${_ALPHA})?${_WS}\\)$`;
 const _L_RGB = `(?:${_L_RGB_N}|${_L_RGB_P})`;
 
 // <modern-rgb-syntax> https://drafts.csswg.org/css-color-4/#typedef-modern-rgb-syntax
 // <modern-rgba-syntax> https://drafts.csswg.org/css-color-4/#typedef-modern-rgba-syntax
 const _NP = `${_NUM}%?`;
 const _SLS = `${_WS}\\/${_WS}`;
-const _M_RGB = `rgba?\\(${_WS}(?:${_NP}){3}(?:${_SLS}${_ALPHA})?${_WS}\\)`;
+const _M_RGB = `^rgba?\\(${_WS}${_NP}(?:${_WHITESPACE}+${_NP}){2}(?:${_SLS}${_ALPHA})?${_WS}\\)$`;
 //XXX `none`は現バージョンでは対応しない
 
 let _mRgbRegex: RegExp;
@@ -135,7 +135,7 @@ function _parseModernRgb(source: string): Color {
   const [rgbStr, aStr] = temp.split("/").map((c) => _trim(c));
   const [rStr, gStr, bStr] = _normalizeWs(rgbStr).split(" ");
 
-  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr));
+  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), { mode: "precision" });
 }
 
 function _parseRgbComponents(
@@ -161,7 +161,7 @@ function _parseLegacyRgb(source: string): Color {
   const temp = source.replace(/^rgba?\(/i, "").replace(/\)$/, "");
   const [rStr, gStr, bStr, aStr] = temp.split(",").map((c) => _trim(c));
 
-  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr));
+  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), { mode: "precision" });
 }
 
 function _stringify(input: number): string {

@@ -46,14 +46,6 @@ Deno.test("CssColorFormat.parse(string) - hex", () => {
 
   assertThrows(
     () => {
-      CssColorFormat.parse(255 as unknown as string);
-    },
-    TypeError,
-    "colorString",
-  );
-
-  assertThrows(
-    () => {
       CssColorFormat.parse("#");
     },
     RangeError,

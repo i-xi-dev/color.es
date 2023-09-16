@@ -9,4 +9,12 @@ Deno.test("CssColorFormat.parse(string)", () => {
     TypeError,
     "colorString",
   );
+
+  assertThrows(
+    () => {
+      CssColorFormat.parse(255 as unknown as string);
+    },
+    TypeError,
+    "colorString",
+  );
 });
