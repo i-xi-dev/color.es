@@ -11,7 +11,11 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(0 204 34 / 1)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c1, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c1, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(0 204 34)",
   );
 
@@ -22,18 +26,29 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(0 204 34 / 0.5333)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c2, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c2, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(0 204 34 / 0.5333)",
   );
 
   const c3 = Color.fromHexString("#aabbcdee");
-  assertStrictEquals(CssColorFormat.format(c3, op), "rgb(170 187 205 / 0.9333)");
+  assertStrictEquals(
+    CssColorFormat.format(c3, op),
+    "rgb(170 187 205 / 0.9333)",
+  );
   assertStrictEquals(
     CssColorFormat.format(c3, { ...op, upperCase: true }),
     "RGB(170 187 205 / 0.9333)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c3, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c3, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(170 187 205 / 0.9333)",
   );
 
@@ -44,7 +59,11 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(170 187 205 / 1)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c4, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c4, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(170 187 205)",
   );
 
@@ -55,7 +74,11 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(170 187 205 / 1)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c4b, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c4b, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(170 187 205)",
   );
 });
@@ -70,7 +93,11 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGBA(0, 204, 34, 1)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c1, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c1, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(0, 204, 34)",
   );
 
@@ -81,18 +108,29 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGBA(0, 204, 34, 0.5333)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c2, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c2, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGBA(0, 204, 34, 0.5333)",
   );
 
   const c3 = Color.fromHexString("#aabbcdee");
-  assertStrictEquals(CssColorFormat.format(c3, op), "rgba(170, 187, 205, 0.9333)");
+  assertStrictEquals(
+    CssColorFormat.format(c3, op),
+    "rgba(170, 187, 205, 0.9333)",
+  );
   assertStrictEquals(
     CssColorFormat.format(c3, { ...op, upperCase: true }),
     "RGBA(170, 187, 205, 0.9333)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c3, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c3, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGBA(170, 187, 205, 0.9333)",
   );
 
@@ -103,7 +141,11 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGBA(170, 187, 205, 1)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c4, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c4, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(170, 187, 205)",
   );
 
@@ -114,7 +156,11 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGBA(170, 187, 205, 1)",
   );
   assertStrictEquals(
-    CssColorFormat.format(c4b, { ...op, upperCase: true, shortenIfPossible: true }),
+    CssColorFormat.format(c4b, {
+      ...op,
+      upperCase: true,
+      shortenIfPossible: true,
+    }),
     "RGB(170, 187, 205)",
   );
 });

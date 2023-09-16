@@ -1,5 +1,6 @@
 import { StringUtils } from "../deps.ts";
 import { Color } from "./color.ts";
+import { rgbFromName } from "./css_color_name.ts";
 
 namespace CssColorFormat {
   /*
@@ -24,13 +25,27 @@ namespace CssColorFormat {
       throw new TypeError("colorString");
     }
 
-    if (colorString.startsWith("#")) {
+    const lowerCased = colorString.toLocaleLowerCase();
+    if (lowerCased.startsWith("#")) {
       return _parseHex(colorString);
-    } else if (/^rgba?\(/i.test(colorString)) {
+    } else if (/^rgba?\(/.test(lowerCased)) {
       return _parseRgb(colorString);
     }
 
-    throw new Error("not implemented");
+    const colorFromName = _fromName(lowerCased);
+    if (colorFromName) {
+      return colorFromName;
+    }
+
+    // currentcolor
+    // inherit
+    // initial
+    // revert
+    // transparent 補完時は#0000であるとは限らない
+    // unset
+    // var()
+    // ...
+    throw new RangeError("colorString");
   }
 
   export function format(color: Color, options?: FormatOptions): string {
@@ -85,7 +100,8 @@ const _L_RGB = `(?:${_L_RGB_N}|${_L_RGB_P})`;
 // <modern-rgba-syntax> https://drafts.csswg.org/css-color-4/#typedef-modern-rgba-syntax
 const _NP = `${_NUM}%?`;
 const _SLS = `${_WS}\\/${_WS}`;
-const _M_RGB = `^rgba?\\(${_WS}${_NP}(?:${_WHITESPACE}+${_NP}){2}(?:${_SLS}${_ALPHA})?${_WS}\\)$`;
+const _M_RGB =
+  `^rgba?\\(${_WS}${_NP}(?:${_WHITESPACE}+${_NP}){2}(?:${_SLS}${_ALPHA})?${_WS}\\)$`;
 //XXX `none`は現バージョンでは対応しない
 
 let _mRgbRegex: RegExp;
@@ -135,7 +151,9 @@ function _parseModernRgb(source: string): Color {
   const [rgbStr, aStr] = temp.split("/").map((c) => _trim(c));
   const [rStr, gStr, bStr] = _normalizeWs(rgbStr).split(" ");
 
-  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), { mode: "precision" });
+  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), {
+    mode: "precision",
+  });
 }
 
 function _parseRgbComponents(
@@ -161,7 +179,9 @@ function _parseLegacyRgb(source: string): Color {
   const temp = source.replace(/^rgba?\(/i, "").replace(/\)$/, "");
   const [rStr, gStr, bStr, aStr] = temp.split(",").map((c) => _trim(c));
 
-  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), { mode: "precision" });
+  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), {
+    mode: "precision",
+  });
 }
 
 function _stringify(input: number): string {
@@ -251,6 +271,12 @@ function _formatHex(
   } else {
     return hex;
   }
+}
+
+/** @deprecated */
+function _fromName(lowerCasedName: string): Color | null {
+  const bytes = rgbFromName(lowerCasedName);
+  return bytes ? Color.fromUint8Array(Uint8Array.of(...bytes)) : null;
 }
 
 export { CssColorFormat };

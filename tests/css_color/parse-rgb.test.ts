@@ -141,7 +141,6 @@ Deno.test("CssColorFormat.parse(string) - rgb", () => {
   assertStrictEquals(x4.green, 0 / 255);
   assertStrictEquals(x4.blue, 253.5 / 255);
   assertStrictEquals(x4.alpha, 0 / 255);
-
 });
 
 Deno.test("CssColorFormat.parse(string) - rgb,legacy", () => {
@@ -284,7 +283,6 @@ Deno.test("CssColorFormat.parse(string) - rgb,legacy", () => {
   assertStrictEquals(x4.green, 0 / 255);
   assertStrictEquals(x4.blue, 253.5 / 255);
   assertStrictEquals(x4.alpha, 0 / 255);
-
 });
 
 //TODO コンマスペース混在（chromeだとokになるケースがあるが）

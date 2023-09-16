@@ -22,22 +22,6 @@ class SrgbColor {
     }
   }
 
-  #toCssRgbFunction(omitAlpha: boolean, type: SrgbColor.Format.CssFunction = SrgbColor.Format.CssFunction.LEGACY_RGB): string {
-    const { r, g, b } = this.toRgb();
-    if (type === SrgbColor.Format.CssFunction.L4_RGB) {
-      if (omitAlpha === true) {
-        return `rgb(${ r } ${ g } ${ b })`;
-      }
-      return `rgb(${ r } ${ g } ${ b } / ${ this.opacity })`;
-    }
-    else /* SrgbColor.Format.CssFunction.LEGACY_RGB */ {
-      if (omitAlpha === true) {
-        return `rgb(${ r }, ${ g }, ${ b })`;
-      }
-      return `rgba(${ r }, ${ g }, ${ b }, ${ this.opacity })`;
-    }
-  }
-
   #toCssHslFunction(omitAlpha: boolean, type: SrgbColor.Format.CssFunction = SrgbColor.Format.CssFunction.LEGACY_HSL): string {
     const { h, s, l } = this.toHsl();
     const sp = (s * 100);
@@ -69,15 +53,6 @@ static fromCssString(cssString: string): RgbColor {
     else if (trimmed.startsWith("hsl(") || trimmed.startsWith("hsla(")) {
       return RgbColor.#parseCssHslFunction(trimmed);
     }
-    else if (trimmed.startsWith("var(")) {
-      throw new RangeError("cssString");
-    }
-    else if ([ "inherit", "initial", "unset", "revert", "currentcolor" ].includes(trimmed)) {
-      throw new RangeError("cssString");
-    }
-    else {
-      // XXX: not implemented: color names, hwb(), システム色L4, deprecatedシステム色, ...
-    }
   }
   throw new TypeError("cssString");
 }
@@ -90,20 +65,15 @@ static #parseCssHslFunction(cssString: string): RgbColor {
 // }
 
   export const CssFunction = {
-    LEGACY_RGB: "legacy-rgb",
     LEGACY_HSL: "legacy-hsl",
-    L4_RGB: "l4-rgb",
     L4_HSL: "l4-hsl",
     // XXX lab, lch, ...
   } as const;
   export type CssFunction = typeof CssFunction[keyof typeof CssFunction];
 
-  export type CssNotation = CssFunction | "hex";
-
   export type CssOptions = {
     omitAlpha?: OmitAlpha;
     type?: CssNotation;
-    //XXX nameIfExists
   };
 
 
