@@ -14,7 +14,7 @@ namespace CssColorFormat {
   */
 
   export type FormatOptions = /* Options & */ {
-    notation?: "hex" | "rgb";
+    notation?: "hex" | "rgb" | "hsl";
     upperCase?: boolean;
     shortenIfPossible?: boolean;
     legacy?: boolean;
@@ -30,6 +30,8 @@ namespace CssColorFormat {
       return _parseHex(colorString);
     } else if (/^rgba?\(/.test(lowerCased)) {
       return _parseRgb(colorString);
+    } else if (/^hsla?\(/.test(lowerCased)) {
+      return _parseHsl(colorString);
     }
 
     const colorFromName = _fromName(lowerCased);
@@ -37,11 +39,14 @@ namespace CssColorFormat {
       return colorFromName;
     }
 
+    if (lowerCased === "transparent") {
+      return Color.fromUint8Array(Uint8Array.of(0, 0, 0, 0));
+    }
+
     // currentcolor
     // inherit
     // initial
     // revert
-    // transparent 補完時は#0000であるとは限らない
     // unset
     // var()
     // ...
@@ -56,6 +61,9 @@ namespace CssColorFormat {
     switch (options?.notation) {
       case "rgb":
         return _formatRgb(color, options);
+
+      case "hsl":
+        return _formatHsl(color, options);
 
       default:
         return _formatHex(color, options);
@@ -277,6 +285,19 @@ function _formatHex(
 function _fromName(lowerCasedName: string): Color | null {
   const bytes = rgbFromName(lowerCasedName);
   return bytes ? Color.fromUint8Array(Uint8Array.of(...bytes)) : null;
+}
+
+function _parseHsl(source: string): Color {
+  //TODO
+  throw new Error("not implemented");
+}
+
+function _formatHsl(
+  color: Color,
+  options?: CssColorFormat.FormatOptions,
+): string {
+  //TODO
+  throw new Error("not implemented");
 }
 
 export { CssColorFormat };

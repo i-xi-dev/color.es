@@ -1,4 +1,4 @@
-import { assertThrows } from "../deps.ts";
+import { assertStrictEquals, assertThrows } from "../deps.ts";
 import { CssColorFormat } from "../../mod.ts";
 
 Deno.test("CssColorFormat.parse(string)", () => {
@@ -81,4 +81,10 @@ Deno.test("CssColorFormat.parse(string)", () => {
     RangeError,
     "colorString",
   );
+
+  const c1 = CssColorFormat.parse("transparent");
+  assertStrictEquals(c1.red, 0 / 255);
+  assertStrictEquals(c1.green, 0 / 255);
+  assertStrictEquals(c1.blue, 0 / 255);
+  assertStrictEquals(c1.alpha, 0 / 255);
 });
