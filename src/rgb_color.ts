@@ -1,11 +1,69 @@
 import { ByteSequence, NumberUtils, Uint8 } from "../deps.ts";
 import { Color } from "./color.ts";
 
+type _0_1 = number;
+const _0_1_MIN = 0;
+const _0_1_MAX = 1;
+function _normalize_0_1(value: unknown): _0_1 {
+  if (Number.isFinite(value)) {
+    return NumberUtils.clamp(value as number, _0_1_MIN, _0_1_MAX);
+  }
+  return _0_1_MIN;
+}
+
+type _RgbComponent = number;
+namespace _RgbComponent {
+  export const MIN_VALUE = 0;
+  export const MAX_VALUE = 1;
+  //XXX 現バージョンでは、範囲は0-1で固定（sRGB以外は考慮しない）
+  export const normalize = _normalize_0_1;
+}
+
+//XXX ここで適切？
+export type _Saturation = _0_1;
+export namespace _Saturation {
+  export const MIN_VALUE = _0_1_MIN;
+  export const MAX_VALUE = _0_1_MAX;
+  export const normalize = _normalize_0_1;
+}
+
+//XXX ここで適切？
+export type _Lightness = _0_1;
+export namespace _Lightness {
+  export const MIN_VALUE = _0_1_MIN;
+  export const MAX_VALUE = _0_1_MAX;
+  export const normalize = _normalize_0_1;
+}
+
+//XXX ここで適切？
+export type _Whiteness = _0_1;
+export namespace _Whiteness {
+  export const MIN_VALUE = _0_1_MIN;
+  export const MAX_VALUE = _0_1_MAX;
+  export const normalize = _normalize_0_1;
+}
+
+//XXX ここで適切？
+export type _Blackness = _0_1;
+export namespace _Blackness {
+  export const MIN_VALUE = _0_1_MIN;
+  export const MAX_VALUE = _0_1_MAX;
+  export const normalize = _normalize_0_1;
+}
+
+type _RgbOptions = {
+  mode?: "compat" | "bytes" | "precision";
+};
+
+type _HexStringOptions = {
+  order?: "rgba" | "argb";
+};
+
 namespace _Rgb {
   export type Normalized = {
-    r: RgbColor.RgbComponent;
-    g: RgbColor.RgbComponent;
-    b: RgbColor.RgbComponent;
+    r: _RgbComponent;
+    g: _RgbComponent;
+    b: _RgbComponent;
   };
 
   export function normalize(value: Color.Rgb): Normalized {
@@ -24,9 +82,9 @@ namespace _Rgb {
       }
     }
     return {
-      r: RgbColor.RgbComponent.normalize(r),
-      g: RgbColor.RgbComponent.normalize(g),
-      b: RgbColor.RgbComponent.normalize(b),
+      r: _RgbComponent.normalize(r),
+      g: _RgbComponent.normalize(g),
+      b: _RgbComponent.normalize(b),
     };
   }
 }
@@ -82,8 +140,8 @@ namespace _RgbBytes {
 namespace _Hsl {
   export type Normalized = {
     h: Color.Hue;
-    s: RgbColor.Saturation;
-    l: RgbColor.Lightness;
+    s: _Saturation;
+    l: _Lightness;
   };
 
   export function normalize(value: Color.Hsl): Normalized {
@@ -103,8 +161,8 @@ namespace _Hsl {
     }
     return {
       h: Color.Hue.normalize(h),
-      s: RgbColor.Saturation.normalize(s),
-      l: RgbColor.Lightness.normalize(l),
+      s: _Saturation.normalize(s),
+      l: _Lightness.normalize(l),
     };
   }
 
@@ -165,8 +223,8 @@ namespace _Hsl {
 namespace _Hwb {
   export type Normalized = {
     h: Color.Hue;
-    w: RgbColor.Whiteness;
-    b: RgbColor.Blackness;
+    w: _Whiteness;
+    b: _Blackness;
   };
 
   export function normalize(value: Color.Hwb): Normalized {
@@ -186,8 +244,8 @@ namespace _Hwb {
     }
     return {
       h: Color.Hue.normalize(h),
-      w: RgbColor.Whiteness.normalize(w),
-      b: RgbColor.Blackness.normalize(b),
+      w: _Whiteness.normalize(w),
+      b: _Blackness.normalize(b),
       //XXX w+bに上限制約があるが…
     };
   }
@@ -244,9 +302,10 @@ function _isRequiredAlpha(alpha: Color.Alpha, options?: _ToOptions): boolean {
  * A color represented by red, green, and blue channels
  */
 class RgbColor {
-  readonly #r: RgbColor.RgbComponent;
-  readonly #g: RgbColor.RgbComponent;
-  readonly #b: RgbColor.RgbComponent;
+  readonly #space: Color.Space;
+  readonly #r: _RgbComponent;
+  readonly #g: _RgbComponent;
+  readonly #b: _RgbComponent;
   readonly #a: Color.Alpha;
 
   #rgbBytesCache?: _RgbBytes.Normalized;
@@ -255,11 +314,12 @@ class RgbColor {
   #hwbCache?: _Hwb.Normalized;
 
   private constructor(
-    r: RgbColor.RgbComponent,
-    g: RgbColor.RgbComponent,
-    b: RgbColor.RgbComponent,
+    r: _RgbComponent,
+    g: _RgbComponent,
+    b: _RgbComponent,
     a: Color.Alpha,
   ) {
+    this.#space = Color.Space.SRGB; //XXX 現バージョンでは固定とする
     this.#r = r;
     this.#g = g;
     this.#b = b;
@@ -267,24 +327,28 @@ class RgbColor {
     Object.freeze(this);
   }
 
+  get space(): Color.Space {
+    return this.#space;
+  }
+
   /**
    * The red component value.
    */
-  get red(): RgbColor.RgbComponent {
+  get red(): _RgbComponent {
     return this.#r;
   }
 
   /**
    * The green component value.
    */
-  get green(): RgbColor.RgbComponent {
+  get green(): _RgbComponent {
     return this.#g;
   }
 
   /**
    * The blue component value.
    */
-  get blue(): RgbColor.RgbComponent {
+  get blue(): _RgbComponent {
     return this.#b;
   }
 
@@ -296,19 +360,19 @@ class RgbColor {
     return this.#hsl.h;
   }
 
-  get saturation(): RgbColor.Saturation {
+  get saturation(): _Saturation {
     return this.#hsl.s;
   }
 
-  get lightness(): RgbColor.Lightness {
+  get lightness(): _Lightness {
     return this.#hsl.l;
   }
 
-  get whiteness(): RgbColor.Whiteness {
+  get whiteness(): _Whiteness {
     return this.#hwb.w;
   }
 
-  get blackness(): RgbColor.Blackness {
+  get blackness(): _Blackness {
     return this.#hwb.b;
   }
 
@@ -352,7 +416,7 @@ class RgbColor {
     return { ...this.#hwbCache };
   }
 
-  static fromRgb(rgba: Color.Rgb, options?: RgbColor.FromRgbOptions): RgbColor {
+  static fromRgb(rgba: Color.Rgb, options?: FromRgbOptions): RgbColor {
     // sRGB固定
 
     if (options?.mode === "precision") {
@@ -377,7 +441,7 @@ class RgbColor {
     }
   }
 
-  static fromHsl(hsla: Color.Hsl, options?: RgbColor.FromHslOptions): RgbColor {
+  static fromHsl(hsla: Color.Hsl, options?: FromHslOptions): RgbColor {
     const { r, g, b } = _Hsl.toRgb(hsla);
     const a = (options?.ignoreAlpha === true)
       ? Color.Alpha.MAX_VALUE
@@ -385,7 +449,7 @@ class RgbColor {
     return new RgbColor(r, g, b, a);
   }
 
-  static fromHwb(hwba: Color.Hwb, options?: RgbColor.FromHwbOptions): RgbColor {
+  static fromHwb(hwba: Color.Hwb, options?: FromHwbOptions): RgbColor {
     const { r, g, b } = _Hwb.toRgb(hwba);
     const a = (options?.ignoreAlpha === true)
       ? Color.Alpha.MAX_VALUE
@@ -395,7 +459,7 @@ class RgbColor {
 
   static fromUint8Array(
     rgbaBytes: Uint8Array | Uint8ClampedArray,
-    options?: RgbColor.FromUint8ArrayOptions,
+    options?: FromUint8ArrayOptions,
   ): RgbColor {
     if (rgbaBytes[Symbol.iterator]) {
       const bytes: [number, number, number, number] = [
@@ -431,7 +495,7 @@ class RgbColor {
 
   static fromHexString(
     hexString: string,
-    options?: RgbColor.FromHexStringOptions,
+    options?: FromHexStringOptions,
   ): RgbColor {
     if (typeof hexString !== "string") {
       throw new TypeError("hexString");
@@ -466,7 +530,7 @@ class RgbColor {
     );
   }
 
-  toRgb(options?: RgbColor.ToRgbOptions): Color.Rgb {
+  toRgb(options?: ToRgbOptions): Color.Rgb {
     let r: number;
     let g: number;
     let b: number;
@@ -493,7 +557,7 @@ class RgbColor {
     return { r, g, b };
   }
 
-  toHsl(options?: RgbColor.ToHslOptions): Color.Hsl {
+  toHsl(options?: ToHslOptions): Color.Hsl {
     const { h, s, l } = this.#hsl;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, s, l, a: this.#a };
@@ -501,7 +565,7 @@ class RgbColor {
     return { h, s, l };
   }
 
-  toHwb(options?: RgbColor.ToHwbOptions): Color.Hwb {
+  toHwb(options?: ToHwbOptions): Color.Hwb {
     const { h, w, b } = this.#hwb;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, w, b, a: this.#a };
@@ -509,7 +573,7 @@ class RgbColor {
     return { h, w, b };
   }
 
-  toUint8Array(options?: RgbColor.ToUint8ArrayOptions): Uint8Array {
+  toUint8Array(options?: ToUint8ArrayOptions): Uint8Array {
     const { r, g, b } = this.#rgbBytes;
     if (_isRequiredAlpha(this.#a, options)) {
       return Uint8Array.of(r, g, b, this.#alphaByte);
@@ -518,7 +582,7 @@ class RgbColor {
   }
 
   toUint8ClampedArray(
-    options?: RgbColor.ToUint8ArrayOptions,
+    options?: ToUint8ArrayOptions,
   ): Uint8ClampedArray {
     const { r, g, b } = this.#rgbBytes;
     if (_isRequiredAlpha(this.#a, options)) {
@@ -527,7 +591,7 @@ class RgbColor {
     return Uint8ClampedArray.of(r, g, b);
   }
 
-  toHexString(options?: RgbColor.ToHexStringOptions): string {
+  toHexString(options?: ToHexStringOptions): string {
     const lowerCase = options?.upperCase !== true;
 
     const bytes = ByteSequence.fromArrayBufferView(this.toUint8Array());
@@ -641,87 +705,28 @@ class RgbColor {
   }
 }
 
-namespace RgbColor {
-  export type RgbComponent = number;
-  export namespace RgbComponent {
-    export const MIN_VALUE = 0;
-    export const MAX_VALUE = 1;
-    //XXX 現バージョンでは、範囲は0-1で固定（sRGB以外は考慮しない）
-    export const normalize = _normalize_0_1;
-  }
+// namespace RgbColor {
+type FromRgbOptions = _RgbOptions & _FromOptions;
 
-  type _0_1 = number;
+type ToRgbOptions = _RgbOptions & _ToOptions;
 
-  const _0_1_MIN = 0;
-  const _0_1_MAX = 1;
-  function _normalize_0_1(value: unknown): _0_1 {
-    if (Number.isFinite(value)) {
-      return NumberUtils.clamp(value as number, _0_1_MIN, _0_1_MAX);
-    }
-    return _0_1_MIN;
-  }
+type FromHslOptions = _FromOptions;
 
-  //XXX ここで適切？
-  export type Saturation = _0_1;
-  export namespace Saturation {
-    export const MIN_VALUE = _0_1_MIN;
-    export const MAX_VALUE = _0_1_MAX;
-    export const normalize = _normalize_0_1;
-  }
+type ToHslOptions = _ToOptions;
 
-  //XXX ここで適切？
-  export type Lightness = _0_1;
-  export namespace Lightness {
-    export const MIN_VALUE = _0_1_MIN;
-    export const MAX_VALUE = _0_1_MAX;
-    export const normalize = _normalize_0_1;
-  }
+type FromHwbOptions = _FromOptions;
 
-  //XXX ここで適切？
-  export type Whiteness = _0_1;
-  export namespace Whiteness {
-    export const MIN_VALUE = _0_1_MIN;
-    export const MAX_VALUE = _0_1_MAX;
-    export const normalize = _normalize_0_1;
-  }
+type ToHwbOptions = _ToOptions;
 
-  //XXX ここで適切？
-  export type Blackness = _0_1;
-  export namespace Blackness {
-    export const MIN_VALUE = _0_1_MIN;
-    export const MAX_VALUE = _0_1_MAX;
-    export const normalize = _normalize_0_1;
-  }
+type FromUint8ArrayOptions = _FromOptions;
 
-  type RgbOptions = {
-    mode?: "compat" | "bytes" | "precision";
-  };
+type ToUint8ArrayOptions = _ToOptions;
 
-  type HexStringOptions = {
-    order?: "rgba" | "argb";
-  };
+type FromHexStringOptions = _HexStringOptions & _FromOptions;
 
-  export type FromRgbOptions = RgbOptions & _FromOptions;
-
-  export type ToRgbOptions = RgbOptions & _ToOptions;
-
-  export type FromHslOptions = _FromOptions;
-
-  export type ToHslOptions = _ToOptions;
-
-  export type FromHwbOptions = _FromOptions;
-
-  export type ToHwbOptions = _ToOptions;
-
-  export type FromUint8ArrayOptions = _FromOptions;
-
-  export type ToUint8ArrayOptions = _ToOptions;
-
-  export type FromHexStringOptions = HexStringOptions & _FromOptions;
-
-  export type ToHexStringOptions = HexStringOptions & {
-    upperCase?: boolean;
-  } & _ToOptions;
-}
+type ToHexStringOptions = _HexStringOptions & {
+  upperCase?: boolean;
+} & _ToOptions;
+// }
 
 export { RgbColor };

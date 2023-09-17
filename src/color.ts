@@ -12,11 +12,19 @@ namespace Color {
     a?: number;
   };
 
+  export type Rgba = Rgb & {
+    a: number;
+  };
+
   export type Hsl = {
     h: number;
     s: number;
     l: number;
     a?: number;
+  };
+
+  export type Hsla = Hsl & {
+    a: number;
   };
 
   export type Hwb = {
@@ -26,9 +34,31 @@ namespace Color {
     a?: number;
   };
 
-  export const Space = {
+  export type Hwba = Hwb & {
+    a: number;
+  };
+
+  const _RgbSpace = {
+    A98_RGB: "a98-rgb",
+    DISPLAY_P3: "display-p3",
+    PROPHOTO_RGB: "prophoto-rgb",
+    REC2020: "rec2020",
     SRGB: "srgb",
+    SRGB_LINEAR: "srgb-linear",
   } as const;
+
+  const _XyzSpace = {
+    XYZ: "xyz",
+    XYZ_D50: "xyz-d50",
+    XYZ_D65: "xyz-d65",
+  } as const;
+
+  export const Space = {
+    ..._RgbSpace,
+    ..._XyzSpace,
+    //XXX 他のspace
+  } as const;
+
   export type Space = typeof Space[keyof typeof Space];
 
   export type Alpha = number;
