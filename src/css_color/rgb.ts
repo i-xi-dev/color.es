@@ -53,25 +53,27 @@ namespace _CssRgb {
   }
 }
 
-// 以下は https://drafts.csswg.org/css-color-4/#rgb-functions
-
-// <alpha-value> https://drafts.csswg.org/css-color-4/#typedef-alpha-value
-const _ALPHA = `${_Pattern.NUM}%?`;
+// パターンは https://drafts.csswg.org/css-color-4/#rgb-functions から
 
 // <legacy-rgb-syntax> https://drafts.csswg.org/css-color-4/#typedef-legacy-rgb-syntax
 // <legacy-rgba-syntax> https://drafts.csswg.org/css-color-4/#typedef-legacy-rgba-syntax
-const _L_RGB_N =
-  `^rgba?\\(${_Pattern.WS}${_Pattern.NUM}(?:${_Pattern.CMS}${_Pattern.NUM}){2}(?:${_Pattern.CMS}${_ALPHA})?${_Pattern.WS}\\)$`;
-const _L_RGB_P =
-  `^rgba?\\(${_Pattern.WS}${_Pattern.PERC}(?:${_Pattern.CMS}${_Pattern.PERC}){2}(?:${_Pattern.CMS}${_ALPHA})?${_Pattern.WS}\\)$`;
+const _L_RGB_N = `^rgba?\\(${_Pattern.WS}` +
+  `${_Pattern.NUM}(?:${_Pattern.CMS}${_Pattern.NUM}){2}` +
+  `(?:${_Pattern.CMS}${_Pattern.ALPHA})?` +
+  `${_Pattern.WS}\\)$`;
+const _L_RGB_P = `^rgba?\\(${_Pattern.WS}` +
+  `${_Pattern.PERC}(?:${_Pattern.CMS}${_Pattern.PERC}){2}` +
+  `(?:${_Pattern.CMS}${_Pattern.ALPHA})?` +
+  `${_Pattern.WS}\\)$`;
 const _L_RGB = `(?:${_L_RGB_N}|${_L_RGB_P})`;
 
 // <modern-rgb-syntax> https://drafts.csswg.org/css-color-4/#typedef-modern-rgb-syntax
 // <modern-rgba-syntax> https://drafts.csswg.org/css-color-4/#typedef-modern-rgba-syntax
 const _NP = `${_Pattern.NUM}%?`;
-
-const _M_RGB =
-  `^rgba?\\(${_Pattern.WS}${_NP}(?:${_Pattern.WHITESPACE}+${_NP}){2}(?:${_Pattern.SLS}${_ALPHA})?${_Pattern.WS}\\)$`;
+const _M_RGB = `^rgba?\\(${_Pattern.WS}` +
+  `${_NP}(?:${_Pattern.WHITESPACE}+${_NP}){2}` +
+  `(?:${_Pattern.SLS}${_Pattern.ALPHA})?` +
+  `${_Pattern.WS}\\)$`;
 //XXX `none`は現バージョンでは対応しない
 
 let _mRgbRegex: RegExp;

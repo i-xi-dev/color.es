@@ -1,3 +1,5 @@
+import { Angle } from "../../deps.ts";
+
 /*
 export type _Options =
 export type _ParseOptions = _Options & {
@@ -62,4 +64,25 @@ export namespace _Pattern {
   export const CMS = `${WS},${WS}`;
 
   export const SLS = `${WS}\\/${WS}`;
+
+  // <alpha-value> https://drafts.csswg.org/css-color-4/#typedef-alpha-value
+  export const ALPHA = `${_Pattern.NUM}%?`;
+
+  // <hue> https://drafts.csswg.org/css-color-4/#typedef-hue
+  export const HUE = `${_Pattern.NUM}(?:deg|grad|rad|turn)?`;
+
+  export function parseHue(input: string): number {
+    // 形式チェック済の前提
+    const lowerCased = input.toLowerCase();
+    const numberValue = Number.parseFloat(input);
+    if (lowerCased.endsWith("grad")) {
+      return Angle.Degrees.fromGradians(numberValue);
+    } else if (lowerCased.endsWith("rad")) {
+      return Angle.Degrees.fromRadians(numberValue);
+    } else if (lowerCased.endsWith("turn")) {
+      return Angle.Degrees.fromTurns(numberValue);
+    } else {
+      return numberValue;
+    }
+  }
 }
