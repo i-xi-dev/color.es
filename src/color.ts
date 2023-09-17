@@ -1,41 +1,79 @@
 import { Angle, NumberUtils } from "../deps.ts";
 
 namespace Color {
-  // 以下いずれか
-  // ・r,g,bはバイト表現 0～255、aは0～1（多分一般的。VuetifyとかReactの形式）
-  // ・r,g,b,aすべてバイト表現 0～255
-  // ・r,g,b,aすべて0～1
+  /**
+   * The RGB object, that represents RGB color in red, green, and blue.
+   */
   export type Rgb = {
+    /**
+     * Red
+     */
     r: number;
+
+    /**
+     * Green
+     */
     g: number;
+
+    /**
+     * Blue
+     */
     b: number;
+
+    /**
+     * Alpha
+     */
     a?: number;
   };
 
-  export type Rgba = Rgb & {
-    a: number;
-  };
-
+  /**
+   * The HSL object, that represents RGB color in hue, saturation, and lightness.
+   */
   export type Hsl = {
+    /**
+     * Hue
+     */
     h: number;
+
+    /**
+     * Saturation
+     */
     s: number;
+
+    /**
+     * Lightness
+     */
     l: number;
+
+    /**
+     * Alpha
+     */
     a?: number;
   };
 
-  export type Hsla = Hsl & {
-    a: number;
-  };
-
+  /**
+   * The HWB object, that represents RGB color in hue, whiteness, and blackness.
+   */
   export type Hwb = {
+    /**
+     * Hue
+     */
     h: number;
-    w: number;
-    b: number;
-    a?: number;
-  };
 
-  export type Hwba = Hwb & {
-    a: number;
+    /**
+     * Whiteness
+     */
+    w: number;
+
+    /**
+     * Blackness
+     */
+    b: number;
+
+    /**
+     * Alpha
+     */
+    a?: number;
   };
 
   const _RgbSpace = {
@@ -59,6 +97,9 @@ namespace Color {
     //XXX 他のspace
   } as const;
 
+  /**
+   * The color space
+   */
   export type Space = typeof Space[keyof typeof Space];
 
   /**
@@ -70,9 +111,23 @@ namespace Color {
   export type Alpha = number;
 
   export namespace Alpha {
+    /**
+     * The minimum value of alpha value.
+     */
     export const MIN_VALUE = 0;
+
+    /**
+     * The maximum value of alpha value.
+     */
     export const MAX_VALUE = 1;
 
+    /**
+     * If the `value` is a numeric type, returns the result rounded to the range of `0` to `1`.
+     * Otherwise, returns `1`.
+     * 
+     * @param value - Alpha value.
+     * @returns A normalized alpha value.
+     */
     export function normalize(value: unknown): Alpha {
       if (Number.isFinite(value)) {
         return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);

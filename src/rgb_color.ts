@@ -491,6 +491,9 @@ class RgbColor {
     return { ...this.#hwbCache };
   }
 
+  // ・r,g,bはバイト表現 0～255、aは0～1（多分一般的。VuetifyとかReactの形式）
+  // ・r,g,b,aすべてバイト表現 0～255
+  // ・r,g,b,aすべて0～1
   static fromRgb(rgba: Color.Rgb, options?: FromRgbOptions): RgbColor {
     // sRGB固定
 
