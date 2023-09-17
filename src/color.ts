@@ -61,6 +61,12 @@ namespace Color {
 
   export type Space = typeof Space[keyof typeof Space];
 
+  /**
+   * The opacity value, represented as a `number`.
+   * 
+   * The useful range of the value is `0` to `1`.
+   * `0` represents completely transparent, `1` represents completely opaque.
+   */
   export type Alpha = number;
 
   export namespace Alpha {

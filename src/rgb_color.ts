@@ -354,7 +354,7 @@ class RgbColor {
    * //   → 0.533333
    * ```
    */
-  get red(): _RgbComponent {
+  get red(): number /* _RgbComponent */ {
     return this.#r;
   }
 
@@ -376,7 +376,7 @@ class RgbColor {
    * //   → 0.533333
    * ```
    */
-  get green(): _RgbComponent {
+  get green(): number /* _RgbComponent */ {
     return this.#g;
   }
 
@@ -398,7 +398,7 @@ class RgbColor {
    * //   → 0.533333
    * ```
    */
-  get blue(): _RgbComponent {
+  get blue(): number /* _RgbComponent */ {
     return this.#b;
   }
 
