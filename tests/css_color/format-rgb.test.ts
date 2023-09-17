@@ -1,10 +1,10 @@
 import { assertStrictEquals } from "../deps.ts";
-import { Color, CssColorFormat } from "../../mod.ts";
+import { CssColorFormat, RgbColor } from "../../mod.ts";
 
 Deno.test("CssColorFormat.format(object) - rgb", () => {
   const op = { notation: "rgb" } as const;
 
-  const c1 = Color.fromHexString("#00cc22ff");
+  const c1 = RgbColor.fromHexString("#00cc22ff");
   assertStrictEquals(CssColorFormat.format(c1, op), "rgb(0 204 34 / 1.00)");
   assertStrictEquals(
     CssColorFormat.format(c1, { ...op, upperCase: true }),
@@ -19,7 +19,7 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(0 204 34)",
   );
 
-  const c2 = Color.fromHexString("#00cc2288");
+  const c2 = RgbColor.fromHexString("#00cc2288");
   assertStrictEquals(CssColorFormat.format(c2, op), "rgb(0 204 34 / 0.53)");
   assertStrictEquals(
     CssColorFormat.format(c2, { ...op, upperCase: true }),
@@ -34,7 +34,7 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(0 204 34 / 0.53)",
   );
 
-  const c3 = Color.fromHexString("#aabbcdee");
+  const c3 = RgbColor.fromHexString("#aabbcdee");
   assertStrictEquals(
     CssColorFormat.format(c3, op),
     "rgb(170 187 205 / 0.93)",
@@ -52,7 +52,7 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(170 187 205 / 0.93)",
   );
 
-  const c4 = Color.fromHexString("#aabbcdff");
+  const c4 = RgbColor.fromHexString("#aabbcdff");
   assertStrictEquals(CssColorFormat.format(c4, op), "rgb(170 187 205 / 1.00)");
   assertStrictEquals(
     CssColorFormat.format(c4, { ...op, upperCase: true }),
@@ -67,7 +67,7 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(170 187 205)",
   );
 
-  const c4b = Color.fromHexString("#aabbcd");
+  const c4b = RgbColor.fromHexString("#aabbcd");
   assertStrictEquals(CssColorFormat.format(c4, op), "rgb(170 187 205 / 1.00)");
   assertStrictEquals(
     CssColorFormat.format(c4b, { ...op, upperCase: true }),
@@ -82,7 +82,7 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     "RGB(170 187 205)",
   );
 
-  const c5 = Color.fromHexString("#aabbcd00");
+  const c5 = RgbColor.fromHexString("#aabbcd00");
   assertStrictEquals(CssColorFormat.format(c5, op), "rgb(170 187 205 / 0.00)");
   assertStrictEquals(
     CssColorFormat.format(c5, { ...op, shortenIfPossible: true }),
@@ -93,7 +93,7 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
 Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
   const op = { notation: "rgb", legacy: true } as const;
 
-  const c1 = Color.fromHexString("#00cc22ff");
+  const c1 = RgbColor.fromHexString("#00cc22ff");
   assertStrictEquals(CssColorFormat.format(c1, op), "rgba(0, 204, 34, 1.00)");
   assertStrictEquals(
     CssColorFormat.format(c1, { ...op, upperCase: true }),
@@ -108,7 +108,7 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGB(0, 204, 34)",
   );
 
-  const c2 = Color.fromHexString("#00cc2288");
+  const c2 = RgbColor.fromHexString("#00cc2288");
   assertStrictEquals(CssColorFormat.format(c2, op), "rgba(0, 204, 34, 0.53)");
   assertStrictEquals(
     CssColorFormat.format(c2, { ...op, upperCase: true }),
@@ -123,7 +123,7 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGBA(0, 204, 34, 0.53)",
   );
 
-  const c3 = Color.fromHexString("#aabbcdee");
+  const c3 = RgbColor.fromHexString("#aabbcdee");
   assertStrictEquals(
     CssColorFormat.format(c3, op),
     "rgba(170, 187, 205, 0.93)",
@@ -141,7 +141,7 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGBA(170, 187, 205, 0.93)",
   );
 
-  const c4 = Color.fromHexString("#aabbcdff");
+  const c4 = RgbColor.fromHexString("#aabbcdff");
   assertStrictEquals(
     CssColorFormat.format(c4, op),
     "rgba(170, 187, 205, 1.00)",
@@ -159,7 +159,7 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
     "RGB(170, 187, 205)",
   );
 
-  const c4b = Color.fromHexString("#aabbcd");
+  const c4b = RgbColor.fromHexString("#aabbcd");
   assertStrictEquals(
     CssColorFormat.format(c4, op),
     "rgba(170, 187, 205, 1.00)",

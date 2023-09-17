@@ -1,10 +1,10 @@
 import { assertThrows } from "../deps.ts";
-import { Color, CssColorFormat } from "../../mod.ts";
+import { CssColorFormat, RgbColor } from "../../mod.ts";
 
 Deno.test("CssColorFormat.format(object)", () => {
   assertThrows(
     () => {
-      CssColorFormat.format({} as unknown as Color);
+      CssColorFormat.format({} as unknown as RgbColor);
     },
     TypeError,
     "color",

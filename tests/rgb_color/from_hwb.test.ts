@@ -1,10 +1,10 @@
 import { assertStrictEquals } from "../deps.ts";
-import { Color } from "../../mod.ts";
+import { RgbColor } from "../../mod.ts";
 import { r1Cases, r2Cases, r3Cases } from "../data.ts";
 
-Deno.test("Color.fromHwb({ h, w, b })", () => {
+Deno.test("RgbColor.fromHwb({ h, w, b })", () => {
   for (const c of r1Cases) {
-    const c0 = Color.fromHwb({
+    const c0 = RgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
       b: Number(c.bk),
@@ -19,7 +19,7 @@ Deno.test("Color.fromHwb({ h, w, b })", () => {
   }
 
   for (const c of r2Cases) {
-    const c0 = Color.fromHwb({
+    const c0 = RgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
       b: Number(c.bk),
@@ -37,7 +37,7 @@ Deno.test("Color.fromHwb({ h, w, b })", () => {
   }
 
   for (const c of r3Cases) {
-    const c0 = Color.fromHwb({
+    const c0 = RgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
       b: Number(c.bk),
@@ -58,9 +58,9 @@ Deno.test("Color.fromHwb({ h, w, b })", () => {
   }
 });
 
-Deno.test("Color.fromHwb({ h, w, b, a })", () => {
+Deno.test("RgbColor.fromHwb({ h, w, b, a })", () => {
   for (const c of r1Cases) {
-    const c0 = Color.fromHwb({
+    const c0 = RgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
       b: Number(c.bk),
@@ -76,7 +76,7 @@ Deno.test("Color.fromHwb({ h, w, b, a })", () => {
   }
 
   for (const c of r2Cases) {
-    const c0 = Color.fromHwb({
+    const c0 = RgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
       b: Number(c.bk),
@@ -95,9 +95,9 @@ Deno.test("Color.fromHwb({ h, w, b, a })", () => {
   }
 });
 
-Deno.test("Color.fromHwb({ h, w, b, a }) - ignoreAlpha", () => {
+Deno.test("RgbColor.fromHwb({ h, w, b, a }) - ignoreAlpha", () => {
   for (const c of r1Cases) {
-    const c0 = Color.fromHwb({
+    const c0 = RgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
       b: Number(c.bk),
@@ -113,7 +113,7 @@ Deno.test("Color.fromHwb({ h, w, b, a }) - ignoreAlpha", () => {
   }
 
   for (const c of r2Cases) {
-    const c0 = Color.fromHwb({
+    const c0 = RgbColor.fromHwb({
       h: Number(c.h),
       w: Number(c.wt),
       b: Number(c.bk),

@@ -6,7 +6,7 @@ export type _ParseOptions = _Options & {
 */
 
 export type _FormatOptions = /* _Options & */ {
-  notation?: "hex" | "rgb" | "hsl";
+  notation?: "hex" | "rgb" | "hsl"; //TODO hwb
   upperCase?: boolean;
   shortenIfPossible?: boolean;
   legacy?: boolean;

@@ -1,8 +1,8 @@
 import { assertStrictEquals } from "../deps.ts";
-import { Color, CssColorFormat } from "../../mod.ts";
+import { CssColorFormat, RgbColor } from "../../mod.ts";
 
 Deno.test("CssColorFormat.format(object) - hex", () => {
-  const c1 = Color.fromHexString("#00cc22ff");
+  const c1 = RgbColor.fromHexString("#00cc22ff");
   assertStrictEquals(CssColorFormat.format(c1), "#00cc22ff");
   assertStrictEquals(
     CssColorFormat.format(c1, { upperCase: true }),
@@ -13,7 +13,7 @@ Deno.test("CssColorFormat.format(object) - hex", () => {
     "#0C2",
   );
 
-  const c2 = Color.fromHexString("#00cc2288");
+  const c2 = RgbColor.fromHexString("#00cc2288");
   assertStrictEquals(CssColorFormat.format(c2), "#00cc2288");
   assertStrictEquals(
     CssColorFormat.format(c2, { upperCase: true }),
@@ -24,7 +24,7 @@ Deno.test("CssColorFormat.format(object) - hex", () => {
     "#0C28",
   );
 
-  const c3 = Color.fromHexString("#aabbcdee");
+  const c3 = RgbColor.fromHexString("#aabbcdee");
   assertStrictEquals(CssColorFormat.format(c3), "#aabbcdee");
   assertStrictEquals(
     CssColorFormat.format(c3, { upperCase: true }),
@@ -35,7 +35,7 @@ Deno.test("CssColorFormat.format(object) - hex", () => {
     "#AABBCDEE",
   );
 
-  const c4 = Color.fromHexString("#aabbcdff");
+  const c4 = RgbColor.fromHexString("#aabbcdff");
   assertStrictEquals(CssColorFormat.format(c4), "#aabbcdff");
   assertStrictEquals(
     CssColorFormat.format(c4, { upperCase: true }),
@@ -46,7 +46,7 @@ Deno.test("CssColorFormat.format(object) - hex", () => {
     "#AABBCD",
   );
 
-  const c4b = Color.fromHexString("#aabbcd");
+  const c4b = RgbColor.fromHexString("#aabbcd");
   assertStrictEquals(CssColorFormat.format(c4), "#aabbcdff");
   assertStrictEquals(
     CssColorFormat.format(c4b, { upperCase: true }),

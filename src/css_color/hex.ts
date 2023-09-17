@@ -1,8 +1,8 @@
-import { Color } from "../color.ts";
+import { RgbColor } from "../rgb_color.ts";
 import { _FormatOptions } from "./utils.ts";
 
 namespace _CssHex {
-  export function parse(source: string): Color {
+  export function parse(source: string): RgbColor {
     if (
       /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(source) !== true
     ) {
@@ -10,7 +10,7 @@ namespace _CssHex {
     }
 
     if ((source.length === 9) || (source.length === 7)) {
-      return Color.fromHexString(source);
+      return RgbColor.fromHexString(source);
     }
 
     // #[0-9a-f]{3,4}
@@ -18,13 +18,13 @@ namespace _CssHex {
     const g = source.charAt(2);
     const b = source.charAt(3);
     const a = (source.length === 5) ? source.charAt(4) : "f";
-    return Color.fromHexString(
+    return RgbColor.fromHexString(
       `#${r.repeat(2)}${g.repeat(2)}${b.repeat(2)}${a.repeat(2)}`,
     );
   }
 
   export function format(
-    color: Color,
+    color: RgbColor,
     options?: _FormatOptions,
   ): string {
     let hex = color.toHexString({ upperCase: options?.upperCase });

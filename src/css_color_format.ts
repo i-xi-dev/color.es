@@ -1,5 +1,5 @@
 import { StringUtils } from "../deps.ts";
-import { Color } from "./color.ts";
+import { RgbColor } from "./rgb_color.ts";
 import { _FormatOptions } from "./css_color/utils.ts";
 import { _CssHex } from "./css_color/hex.ts";
 import { _CssRgb } from "./css_color/rgb.ts";
@@ -9,7 +9,7 @@ import { _rgbFromName } from "./css_color/name.ts";
 namespace CssColorFormat {
   export type FormatOptions = _FormatOptions;
 
-  export function parse(colorString: string): Color {
+  export function parse(colorString: string): RgbColor {
     if (StringUtils.isNonEmptyString(colorString) !== true) {
       throw new TypeError("colorString");
     }
@@ -25,11 +25,11 @@ namespace CssColorFormat {
 
     const bytesFromName = _rgbFromName(lowerCased);
     if (bytesFromName) {
-      return Color.fromUint8Array(Uint8Array.of(...bytesFromName));
+      return RgbColor.fromUint8Array(Uint8Array.of(...bytesFromName));
     }
 
     if (lowerCased === "transparent") {
-      return Color.fromUint8Array(Uint8Array.of(0, 0, 0, 0));
+      return RgbColor.fromUint8Array(Uint8Array.of(0, 0, 0, 0));
     }
 
     // currentcolor
@@ -42,8 +42,8 @@ namespace CssColorFormat {
     throw new RangeError("colorString");
   }
 
-  export function format(color: Color, options?: FormatOptions): string {
-    if ((color instanceof Color) !== true) {
+  export function format(color: RgbColor, options?: FormatOptions): string {
+    if ((color instanceof RgbColor) !== true) {
       throw new TypeError("color");
     }
 

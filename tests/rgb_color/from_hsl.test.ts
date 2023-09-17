@@ -1,10 +1,10 @@
 import { assertStrictEquals } from "../deps.ts";
-import { Color } from "../../mod.ts";
+import { RgbColor } from "../../mod.ts";
 import { r1Cases, r2Cases, r3Cases } from "../data.ts";
 
-Deno.test("Color.fromHsl({ h, s, l })", () => {
+Deno.test("RgbColor.fromHsl({ h, s, l })", () => {
   for (const c of r1Cases) {
-    const c0 = Color.fromHsl({
+    const c0 = RgbColor.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -16,7 +16,7 @@ Deno.test("Color.fromHsl({ h, s, l })", () => {
   }
 
   for (const c of r2Cases) {
-    const c0 = Color.fromHsl({
+    const c0 = RgbColor.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -28,7 +28,7 @@ Deno.test("Color.fromHsl({ h, s, l })", () => {
   }
 
   for (const c of r3Cases) {
-    const c0 = Color.fromHsl({
+    const c0 = RgbColor.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -40,9 +40,9 @@ Deno.test("Color.fromHsl({ h, s, l })", () => {
   }
 });
 
-Deno.test("Color.fromHsl({ h, s, l, a })", () => {
+Deno.test("RgbColor.fromHsl({ h, s, l, a })", () => {
   for (const c of r1Cases) {
-    const c0 = Color.fromHsl({
+    const c0 = RgbColor.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -55,7 +55,7 @@ Deno.test("Color.fromHsl({ h, s, l, a })", () => {
   }
 
   for (const c of r2Cases) {
-    const c0 = Color.fromHsl({
+    const c0 = RgbColor.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -68,9 +68,9 @@ Deno.test("Color.fromHsl({ h, s, l, a })", () => {
   }
 });
 
-Deno.test("Color.fromHsl({ h, s, l, a }) - ignoreAlpha", () => {
+Deno.test("RgbColor.fromHsl({ h, s, l, a }) - ignoreAlpha", () => {
   for (const c of r1Cases) {
-    const c0 = Color.fromHsl({
+    const c0 = RgbColor.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),
@@ -83,7 +83,7 @@ Deno.test("Color.fromHsl({ h, s, l, a }) - ignoreAlpha", () => {
   }
 
   for (const c of r2Cases) {
-    const c0 = Color.fromHsl({
+    const c0 = RgbColor.fromHsl({
       h: Number(c.h),
       s: Number(c.s),
       l: Number(c.l),

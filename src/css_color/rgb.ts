@@ -1,8 +1,9 @@
 import { Color } from "../color.ts";
+import { RgbColor } from "../rgb_color.ts";
 import { _floatStringify, _FormatOptions, _Pattern } from "./utils.ts";
 
 namespace _CssRgb {
-  export function parse(source: string): Color {
+  export function parse(source: string): RgbColor {
     if (_matchesModernRgb(source)) {
       return _parseModernRgb(source);
     } else if (_matchesLegacyRgb(source)) {
@@ -16,7 +17,7 @@ namespace _CssRgb {
   //XXX numberかpercentageか指定可能にする？
   //XXX r,g,bを整数に丸めるか指定可能にする？
   export function format(
-    color: Color,
+    color: RgbColor,
     options?: _FormatOptions,
   ): string {
     const shortenIfPossible = options?.shortenIfPossible === true;
@@ -112,17 +113,17 @@ function _parseRgbComponents(
   return { r, g, b, a };
 }
 
-function _parseModernRgb(source: string): Color {
+function _parseModernRgb(source: string): RgbColor {
   const temp = source.replace(/^rgba?\(/i, "").replace(/\)$/, "");
   const [rgbStr, aStr] = temp.split("/").map((c) => _Pattern.trimWs(c));
   const [rStr, gStr, bStr] = _Pattern.normalizeWs(rgbStr).split(" ");
 
-  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), {
+  return RgbColor.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), {
     mode: "precision",
   });
 }
 
-function _parseLegacyRgb(source: string): Color {
+function _parseLegacyRgb(source: string): RgbColor {
   const temp = source.replace(/^rgba?\(/i, "").replace(/\)$/, "");
   const [
     rStr,
@@ -131,7 +132,7 @@ function _parseLegacyRgb(source: string): Color {
     aStr,
   ] = temp.split(",").map((c) => _Pattern.trimWs(c));
 
-  return Color.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), {
+  return RgbColor.fromRgb(_parseRgbComponents(rStr, gStr, bStr, aStr), {
     mode: "precision",
   });
 }

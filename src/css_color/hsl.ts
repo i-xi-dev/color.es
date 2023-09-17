@@ -1,8 +1,9 @@
 import { Color } from "../color.ts";
+import { RgbColor } from "../rgb_color.ts";
 import { _floatStringify, _FormatOptions, _Pattern } from "./utils.ts";
 
 namespace _CssHsl {
-  export function parse(source: string): Color {
+  export function parse(source: string): RgbColor {
     if (_matchesModernHsl(source)) {
       return _parseModernHsl(source);
     } else if (_matchesLegacyHsl(source)) {
@@ -13,7 +14,7 @@ namespace _CssHsl {
 
   //XXX !legacy の場合に s,l を<number>にする記法は chrome が未実装なので、現バージョンでは対応しない
   export function format(
-    color: Color,
+    color: RgbColor,
     options?: _FormatOptions,
   ): string {
     const shortenIfPossible = options?.shortenIfPossible === true;
@@ -101,15 +102,15 @@ function _parseHslComponents(
   return { h, s, l, a };
 }
 
-function _parseModernHsl(source: string): Color {
+function _parseModernHsl(source: string): RgbColor {
   const temp = source.replace(/^hsla?\(/i, "").replace(/\)$/, "");
   const [hslStr, aStr] = temp.split("/").map((c) => _Pattern.trimWs(c));
   const [hStr, sStr, lStr] = _Pattern.normalizeWs(hslStr).split(" ");
 
-  return Color.fromHsl(_parseHslComponents(hStr, sStr, lStr, aStr));
+  return RgbColor.fromHsl(_parseHslComponents(hStr, sStr, lStr, aStr));
 }
 
-function _parseLegacyHsl(source: string): Color {
+function _parseLegacyHsl(source: string): RgbColor {
   const temp = source.replace(/^hsla?\(/i, "").replace(/\)$/, "");
   const [
     hStr,
@@ -118,7 +119,7 @@ function _parseLegacyHsl(source: string): Color {
     aStr,
   ] = temp.split(",").map((c) => _Pattern.trimWs(c));
 
-  return Color.fromHsl(_parseHslComponents(hStr, sStr, lStr, aStr));
+  return RgbColor.fromHsl(_parseHslComponents(hStr, sStr, lStr, aStr));
 }
 
 export { _CssHsl };
