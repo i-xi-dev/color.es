@@ -1,7 +1,7 @@
-import { Uint8 } from "../deps.ts";
+import { Uint8 } from "../../deps.ts";
 
 /** @deprecated */
-export function rgbFromName(
+export function _rgbFromName(
   lowerCasedName: string,
 ): [r: Uint8, g: Uint8, b: Uint8] | null {
   switch (lowerCasedName) {

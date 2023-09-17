@@ -27,26 +27,56 @@ Deno.test("CssColorFormat.format(object) - hsl", () => {
   }
 
   const c1 = Color.fromHexString("#4a8b7b88");
-  assertStrictEquals(CssColorFormat.format(c1, op), `hsl(165.23deg 30.52% 41.76% / 0.53)`);
+  assertStrictEquals(
+    CssColorFormat.format(c1, op),
+    `hsl(165.23deg 30.52% 41.76% / 0.53)`,
+  );
 
   const c2 = Color.fromHexString("#4a8b7b00");
-  assertStrictEquals(CssColorFormat.format(c2, op), `hsl(165.23deg 30.52% 41.76% / 0.00)`);
-  assertStrictEquals(CssColorFormat.format(c2, {...op, shortenIfPossible:true}), `hsl(165.23 30.52% 41.76% / 0)`);
+  assertStrictEquals(
+    CssColorFormat.format(c2, op),
+    `hsl(165.23deg 30.52% 41.76% / 0.00)`,
+  );
+  assertStrictEquals(
+    CssColorFormat.format(c2, { ...op, shortenIfPossible: true }),
+    `hsl(165.23 30.52% 41.76% / 0)`,
+  );
 });
 
 Deno.test("CssColorFormat.format(object) - hsl,legacy", () => {
   const op = { notation: "hsl", legacy: true } as const;
 
   const c1 = Color.fromHexString("#4a8b7b88");
-  assertStrictEquals(CssColorFormat.format(c1, op), `hsla(165.23deg, 30.52%, 41.76%, 0.53)`);
-  assertStrictEquals(CssColorFormat.format(c1, {...op, shortenIfPossible:true}), `hsla(165.23, 30.52%, 41.76%, 0.53)`);
+  assertStrictEquals(
+    CssColorFormat.format(c1, op),
+    `hsla(165.23deg, 30.52%, 41.76%, 0.53)`,
+  );
+  assertStrictEquals(
+    CssColorFormat.format(c1, { ...op, shortenIfPossible: true }),
+    `hsla(165.23, 30.52%, 41.76%, 0.53)`,
+  );
 
   const c2 = Color.fromHexString("#4a8b7bff");
-  assertStrictEquals(CssColorFormat.format(c2, op), `hsla(165.23deg, 30.52%, 41.76%, 1.00)`);
-  assertStrictEquals(CssColorFormat.format(c2, {...op, shortenIfPossible:true}), `hsl(165.23, 30.52%, 41.76%)`);
-  assertStrictEquals(CssColorFormat.format(c2, {...op, upperCase:true}), `HSLA(165.23DEG, 30.52%, 41.76%, 1.00)`);
+  assertStrictEquals(
+    CssColorFormat.format(c2, op),
+    `hsla(165.23deg, 30.52%, 41.76%, 1.00)`,
+  );
+  assertStrictEquals(
+    CssColorFormat.format(c2, { ...op, shortenIfPossible: true }),
+    `hsl(165.23, 30.52%, 41.76%)`,
+  );
+  assertStrictEquals(
+    CssColorFormat.format(c2, { ...op, upperCase: true }),
+    `HSLA(165.23DEG, 30.52%, 41.76%, 1.00)`,
+  );
 
   const c3 = Color.fromHexString("#4a8b7b00");
-  assertStrictEquals(CssColorFormat.format(c3, op), `hsla(165.23deg, 30.52%, 41.76%, 0.00)`);
-  assertStrictEquals(CssColorFormat.format(c3, {...op, shortenIfPossible:true}), `hsla(165.23, 30.52%, 41.76%, 0)`);
+  assertStrictEquals(
+    CssColorFormat.format(c3, op),
+    `hsla(165.23deg, 30.52%, 41.76%, 0.00)`,
+  );
+  assertStrictEquals(
+    CssColorFormat.format(c3, { ...op, shortenIfPossible: true }),
+    `hsla(165.23, 30.52%, 41.76%, 0)`,
+  );
 });

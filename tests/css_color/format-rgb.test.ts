@@ -81,7 +81,7 @@ Deno.test("CssColorFormat.format(object) - rgb", () => {
     }),
     "RGB(170 187 205)",
   );
-  
+
   const c5 = Color.fromHexString("#aabbcd00");
   assertStrictEquals(CssColorFormat.format(c5, op), "rgb(170 187 205 / 0.00)");
   assertStrictEquals(
@@ -142,7 +142,10 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
   );
 
   const c4 = Color.fromHexString("#aabbcdff");
-  assertStrictEquals(CssColorFormat.format(c4, op), "rgba(170, 187, 205, 1.00)");
+  assertStrictEquals(
+    CssColorFormat.format(c4, op),
+    "rgba(170, 187, 205, 1.00)",
+  );
   assertStrictEquals(
     CssColorFormat.format(c4, { ...op, upperCase: true }),
     "RGBA(170, 187, 205, 1.00)",
@@ -157,7 +160,10 @@ Deno.test("CssColorFormat.format(object) - rgb,legacy", () => {
   );
 
   const c4b = Color.fromHexString("#aabbcd");
-  assertStrictEquals(CssColorFormat.format(c4, op), "rgba(170, 187, 205, 1.00)");
+  assertStrictEquals(
+    CssColorFormat.format(c4, op),
+    "rgba(170, 187, 205, 1.00)",
+  );
   assertStrictEquals(
     CssColorFormat.format(c4b, { ...op, upperCase: true }),
     "RGBA(170, 187, 205, 1.00)",
