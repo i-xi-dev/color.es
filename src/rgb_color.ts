@@ -327,13 +327,18 @@ class RgbColor {
     Object.freeze(this);
   }
 
+  /**
+   * Gets the color space.
+   *
+   * Always returns `"srgb"` in this version.
+   */
   get space(): Color.Space {
     return this.#space;
   }
 
   /**
    * Gets the red component value.
-   * 
+   *
    * @example
    * ```javascript
    * const color = RgbColor.fromHexString("#ff0000");
@@ -355,7 +360,7 @@ class RgbColor {
 
   /**
    * Gets the green component value.
-   * 
+   *
    * @example
    * ```javascript
    * const color = RgbColor.fromHexString("#00ff00");
@@ -377,7 +382,7 @@ class RgbColor {
 
   /**
    * Gets the blue component value.
-   * 
+   *
    * @example
    * ```javascript
    * const color = RgbColor.fromHexString("#0000ff");
@@ -399,7 +404,7 @@ class RgbColor {
 
   /**
    * Gets the alpha component value.
-   * 
+   *
    * @example
    * ```javascript
    * const color = RgbColor.fromHexString("#000000");
