@@ -332,26 +332,96 @@ class RgbColor {
   }
 
   /**
-   * The red component value.
+   * Gets the red component value.
+   * 
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const r = color.red;
+   * // r
+   * //   → 1
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#88ffff");
+   * const r = color.red;
+   * // r
+   * //   → 0.533333
+   * ```
    */
   get red(): _RgbComponent {
     return this.#r;
   }
 
   /**
-   * The green component value.
+   * Gets the green component value.
+   * 
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#00ff00");
+   * const g = color.green;
+   * // g
+   * //   → 1
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff88ff");
+   * const g = color.green;
+   * // g
+   * //   → 0.533333
+   * ```
    */
   get green(): _RgbComponent {
     return this.#g;
   }
 
   /**
-   * The blue component value.
+   * Gets the blue component value.
+   * 
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#0000ff");
+   * const b = color.blue;
+   * // b
+   * //   → 1
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ffff88");
+   * const b = color.blue;
+   * // b
+   * //   → 0.533333
+   * ```
    */
   get blue(): _RgbComponent {
     return this.#b;
   }
 
+  /**
+   * Gets the alpha component value.
+   * 
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#000000");
+   * const a = color.alpha;
+   * // a
+   * //   → 1
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#00000000");
+   * const a = color.alpha;
+   * // a
+   * //   → 0
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ffffff88");
+   * const a = color.alpha;
+   * // a
+   * //   → 0.533333
+   * ```
+   */
   get alpha(): Color.Alpha {
     return this.#a;
   }
