@@ -192,12 +192,10 @@ function _parseLegacyRgb(source: string): Color {
   });
 }
 
-function _stringify(input: number): string {
+function _floatStringify(input: number, shortenIfPossible: boolean): string {
   if (Number.isFinite(input)) {
-    if (Number.isInteger(input)) {
-      return input.toString(10);
-    }
-    return input.toFixed(4);
+    const str = input.toFixed(2);
+    return ((shortenIfPossible === true) && str.endsWith(".00")) ? str.replace(/\.00$/, "") : str;
   }
   throw new RangeError("input");
 }
@@ -222,18 +220,18 @@ function _formatRgb(
     if ((shortenIfPossible === true) && (a === 1)) {
       result = `rgb(${r}, ${g}, ${b})`;
     } else {
-      result = `rgba(${r}, ${g}, ${b}, ${_stringify(a as number)})`;
+      result = `rgba(${r}, ${g}, ${b}, ${_floatStringify(a as number, shortenIfPossible)})`;
     }
   } else {
     const { r, g, b, a } = color.toRgb({ mode: "precision" });
-    const rS = _stringify(r * 255);
-    const gS = _stringify(g * 255);
-    const bS = _stringify(b * 255);
+    const rS = _floatStringify(r * 255, true);//XXX 現バージョンでは小数点以下は基本的には切り捨てる
+    const gS = _floatStringify(g * 255, true);//XXX 現バージョンでは小数点以下は基本的には切り捨てる
+    const bS = _floatStringify(b * 255, true);//XXX 現バージョンでは小数点以下は基本的には切り捨てる
 
     if ((shortenIfPossible === true) && (a === 1)) {
       result = `rgb(${rS} ${gS} ${bS})`;
     } else {
-      result = `rgb(${rS} ${gS} ${bS} / ${_stringify(a as number)})`;
+      result = `rgb(${rS} ${gS} ${bS} / ${_floatStringify(a as number, shortenIfPossible)})`;
     }
   }
   return (options?.upperCase === true) ? result.toUpperCase() : result;
@@ -303,11 +301,11 @@ function _formatHsl(
 
   const { h, s, l, a } = color.toHsl();
   const hS = (shortenIfPossible === true)
-    ? _stringify(h)
-    : `${_stringify(h)}deg`;
-  const spS = `${_stringify(s * 100)}%`;
-  const lpS = `${_stringify(l * 100)}%`;
-  const aS = _stringify(a as number);
+    ? _floatStringify(h, shortenIfPossible)
+    : `${_floatStringify(h, shortenIfPossible)}deg`;
+  const spS = `${_floatStringify(s * 100, shortenIfPossible)}%`;
+  const lpS = `${_floatStringify(l * 100, shortenIfPossible)}%`;
+  const aS = _floatStringify(a as number, shortenIfPossible);
 
   let result: string;
   if (options?.legacy === true) {
