@@ -104,7 +104,7 @@ namespace Color {
 
   /**
    * The opacity value, represented as a `number`.
-   * 
+   *
    * The useful range of the value is `0` to `1`.
    * `0` represents completely transparent, `1` represents completely opaque.
    */
@@ -124,7 +124,7 @@ namespace Color {
     /**
      * If the `value` is a numeric type, returns the result rounded to the range of `0` to `1`.
      * Otherwise, returns `1`.
-     * 
+     *
      * @param value - Alpha value.
      * @returns A normalized alpha value.
      * @example
@@ -171,7 +171,7 @@ namespace Color {
     /**
      * If the `value` is a numeric type, returns the result rounded to `0` or more and less than `360`.
      * Otherwise, returns `0`.
-     * 
+     *
      * @param value - Hue.
      * @returns A normalized hue.
      * @example
@@ -200,6 +200,23 @@ namespace Color {
       return ZERO_TURN; //XXX Number.NaN にするか？
     }
   }
+
+  /**
+   * The options object.
+   */
+  export type ToOptions = {
+    /**
+     * Whether to discard `a` (alpha).
+     * The default is `false`.
+     */
+    discardAlpha?: boolean;
+
+    /**
+     * Whether to omit `a` (alpha) if alpha equals `1`.
+     * The default is `false`.
+     */
+    omitAlphaIfOpaque?: boolean;
+  };
 }
 
 export { Color };

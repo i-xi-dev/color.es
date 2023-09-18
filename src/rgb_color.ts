@@ -58,6 +58,7 @@ type _RgbOptions = {
 type _HexStringOptions = {
   order?: "rgba" | "argb";
 };
+//TODO uint8arrayoptions にも追加
 
 namespace _Rgb {
   export type Normalized = {
@@ -281,15 +282,10 @@ type _FromOptions = {
   ignoreAlpha?: boolean;
 };
 
-type _ToOptions = {
-  /**
-   * Whether to discard `a` (alpha).
-   */
-  discardAlpha?: boolean;
-  omitAlphaIfOpaque?: boolean;
-};
-
-function _isRequiredAlpha(alpha: Color.Alpha, options?: _ToOptions): boolean {
+function _isRequiredAlpha(
+  alpha: Color.Alpha,
+  options?: Color.ToOptions,
+): boolean {
   if (options?.discardAlpha === true) {
     return false;
   }
@@ -639,12 +635,46 @@ class RgbColor {
   }
 
   /**
-   * 
-   * 
+   * Returns the triplet of `h` (hue), `s` (saturation), and `l` (lightness).
+   *
    * @param options - An options object.
-   * @returns A triplet of `h` (hue), `s` (saturation), and `l` (lightness).
+   * @returns A triplet of `h`, `s`, and `l`.
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const hsl = color.toHsl();
+   * // hsl
+   * //   → {
+   * //       h: 0,
+   * //       s: 1,
+   * //       l: 0.5,
+   * //       a: 1,
+   * //     }
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const hsl = color.toHsl({ omitAlphaIfOpaque: true });
+   * // hsl
+   * //   → {
+   * //       h: 0,
+   * //       s: 1,
+   * //       l: 0.5,
+   * //     }
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff000088");
+   * const hsl = color.toHsl({ discardAlpha: true });
+   * // hsl
+   * //   → {
+   * //       h: 0,
+   * //       s: 1,
+   * //       l: 0.5,
+   * //     }
+   * ```
    */
-  toHsl(options?: ToHslOptions): Color.Hsl {
+  toHsl(options?: Color.ToOptions): Color.Hsl {
     const { h, s, l } = this.#hsl;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, s, l, a: this.#a };
@@ -652,7 +682,47 @@ class RgbColor {
     return { h, s, l };
   }
 
-  toHwb(options?: ToHwbOptions): Color.Hwb {
+  /**
+   * Returns the triplet of `h` (hue), `w` (whiteness), and `b` (blackness).
+   *
+   * @param options - An options object.
+   * @returns A triplet of `h`, `w`, and `b`.
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff8888");
+   * const hwb = color.toHwb();
+   * // hwb
+   * //   → {
+   * //       h: 0,
+   * //       w: 0.533333,
+   * //       b: 0,
+   * //       a: 1,
+   * //     }
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff8888");
+   * const hwb = color.toHwb({ omitAlphaIfOpaque: true });
+   * // hwb
+   * //   → {
+   * //       h: 0,
+   * //       w: 0.533333,
+   * //       b: 0,
+   * //     }
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff888888");
+   * const hwb = color.toHwb({ discardAlpha: true });
+   * // hwb
+   * //   → {
+   * //       h: 0,
+   * //       w: 0.533333,
+   * //       b: 0,
+   * //     }
+   * ```
+   */
+  toHwb(options?: Color.ToOptions): Color.Hwb {
     const { h, w, b } = this.#hwb;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, w, b, a: this.#a };
@@ -795,28 +865,21 @@ class RgbColor {
 // namespace RgbColor {
 type FromRgbOptions = _RgbOptions & _FromOptions;
 
-type ToRgbOptions = _RgbOptions & _ToOptions;
+type ToRgbOptions = _RgbOptions & Color.ToOptions;
 
 type FromHslOptions = _FromOptions;
 
-/**
- * An options object for `RgbColor.prototype.toHsl`.
- */
-export type ToHslOptions = _ToOptions;
-
 type FromHwbOptions = _FromOptions;
-
-type ToHwbOptions = _ToOptions;
 
 type FromUint8ArrayOptions = _FromOptions;
 
-type ToUint8ArrayOptions = _ToOptions;
+type ToUint8ArrayOptions = Color.ToOptions;
 
 type FromHexStringOptions = _HexStringOptions & _FromOptions;
 
 type ToHexStringOptions = _HexStringOptions & {
   upperCase?: boolean;
-} & _ToOptions;
+} & Color.ToOptions;
 // }
 
 export { RgbColor };
