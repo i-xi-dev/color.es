@@ -635,7 +635,19 @@ class RgbColor {
     return { r, g, b };
   }
 
-  toHsl(options?: ToHslOptions): Color.Hsl {
+  /**
+   * 
+   * 
+   * @param options 
+   * @returns A triplet of `h` (hue), `s` (saturation), and `l` (lightness).
+   */
+  toHsl(options?: {
+    /**
+     * Whether to discard `a` (alpha).
+     */
+    discardAlpha?: boolean;
+    omitAlphaIfOpaque?: boolean;
+  }/* ToHslOptions*/): Color.Hsl {
     const { h, s, l } = this.#hsl;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, s, l, a: this.#a };
@@ -790,7 +802,7 @@ type ToRgbOptions = _RgbOptions & _ToOptions;
 
 type FromHslOptions = _FromOptions;
 
-type ToHslOptions = _ToOptions;
+// type ToHslOptions = _ToOptions;
 
 type FromHwbOptions = _FromOptions;
 
