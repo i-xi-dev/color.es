@@ -20,32 +20,32 @@ namespace _RgbComponent {
 }
 
 //XXX ここで適切？
-export type _Saturation = _0_1;
-export namespace _Saturation {
+type _Saturation = _0_1;
+namespace _Saturation {
   export const MIN_VALUE = _0_1_MIN;
   export const MAX_VALUE = _0_1_MAX;
   export const normalize = _normalize_0_1;
 }
 
 //XXX ここで適切？
-export type _Lightness = _0_1;
-export namespace _Lightness {
+type _Lightness = _0_1;
+namespace _Lightness {
   export const MIN_VALUE = _0_1_MIN;
   export const MAX_VALUE = _0_1_MAX;
   export const normalize = _normalize_0_1;
 }
 
 //XXX ここで適切？
-export type _Whiteness = _0_1;
-export namespace _Whiteness {
+type _Whiteness = _0_1;
+namespace _Whiteness {
   export const MIN_VALUE = _0_1_MIN;
   export const MAX_VALUE = _0_1_MAX;
   export const normalize = _normalize_0_1;
 }
 
 //XXX ここで適切？
-export type _Blackness = _0_1;
-export namespace _Blackness {
+type _Blackness = _0_1;
+namespace _Blackness {
   export const MIN_VALUE = _0_1_MIN;
   export const MAX_VALUE = _0_1_MAX;
   export const normalize = _normalize_0_1;
@@ -55,10 +55,11 @@ type _RgbOptions = {
   mode?: "compat" | "bytes" | "precision";
 };
 
-type _HexStringOptions = {
-  order?: "rgba" | "argb";
+export type RgbOrderOptions = {
+  order?: _RgbBytes.Order;
 };
-//TODO uint8arrayoptions にも追加
+
+export type ToArrayOptions = RgbOrderOptions & Color.ToOptions;
 
 namespace _Rgb {
   export type Normalized = {
@@ -91,6 +92,21 @@ namespace _Rgb {
 }
 
 namespace _RgbBytes {
+  export const Order = {
+    ARGB: "argb",
+    RGBA: "rgba",
+  } as const;
+  export type Order = typeof Order[keyof typeof Order];
+
+  export function byteIndexesOf(
+    order?: _RgbBytes.Order,
+  ): [r: number, g: number, b: number, a: number] {
+    if (order === _RgbBytes.Order.ARGB) {
+      return [1, 2, 3, 0];
+    }
+    return [0, 1, 2, 3];
+  }
+
   export type Normalized = {
     r: Uint8;
     g: Uint8;
@@ -534,6 +550,7 @@ class RgbColor {
     return new RgbColor(r, g, b, a);
   }
 
+  //TODO options.order
   static fromUint8Array(
     rgbaBytes: Uint8Array | Uint8ClampedArray,
     options?: FromUint8ArrayOptions,
@@ -582,7 +599,7 @@ class RgbColor {
     let gg = "00";
     let bb = "00";
     let aa = "ff";
-    if (options?.order === "argb") {
+    if (options?.order === _RgbBytes.Order.ARGB) {
       if (/^#[0-9a-f]{8}$/i.test(hexString)) {
         if (options?.ignoreAlpha !== true) {
           aa = hexString.substring(1, 3);
@@ -730,24 +747,34 @@ class RgbColor {
     return { h, w, b };
   }
 
-  toUint8Array(options?: ToUint8ArrayOptions): Uint8Array {
+  #toByteArray(options?: ToArrayOptions): Array<Uint8> {
+    const [rIndex, gIndex, bIndex, aIndex] = _RgbBytes.byteIndexesOf(
+      options?.order,
+    );
+    const isRequiredAlpha = (aIndex === 0) ||
+      _isRequiredAlpha(this.#a, options);
+
     const { r, g, b } = this.#rgbBytes;
-    if (_isRequiredAlpha(this.#a, options)) {
-      return Uint8Array.of(r, g, b, this.#alphaByte);
+    const bytes: Array<Uint8> = [];
+    bytes[rIndex] = r;
+    bytes[gIndex] = g;
+    bytes[bIndex] = b;
+
+    if (isRequiredAlpha === true) {
+      bytes[aIndex] = this.#alphaByte;
     }
-    return Uint8Array.of(r, g, b);
+    return bytes;
   }
 
-  toUint8ClampedArray(
-    options?: ToUint8ArrayOptions,
-  ): Uint8ClampedArray {
-    const { r, g, b } = this.#rgbBytes;
-    if (_isRequiredAlpha(this.#a, options)) {
-      return Uint8ClampedArray.of(r, g, b, this.#alphaByte);
-    }
-    return Uint8ClampedArray.of(r, g, b);
+  toUint8Array(options?: ToArrayOptions): Uint8Array {
+    return Uint8Array.from(this.#toByteArray(options));
   }
 
+  toUint8ClampedArray(options?: ToArrayOptions): Uint8ClampedArray {
+    return Uint8ClampedArray.from(this.#toByteArray(options));
+  }
+
+  //TODO #toByteArrayつかう
   toHexString(options?: ToHexStringOptions): string {
     const lowerCase = options?.upperCase !== true;
 
@@ -760,7 +787,7 @@ class RgbColor {
       return "#" + rrggbb;
     }
 
-    if (options?.order === "argb") {
+    if (options?.order === _RgbBytes.Order.ARGB) {
       return "#" + aa + rrggbb;
     }
     return "#" + rrggbb + aa;
@@ -871,13 +898,11 @@ type FromHslOptions = _FromOptions;
 
 type FromHwbOptions = _FromOptions;
 
-type FromUint8ArrayOptions = _FromOptions;
+type FromUint8ArrayOptions = RgbOrderOptions & _FromOptions;
 
-type ToUint8ArrayOptions = Color.ToOptions;
+type FromHexStringOptions = RgbOrderOptions & _FromOptions;
 
-type FromHexStringOptions = _HexStringOptions & _FromOptions;
-
-type ToHexStringOptions = _HexStringOptions & {
+type ToHexStringOptions = RgbOrderOptions & {
   upperCase?: boolean;
 } & Color.ToOptions;
 // }
