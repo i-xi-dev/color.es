@@ -59,6 +59,8 @@ export type RgbOrderOptions = {
   order?: _RgbBytes.Order;
 };
 
+export type FromArrayOptions = RgbOrderOptions & Color.FromOptions;
+
 export type ToArrayOptions = RgbOrderOptions & Color.ToOptions;
 
 namespace _Rgb {
@@ -284,10 +286,6 @@ namespace _Hwb {
     return rgb;
   }
 }
-
-type _FromOptions = {
-  ignoreAlpha?: boolean;
-};
 
 function _isRequiredAlpha(
   alpha: Color.Alpha,
@@ -541,39 +539,34 @@ class RgbColor {
     return new RgbColor(r, g, b, a);
   }
 
-  //TODO options.order
   static fromUint8Array(
     rgbaBytes: Uint8Array | Uint8ClampedArray,
-    options?: FromUint8ArrayOptions,
+    options?: FromArrayOptions,
   ): RgbColor {
     if (rgbaBytes[Symbol.iterator]) {
-      const bytes: [number, number, number, number] = [
-        Uint8.MIN_VALUE,
-        Uint8.MIN_VALUE,
-        Uint8.MIN_VALUE,
-        Uint8.MAX_VALUE,
-      ];
+      const [byte0, byte1, byte2, byte3] = rgbaBytes;
 
-      let i = 0;
-      for (const byte of rgbaBytes) {
-        if ((options?.ignoreAlpha === true) && (i >= 3)) {
-          break;
-        }
-        if (i >= 4) {
-          break;
-        }
-
-        bytes[i] = byte;
-
-        i = i + 1;
+      const bytes = {
+        r: Uint8.MIN_VALUE,
+        g: Uint8.MIN_VALUE,
+        b: Uint8.MIN_VALUE,
+        a: Uint8.MAX_VALUE,
+      };
+      if (options?.order === _RgbBytes.Order.ARGB) {
+        bytes.r = Uint8.isUint8(byte1) ? byte1 : bytes.r;
+        bytes.g = Uint8.isUint8(byte2) ? byte2 : bytes.g;
+        bytes.b = Uint8.isUint8(byte3) ? byte3 : bytes.b;
+        bytes.a = Uint8.isUint8(byte0) ? byte0 : bytes.a;
+      } else {
+        bytes.r = Uint8.isUint8(byte0) ? byte0 : bytes.r;
+        bytes.g = Uint8.isUint8(byte1) ? byte1 : bytes.g;
+        bytes.b = Uint8.isUint8(byte2) ? byte2 : bytes.b;
+        bytes.a = ((options?.ignoreAlpha !== true) && Uint8.isUint8(byte3))
+          ? byte3
+          : bytes.a;
       }
 
-      return RgbColor.fromRgb({
-        r: bytes[0],
-        g: bytes[1],
-        b: bytes[2],
-        a: bytes[3],
-      }, { mode: "bytes" });
+      return RgbColor.fromRgb(bytes, { mode: "bytes" });
     }
     throw new TypeError("rgbaBytes");
   }
@@ -878,17 +871,15 @@ class RgbColor {
 }
 
 // namespace RgbColor {
-type FromRgbOptions = _RgbOptions & _FromOptions;
+type FromRgbOptions = _RgbOptions & Color.FromOptions;
 
 type ToRgbOptions = _RgbOptions & Color.ToOptions;
 
-type FromHslOptions = _FromOptions;
+type FromHslOptions = Color.FromOptions;
 
-type FromHwbOptions = _FromOptions;
+type FromHwbOptions = Color.FromOptions;
 
-type FromUint8ArrayOptions = RgbOrderOptions & _FromOptions;
-
-type FromHexStringOptions = RgbOrderOptions & _FromOptions;
+type FromHexStringOptions = RgbOrderOptions & Color.FromOptions;
 
 type ToHexStringOptions = RgbOrderOptions & {
   upperCase?: boolean;
