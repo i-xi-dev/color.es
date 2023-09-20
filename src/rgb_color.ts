@@ -98,15 +98,6 @@ namespace _RgbBytes {
   } as const;
   export type Order = typeof Order[keyof typeof Order];
 
-  export function byteIndexesOf(
-    order?: _RgbBytes.Order,
-  ): [r: number, g: number, b: number, a: number] {
-    if (order === _RgbBytes.Order.ARGB) {
-      return [1, 2, 3, 0];
-    }
-    return [0, 1, 2, 3];
-  }
-
   export type Normalized = {
     r: Uint8;
     g: Uint8;
@@ -747,23 +738,20 @@ class RgbColor {
     return { h, w, b };
   }
 
-  #toByteArray(options?: ToArrayOptions): Array<Uint8> {
-    const [rIndex, gIndex, bIndex, aIndex] = _RgbBytes.byteIndexesOf(
-      options?.order,
-    );
-    const isRequiredAlpha = (aIndex === 0) ||
-      _isRequiredAlpha(this.#a, options);
-
+  #toByteArray(
+    options?: ToArrayOptions,
+  ): [Uint8, Uint8, Uint8] | [Uint8, Uint8, Uint8, Uint8] {
     const { r, g, b } = this.#rgbBytes;
-    const bytes: Array<Uint8> = [];
-    bytes[rIndex] = r;
-    bytes[gIndex] = g;
-    bytes[bIndex] = b;
 
-    if (isRequiredAlpha === true) {
-      bytes[aIndex] = this.#alphaByte;
+    if (options?.order === _RgbBytes.Order.ARGB) {
+      return [this.#alphaByte, r, g, b];
+    } else {
+      const isRequiredAlpha = _isRequiredAlpha(this.#a, options);
+      if (isRequiredAlpha === true) {
+        return [r, g, b, this.#alphaByte];
+      }
+      return [r, g, b];
     }
-    return bytes;
   }
 
   toUint8Array(options?: ToArrayOptions): Uint8Array {
