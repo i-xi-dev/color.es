@@ -27,7 +27,7 @@ namespace _CssHex {
     color: RgbColor,
     options?: _FormatOptions,
   ): string {
-    let hex = color.toHexString({ upperCase: options?.upperCase });
+    let hex = color.toHexString({ lowerCase: (options?.upperCase !== true) });
     if (options?.shortenIfPossible === true) {
       // 不透明の場合、alphaを省略
       if (/[fF]{2}$/.test(hex)) {

@@ -63,6 +63,12 @@ export type FromArrayOptions = RgbOrderOptions & Color.FromOptions;
 
 export type ToArrayOptions = RgbOrderOptions & Color.ToOptions;
 
+type _ToStringOptons = {
+  lowerCase?: boolean;
+};
+
+export type ToHexStringOptions = RgbOrderOptions & _ToStringOptons & Color.ToOptions;
+
 namespace _Rgb {
   export type Normalized = {
     r: _RgbComponent;
@@ -747,38 +753,116 @@ class RgbColor {
     }
   }
 
+  /**
+   * Returns the RGB expressed as a byte sequence.
+   * 
+   * @param options - An options object.
+   * @returns A RGB(A) byte sequence or the ARGB byte sequence.
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const bytes = color.toUint8Array();
+   * // bytes
+   * //   → Uint8Array[ 0x11, 0x22, 0x33, 0xFF ] // RGBA
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const bytes = color.toUint8Array({ discardAlpha: true });
+   * // bytes
+   * //   → Uint8Array[ 0x11, 0x22, 0x33 ] // RGB
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const bytes = color.toUint8Array({ order: "argb" });
+   * // bytes
+   * //   → Uint8Array[ 0xFF, 0x11, 0x22, 0x33 ] // ARGB
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const bytes = color.toUint8Array({ order: "argb", discardAlpha: true });
+   * // bytes
+   * //   → Uint8Array[ 0xFF, 0x11, 0x22, 0x33 ] // ARGB
+   * //   If the `order` is "argb", the `discardAlpha` and `omitAlphaIfOpaque` are ignored.
+   * ```
+   */
   toUint8Array(options?: ToArrayOptions): Uint8Array {
     return Uint8Array.from(this.#toByteArray(options));
   }
 
+  /**
+   * Returns the RGB expressed as a byte sequence.
+   * 
+   * @param options - An options object.
+   * @returns A RGB(A) byte sequence or the ARGB byte sequence.
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const bytes = color.toUint8ClampedArray();
+   * // bytes
+   * //   → Uint8ClampedArray[ 0x11, 0x22, 0x33, 0xFF ] // RGBA
+   * ```
+   */
   toUint8ClampedArray(options?: ToArrayOptions): Uint8ClampedArray {
     return Uint8ClampedArray.from(this.#toByteArray(options));
   }
 
-  //TODO #toByteArrayつかう
+  /**
+   * Returns the RGB expressed as a string contains hexadecimal formatted bytes.
+   * 
+   * @param options - An options object.
+   * @returns A RGB(A) byte sequence or the ARGB byte sequence.
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const hex = color.toHexString();
+   * // hex
+   * //   → "#112233FF" // RGBA
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const hex = color.toHexString({ discardAlpha: true });
+   * // hex
+   * //   → "#112233" // RGB
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const hex = color.toHexString({ order: "argb" });
+   * // hex
+   * //   → "#FF112233" // ARGB
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#112233");
+   * const hex = color.toHexString({ order: "argb", discardAlpha: true });
+   * // hex
+   * //   → "#FF112233" // ARGB
+   * //   If the `order` is "argb", the `discardAlpha` and `omitAlphaIfOpaque` are ignored.
+   * ```
+   */
   toHexString(options?: ToHexStringOptions): string {
-    const lowerCase = options?.upperCase !== true;
+    const lowerCase = options?.lowerCase === true;
 
-    const bytes = ByteSequence.fromArrayBufferView(this.toUint8Array());
-    const rrggbbaa: string = bytes.format({ lowerCase });
-    const rrggbb = rrggbbaa.substring(0, 6);
-    const aa = rrggbbaa.substring(6);
+    const bytes = ByteSequence.fromArrayBufferView(this.toUint8Array(options));
+    const hexString = bytes.format({ lowerCase });
 
-    if (_isRequiredAlpha(this.#a, options) !== true) {
-      return "#" + rrggbb;
+    if ((options?.order === _RgbBytes.Order.RGBA) && (_isRequiredAlpha(this.#a, options) !== true)) {
+      return "#" + hexString.substring(0, 6);
     }
-
-    if (options?.order === _RgbBytes.Order.ARGB) {
-      return "#" + aa + rrggbb;
-    }
-    return "#" + rrggbb + aa;
+    return "#" + hexString;
   }
 
+  /**
+   * Equivalents to the `toHexString` method with no parameters.
+   * 
+   * @returns 
+   */
   toString(): string {
-    return this.toHexString({
-      // omitAlphaIfOpaque: true,
-      upperCase: true,
-    });
+    return this.toHexString();
   }
 
   toJSON(): _Rgb.Normalized & { a: Color.Alpha } {
@@ -881,9 +965,6 @@ type FromHwbOptions = Color.FromOptions;
 
 type FromHexStringOptions = RgbOrderOptions & Color.FromOptions;
 
-type ToHexStringOptions = RgbOrderOptions & {
-  upperCase?: boolean;
-} & Color.ToOptions;
 // }
 
 export { RgbColor };

@@ -202,7 +202,11 @@ namespace Color {
   }
 
   /**
-   * The options object.
+   * The object with the following optional fields.
+   * 
+   * - `ignoreAlpha`:
+   *     Whether to interpret `a` (alpha) as `1` or not.
+   *     If `order` is `"argb"`, ignore `ignoreAlpha`.
    */
   export type FromOptions = {
     /**
@@ -214,7 +218,14 @@ namespace Color {
   };
 
   /**
-   * The options object.
+   * The object with the following optional fields.
+   * 
+   * - `discardAlpha`:
+   *     Whether to discard `a` (alpha).
+   *     The default is `false`.
+   * - `omitAlphaIfOpaque`:
+   *     Whether to omit `a` (alpha) if alpha equals `1`.
+   *     The default is `false`.
    */
   export type ToOptions = {
     /**

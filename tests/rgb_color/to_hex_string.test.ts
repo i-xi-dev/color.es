@@ -4,75 +4,91 @@ import { RgbColor } from "../../mod.ts";
 Deno.test("RgbColor.prototype.toHexString()", () => {
   assertStrictEquals(
     RgbColor.fromHexString("#fffefd").toHexString(),
-    "#fffefdff",
-  );
-  assertStrictEquals(
-    RgbColor.fromHexString("#fffefd").toHexString({ upperCase: true }),
     "#FFFEFDFF",
   );
   assertStrictEquals(
-    RgbColor.fromHexString("#fffefd").toHexString({
-      upperCase: true,
-      discardAlpha: true,
-    }),
-    "#FFFEFD",
+    RgbColor.fromHexString("#010203").toHexString({ order: "argb" }),
+    "#FF010203",
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#010203").toHexString({ order: "rgba" }),
+    "#010203FF",
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#010203").toHexString({ order: "argb", discardAlpha: true }),
+    "#FF010203",
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#010203").toHexString({ order: "rgba", discardAlpha: true }),
+    "#010203",
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#fffefd").toHexString({ lowerCase: true }),
+    "#fffefdff",
   );
   assertStrictEquals(
     RgbColor.fromHexString("#fffefd").toHexString({
-      upperCase: true,
-      omitAlphaIfOpaque: true,
+      lowerCase: true,
+      discardAlpha: true,
     }),
-    "#FFFEFD",
+    "#fffefd",
   );
   assertStrictEquals(
     RgbColor.fromHexString("#fffefd").toHexString({
-      upperCase: true,
+      lowerCase: true,
+      omitAlphaIfOpaque: true,
+    }),
+    "#fffefd",
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#fffefd").toHexString({
+      lowerCase: true,
       discardAlpha: true,
       omitAlphaIfOpaque: true,
     }),
-    "#FFFEFD",
+    "#fffefd",
   );
   assertStrictEquals(
     RgbColor.fromHexString("#fffefd88").toHexString({
-      upperCase: true,
+      lowerCase: true,
       discardAlpha: true,
     }),
-    "#FFFEFD",
+    "#fffefd",
   );
   assertStrictEquals(
     RgbColor.fromHexString("#fffefd88").toHexString({
-      upperCase: true,
+      lowerCase: true,
       discardAlpha: true,
       omitAlphaIfOpaque: true,
     }),
-    "#FFFEFD",
+    "#fffefd",
   );
   assertStrictEquals(
     RgbColor.fromHexString("#fffefd88").toHexString({
-      upperCase: true,
+      lowerCase: true,
       omitAlphaIfOpaque: true,
     }),
-    "#FFFEFD88",
+    "#fffefd88",
   );
   assertStrictEquals(
     RgbColor.fromHexString("#ffeedd").toHexString({
-      upperCase: true,
-      discardAlpha: false,
-    }),
-    "#FFEEDDFF",
-  );
-  assertStrictEquals(
-    RgbColor.fromHexString("#ffeedd").toHexString({
-      upperCase: false,
+      lowerCase: true,
       discardAlpha: false,
     }),
     "#ffeeddff",
   );
   assertStrictEquals(
-    RgbColor.fromHexString("#ffeedd88").toHexString({
-      upperCase: false,
+    RgbColor.fromHexString("#ffeedd").toHexString({
+      lowerCase: false,
       discardAlpha: false,
     }),
-    "#ffeedd88",
+    "#FFEEDDFF",
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#ffeedd88").toHexString({
+      lowerCase: false,
+      discardAlpha: false,
+    }),
+    "#FFEEDD88",
   );
 });
