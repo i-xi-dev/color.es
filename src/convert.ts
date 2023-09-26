@@ -1,30 +1,4 @@
-namespace Color {
-  const _RgbSpace = {
-    A98_RGB: "a98-rgb",
-    DISPLAY_P3: "display-p3",
-    PROPHOTO_RGB: "prophoto-rgb",
-    REC2020: "rec2020",
-    SRGB: "srgb",
-    SRGB_LINEAR: "srgb-linear",
-  } as const;
-
-  const _XyzSpace = {
-    XYZ: "xyz",
-    XYZ_D50: "xyz-d50",
-    XYZ_D65: "xyz-d65",
-  } as const;
-
-  export const Space = {
-    ..._RgbSpace,
-    ..._XyzSpace,
-    //XXX 他のspace
-  } as const;
-
-  /**
-   * The color space
-   */
-  export type Space = typeof Space[keyof typeof Space];
-
+namespace Convert {
   /**
    * The object with the following optional fields.
    *
@@ -64,6 +38,33 @@ namespace Color {
      */
     omitAlphaIfOpaque?: boolean;
   };
+
+  type RgbOptions = {
+    mode?: "compat" | "bytes" | "precision";
+  };
+
+  export type FromRgbOptions = RgbOptions & FromOptions;
+
+  export type ToRgbOptions = RgbOptions & ToOptions;
+
+  type RgbOrderOptions = {
+    order?: "argb" | "rgba"; //RgbBytes.Order;
+  };
+
+  export type FromArrayOptions = RgbOrderOptions & FromOptions;
+
+  export type ToArrayOptions = RgbOrderOptions & ToOptions;
+
+  type ToStringOptons = {
+    lowerCase?: boolean;
+  };
+
+  export type FromHexStringOptions = RgbOrderOptions & FromOptions;
+
+  export type ToHexStringOptions =
+    & RgbOrderOptions
+    & ToStringOptons
+    & ToOptions;
 }
 
-export { Color };
+export { type Convert };

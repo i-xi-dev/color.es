@@ -1,5 +1,6 @@
 import { ByteSequence, Uint8 } from "../deps.ts";
-import { Color } from "./color.ts";
+import { Convert } from "./convert.ts";
+import { ColorSpace } from "./color_space.ts";
 import { Alpha } from "./color/alpha.ts";
 import { Hue } from "./color/hue.ts";
 import { Rgb } from "./rgb/rgb.ts";
@@ -7,30 +8,9 @@ import { RgbBytes } from "./rgb/rgb_bytes.ts";
 import { Hsl } from "./rgb/hsl.ts";
 import { Hwb } from "./rgb/hwb.ts";
 
-type _RgbOptions = {
-  mode?: "compat" | "bytes" | "precision";
-};
-
-export type RgbOrderOptions = {
-  order?: RgbBytes.Order;
-};
-
-export type FromArrayOptions = RgbOrderOptions & Color.FromOptions;
-
-export type ToArrayOptions = RgbOrderOptions & Color.ToOptions;
-
-type _ToStringOptons = {
-  lowerCase?: boolean;
-};
-
-export type ToHexStringOptions =
-  & RgbOrderOptions
-  & _ToStringOptons
-  & Color.ToOptions;
-
 function _isRequiredAlpha(
   alpha: Alpha,
-  options?: Color.ToOptions,
+  options?: Convert.ToOptions,
 ): boolean {
   if (options?.discardAlpha === true) {
     return false;
@@ -47,7 +27,7 @@ function _isRequiredAlpha(
  * A color represented by red, green, and blue channels
  */
 class RgbColor {
-  readonly #space: Color.Space;
+  readonly #space: ColorSpace;
   readonly #r: Rgb.Component;
   readonly #g: Rgb.Component;
   readonly #b: Rgb.Component;
@@ -64,7 +44,7 @@ class RgbColor {
     b: Rgb.Component,
     a: Alpha,
   ) {
-    this.#space = Color.Space.SRGB; //XXX 現バージョンでは固定とする
+    this.#space = ColorSpace.SRGB; //XXX 現バージョンでは固定とする
     this.#r = r;
     this.#g = g;
     this.#b = b;
@@ -77,7 +57,7 @@ class RgbColor {
    *
    * Always returns `"srgb"` in this version.
    */
-  get space(): Color.Space {
+  get space(): ColorSpace {
     return this.#space;
   }
 
@@ -239,7 +219,7 @@ class RgbColor {
   // ・r,g,bはバイト表現 0～255、aは0～1（多分一般的。VuetifyとかReactの形式）
   // ・r,g,b,aすべてバイト表現 0～255
   // ・r,g,b,aすべて0～1
-  static fromRgb(rgba: Rgb, options?: FromRgbOptions): RgbColor {
+  static fromRgb(rgba: Rgb, options?: Convert.FromRgbOptions): RgbColor {
     // sRGB固定
 
     if (options?.mode === "precision") {
@@ -264,7 +244,7 @@ class RgbColor {
     }
   }
 
-  static fromHsl(hsla: Hsl, options?: FromHslOptions): RgbColor {
+  static fromHsl(hsla: Hsl, options?: Convert.FromOptions): RgbColor {
     const { r, g, b } = Hsl.toRgb(hsla);
     const a = (options?.ignoreAlpha === true)
       ? Alpha.MAX_VALUE
@@ -272,7 +252,7 @@ class RgbColor {
     return new RgbColor(r, g, b, a);
   }
 
-  static fromHwb(hwba: Hwb, options?: FromHwbOptions): RgbColor {
+  static fromHwb(hwba: Hwb, options?: Convert.FromOptions): RgbColor {
     const { r, g, b } = Hwb.toRgb(hwba);
     const a = (options?.ignoreAlpha === true)
       ? Alpha.MAX_VALUE
@@ -282,7 +262,7 @@ class RgbColor {
 
   static fromUint8Array(
     rgbaBytes: Uint8Array | Uint8ClampedArray,
-    options?: FromArrayOptions,
+    options?: Convert.FromArrayOptions,
   ): RgbColor {
     if (rgbaBytes[Symbol.iterator]) {
       const [byte0, byte1, byte2, byte3] = rgbaBytes;
@@ -314,7 +294,7 @@ class RgbColor {
 
   static fromHexString(
     hexString: string,
-    options?: FromHexStringOptions,
+    options?: Convert.FromHexStringOptions,
   ): RgbColor {
     if (typeof hexString !== "string") {
       throw new TypeError("hexString");
@@ -349,7 +329,7 @@ class RgbColor {
     );
   }
 
-  toRgb(options?: ToRgbOptions): Rgb {
+  toRgb(options?: Convert.ToRgbOptions): Rgb {
     let r: number;
     let g: number;
     let b: number;
@@ -416,7 +396,7 @@ class RgbColor {
    * //     }
    * ```
    */
-  toHsl(options?: Color.ToOptions): Hsl {
+  toHsl(options?: Convert.ToOptions): Hsl {
     const { h, s, l } = this.#hsl;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, s, l, a: this.#a };
@@ -464,7 +444,7 @@ class RgbColor {
    * //     }
    * ```
    */
-  toHwb(options?: Color.ToOptions): Hwb {
+  toHwb(options?: Convert.ToOptions): Hwb {
     const { h, w, b } = this.#hwb;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, w, b, a: this.#a };
@@ -473,7 +453,7 @@ class RgbColor {
   }
 
   #toByteArray(
-    options?: ToArrayOptions,
+    options?: Convert.ToArrayOptions,
   ): [Uint8, Uint8, Uint8] | [Uint8, Uint8, Uint8, Uint8] {
     const { r, g, b } = this.#rgbBytes;
 
@@ -523,7 +503,7 @@ class RgbColor {
    * //   If the `order` is "argb", the `discardAlpha` and `omitAlphaIfOpaque` are ignored.
    * ```
    */
-  toUint8Array(options?: ToArrayOptions): Uint8Array {
+  toUint8Array(options?: Convert.ToArrayOptions): Uint8Array {
     return Uint8Array.from(this.#toByteArray(options));
   }
 
@@ -540,7 +520,7 @@ class RgbColor {
    * //   → Uint8ClampedArray[ 0x11, 0x22, 0x33, 0xFF ] // RGBA
    * ```
    */
-  toUint8ClampedArray(options?: ToArrayOptions): Uint8ClampedArray {
+  toUint8ClampedArray(options?: Convert.ToArrayOptions): Uint8ClampedArray {
     return Uint8ClampedArray.from(this.#toByteArray(options));
   }
 
@@ -579,7 +559,7 @@ class RgbColor {
    * //   If the `order` is "argb", the `discardAlpha` and `omitAlphaIfOpaque` are ignored.
    * ```
    */
-  toHexString(options?: ToHexStringOptions): string {
+  toHexString(options?: Convert.ToHexStringOptions): string {
     const lowerCase = options?.lowerCase === true;
 
     const bytes = ByteSequence.fromArrayBufferView(this.toUint8Array(options));
@@ -691,18 +671,5 @@ class RgbColor {
     return new RgbColor(this.#r, this.#g, this.#b, Alpha.MAX_VALUE);
   }
 }
-
-// namespace RgbColor {
-type FromRgbOptions = _RgbOptions & Color.FromOptions;
-
-type ToRgbOptions = _RgbOptions & Color.ToOptions;
-
-type FromHslOptions = Color.FromOptions;
-
-type FromHwbOptions = Color.FromOptions;
-
-type FromHexStringOptions = RgbOrderOptions & Color.FromOptions;
-
-// }
 
 export { RgbColor };
