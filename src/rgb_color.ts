@@ -1,34 +1,9 @@
-import { ByteSequence, NumberUtils, Uint8 } from "../deps.ts";
+import { ByteSequence, Uint8 } from "../deps.ts";
 import { Color } from "./color.ts";
 import { Rgb } from "./rgb.ts";
 import { RgbBytes } from "./rgb/rgb_bytes.ts";
 import { Hsl } from "./rgb/hsl.ts";
-
-type _0_1 = number;
-const _0_1_MIN = 0;
-const _0_1_MAX = 1;
-function _normalize_0_1(value: unknown): _0_1 {
-  if (Number.isFinite(value)) {
-    return NumberUtils.clamp(value as number, _0_1_MIN, _0_1_MAX);
-  }
-  return _0_1_MIN;
-}
-
-//XXX ここで適切？
-type _Whiteness = _0_1;
-namespace _Whiteness {
-  export const MIN_VALUE = _0_1_MIN;
-  export const MAX_VALUE = _0_1_MAX;
-  export const normalize = _normalize_0_1;
-}
-
-//XXX ここで適切？
-type _Blackness = _0_1;
-namespace _Blackness {
-  export const MIN_VALUE = _0_1_MIN;
-  export const MAX_VALUE = _0_1_MAX;
-  export const normalize = _normalize_0_1;
-}
+import { Hwb } from "./rgb/hwb.ts";
 
 type _RgbOptions = {
   mode?: "compat" | "bytes" | "precision";
@@ -50,63 +25,6 @@ export type ToHexStringOptions =
   & RgbOrderOptions
   & _ToStringOptons
   & Color.ToOptions;
-
-namespace _Hwb {
-  export type Normalized = {
-    h: Color.Hue;
-    w: _Whiteness;
-    b: _Blackness;
-  };
-
-  export function normalize(value: Color.Hwb): Normalized {
-    let h: unknown = undefined;
-    let w: unknown = undefined;
-    let b: unknown = undefined;
-    if (value && (typeof value === "object")) {
-      if ("h" in value) {
-        h = value.h;
-      }
-      if ("w" in value) {
-        w = value.w;
-      }
-      if ("b" in value) {
-        b = value.b;
-      }
-    }
-    return {
-      h: Color.Hue.normalize(h),
-      w: _Whiteness.normalize(w),
-      b: _Blackness.normalize(b),
-      //XXX w+bに上限制約があるが…
-    };
-  }
-
-  export function fromRgb(rgb: Rgb): Normalized {
-    const { r, g, b } = Rgb.normalize(rgb);
-    const { h } = Hsl.fromRgb(rgb);
-    const w = Math.min(r, g, b);
-    const blackness = 1 - Math.max(r, g, b);
-    return { h, w, b: blackness };
-  }
-
-  export function toRgb(hwb: Color.Hwb): Rgb.Normalized {
-    const { h, w, b } = normalize(hwb);
-    if (w + b >= 1) {
-      const g = w / (w + b);
-      return {
-        r: g,
-        g: g,
-        b: g,
-      };
-    }
-
-    const rgb = Hsl.toRgb({ h, s: 1, l: 0.5 });
-    rgb.r = (rgb.r * (1 - w - b)) + w;
-    rgb.g = (rgb.g * (1 - w - b)) + w;
-    rgb.b = (rgb.b * (1 - w - b)) + w;
-    return rgb;
-  }
-}
 
 function _isRequiredAlpha(
   alpha: Color.Alpha,
@@ -136,7 +54,7 @@ class RgbColor {
   #rgbBytesCache?: RgbBytes.Normalized;
   #alphaByteCache?: Uint8;
   #hslCache?: Hsl.Normalized;
-  #hwbCache?: _Hwb.Normalized;
+  #hwbCache?: Hwb.Normalized;
 
   private constructor(
     r: Rgb.Component,
@@ -268,11 +186,11 @@ class RgbColor {
     return this.#hsl.l;
   }
 
-  get whiteness(): _Whiteness {
+  get whiteness(): Hwb.Whiteness {
     return this.#hwb.w;
   }
 
-  get blackness(): _Blackness {
+  get blackness(): Hwb.Blackness {
     return this.#hwb.b;
   }
 
@@ -305,9 +223,9 @@ class RgbColor {
     return { ...this.#hslCache };
   }
 
-  get #hwb(): _Hwb.Normalized {
+  get #hwb(): Hwb.Normalized {
     if (!this.#hwbCache) {
-      this.#hwbCache = _Hwb.fromRgb({
+      this.#hwbCache = Hwb.fromRgb({
         r: this.#r,
         g: this.#g,
         b: this.#b,
@@ -352,8 +270,8 @@ class RgbColor {
     return new RgbColor(r, g, b, a);
   }
 
-  static fromHwb(hwba: Color.Hwb, options?: FromHwbOptions): RgbColor {
-    const { r, g, b } = _Hwb.toRgb(hwba);
+  static fromHwb(hwba: Hwb, options?: FromHwbOptions): RgbColor {
+    const { r, g, b } = Hwb.toRgb(hwba);
     const a = (options?.ignoreAlpha === true)
       ? Color.Alpha.MAX_VALUE
       : Color.Alpha.normalize(hwba.a);
@@ -544,7 +462,7 @@ class RgbColor {
    * //     }
    * ```
    */
-  toHwb(options?: Color.ToOptions): Color.Hwb {
+  toHwb(options?: Color.ToOptions): Hwb {
     const { h, w, b } = this.#hwb;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, w, b, a: this.#a };

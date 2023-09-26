@@ -1,31 +1,6 @@
 import { Angle, NumberUtils } from "../deps.ts";
 
 namespace Color {
-  /**
-   * The HWB object, that represents RGB color in hue, whiteness, and blackness.
-   */
-  export type Hwb = {
-    /**
-     * Hue
-     */
-    h: number;
-
-    /**
-     * Whiteness
-     */
-    w: number;
-
-    /**
-     * Blackness
-     */
-    b: number;
-
-    /**
-     * Alpha
-     */
-    a?: number;
-  };
-
   const _RgbSpace = {
     A98_RGB: "a98-rgb",
     DISPLAY_P3: "display-p3",
