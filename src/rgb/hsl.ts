@@ -1,6 +1,6 @@
 import { NumberUtils } from "../../deps.ts";
-import { Color } from "../color.ts";
-import { Rgb } from "../rgb.ts";
+import { Hue } from "../color/hue.ts";
+import { Rgb } from "./rgb.ts";
 
 /**
  * The HSL object, that represents RGB color in hue, saturation, and lightness.
@@ -59,7 +59,7 @@ namespace Hsl {
   }
 
   export type Normalized = {
-    h: Color.Hue;
+    h: Hue;
     s: Saturation;
     l: Lightness;
   };
@@ -80,7 +80,7 @@ namespace Hsl {
       }
     }
     return {
-      h: Color.Hue.normalize(h),
+      h: Hue.normalize(h),
       s: Saturation.normalize(s),
       l: Lightness.normalize(l),
     };
@@ -94,7 +94,7 @@ namespace Hsl {
 
     const d = maxRgb - minRgb;
 
-    let h = Color.Hue.ZERO_TURN; //XXX Number.NaNにするか
+    let h = Hue.ZERO_TURN; //XXX Number.NaNにするか
     if (d !== 0) {
       switch (maxRgb) {
         case r:
@@ -110,7 +110,7 @@ namespace Hsl {
           h = ((r - g) / d) + 4;
           break;
       }
-      h = Color.Hue.normalize(h * 60);
+      h = Hue.normalize(h * 60);
     }
 
     const l = (minRgb + maxRgb) / 2;

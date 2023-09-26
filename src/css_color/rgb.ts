@@ -1,4 +1,4 @@
-import { Rgb } from "../rgb.ts";
+import { Rgb } from "../rgb/rgb.ts";
 import { RgbColor } from "../rgb_color.ts";
 import { _floatStringify, _FormatOptions, _Pattern } from "./utils.ts";
 

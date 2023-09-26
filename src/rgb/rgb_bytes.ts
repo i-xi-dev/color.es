@@ -1,5 +1,5 @@
 import { Uint8 } from "../../deps.ts";
-import { Rgb } from "../rgb.ts";
+import { Rgb } from "./rgb.ts";
 
 namespace RgbBytes {
   export const Order = {

@@ -1,4 +1,4 @@
-import { NumberUtils } from "../deps.ts";
+import { NumberUtils } from "../../deps.ts";
 
 /**
  * The RGB object, that represents RGB color in red, green, and blue.

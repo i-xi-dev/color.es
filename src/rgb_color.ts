@@ -1,6 +1,8 @@
 import { ByteSequence, Uint8 } from "../deps.ts";
 import { Color } from "./color.ts";
-import { Rgb } from "./rgb.ts";
+import { Alpha } from "./color/alpha.ts";
+import { Hue } from "./color/hue.ts";
+import { Rgb } from "./rgb/rgb.ts";
 import { RgbBytes } from "./rgb/rgb_bytes.ts";
 import { Hsl } from "./rgb/hsl.ts";
 import { Hwb } from "./rgb/hwb.ts";
@@ -27,14 +29,14 @@ export type ToHexStringOptions =
   & Color.ToOptions;
 
 function _isRequiredAlpha(
-  alpha: Color.Alpha,
+  alpha: Alpha,
   options?: Color.ToOptions,
 ): boolean {
   if (options?.discardAlpha === true) {
     return false;
   }
   if (
-    (options?.omitAlphaIfOpaque === true) && (alpha === Color.Alpha.MAX_VALUE)
+    (options?.omitAlphaIfOpaque === true) && (alpha === Alpha.MAX_VALUE)
   ) {
     return false;
   }
@@ -49,7 +51,7 @@ class RgbColor {
   readonly #r: Rgb.Component;
   readonly #g: Rgb.Component;
   readonly #b: Rgb.Component;
-  readonly #a: Color.Alpha;
+  readonly #a: Alpha;
 
   #rgbBytesCache?: RgbBytes.Normalized;
   #alphaByteCache?: Uint8;
@@ -60,7 +62,7 @@ class RgbColor {
     r: Rgb.Component,
     g: Rgb.Component,
     b: Rgb.Component,
-    a: Color.Alpha,
+    a: Alpha,
   ) {
     this.#space = Color.Space.SRGB; //XXX 現バージョンでは固定とする
     this.#r = r;
@@ -170,11 +172,11 @@ class RgbColor {
    * //   → 0.533333
    * ```
    */
-  get alpha(): Color.Alpha {
+  get alpha(): Alpha {
     return this.#a;
   }
 
-  get hue(): Color.Hue {
+  get hue(): Hue {
     return this.#hsl.h;
   }
 
@@ -243,19 +245,19 @@ class RgbColor {
     if (options?.mode === "precision") {
       const { r, g, b } = Rgb.normalize(rgba);
       const a = (options?.ignoreAlpha === true)
-        ? Color.Alpha.MAX_VALUE
-        : Color.Alpha.normalize(rgba.a);
+        ? Alpha.MAX_VALUE
+        : Alpha.normalize(rgba.a);
       return new RgbColor(r, g, b, a);
     } else {
       const { r, g, b } = RgbBytes.toRgb(rgba);
-      let a: number = Color.Alpha.MAX_VALUE;
+      let a: number = Alpha.MAX_VALUE;
       if (options?.ignoreAlpha !== true) {
         if (options?.mode === "bytes") {
           if (Number.isFinite(rgba.a)) {
             a = Uint8.clamp(rgba.a) / Uint8.MAX_VALUE;
           }
         } else {
-          a = Color.Alpha.normalize(rgba.a);
+          a = Alpha.normalize(rgba.a);
         }
       }
       return new RgbColor(r, g, b, a);
@@ -265,16 +267,16 @@ class RgbColor {
   static fromHsl(hsla: Hsl, options?: FromHslOptions): RgbColor {
     const { r, g, b } = Hsl.toRgb(hsla);
     const a = (options?.ignoreAlpha === true)
-      ? Color.Alpha.MAX_VALUE
-      : Color.Alpha.normalize(hsla.a);
+      ? Alpha.MAX_VALUE
+      : Alpha.normalize(hsla.a);
     return new RgbColor(r, g, b, a);
   }
 
   static fromHwb(hwba: Hwb, options?: FromHwbOptions): RgbColor {
     const { r, g, b } = Hwb.toRgb(hwba);
     const a = (options?.ignoreAlpha === true)
-      ? Color.Alpha.MAX_VALUE
-      : Color.Alpha.normalize(hwba.a);
+      ? Alpha.MAX_VALUE
+      : Alpha.normalize(hwba.a);
     return new RgbColor(r, g, b, a);
   }
 
@@ -601,10 +603,10 @@ class RgbColor {
     return this.toHexString();
   }
 
-  toJSON(): Rgb.Normalized & { a: Color.Alpha } {
+  toJSON(): Rgb.Normalized & { a: Alpha } {
     return this.toRgb({
       mode: "precision",
-    }) as (Rgb.Normalized & { a: Color.Alpha });
+    }) as (Rgb.Normalized & { a: Alpha });
   }
 
   plusHue(relativeHue: number): RgbColor {
@@ -672,7 +674,7 @@ class RgbColor {
       this.#r,
       this.#g,
       this.#b,
-      Color.Alpha.normalize(this.#a + relativeAlpha),
+      Alpha.normalize(this.#a + relativeAlpha),
     );
   }
 
@@ -681,12 +683,12 @@ class RgbColor {
       this.#r,
       this.#g,
       this.#b,
-      Color.Alpha.normalize(absoluteAlpha),
+      Alpha.normalize(absoluteAlpha),
     );
   }
 
   withoutAlpha(): RgbColor {
-    return new RgbColor(this.#r, this.#g, this.#b, Color.Alpha.MAX_VALUE);
+    return new RgbColor(this.#r, this.#g, this.#b, Alpha.MAX_VALUE);
   }
 }
 

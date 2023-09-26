@@ -1,6 +1,6 @@
 import { NumberUtils } from "../../deps.ts";
-import { Color } from "../color.ts";
-import { Rgb } from "../rgb.ts";
+import { Hue } from "../color/hue.ts";
+import { Rgb } from "./rgb.ts";
 import { Hsl } from "./hsl.ts";
 
 /**
@@ -58,7 +58,7 @@ namespace Hwb {
   }
 
   export type Normalized = {
-    h: Color.Hue;
+    h: Hue;
     w: Whiteness;
     b: Blackness;
   };
@@ -79,7 +79,7 @@ namespace Hwb {
       }
     }
     return {
-      h: Color.Hue.normalize(h),
+      h: Hue.normalize(h),
       w: Whiteness.normalize(w),
       b: Blackness.normalize(b),
       //XXX w+bに上限制約があるが…
