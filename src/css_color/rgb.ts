@@ -1,4 +1,4 @@
-import { Color } from "../color.ts";
+import { Rgb } from "../rgb.ts";
 import { RgbColor } from "../rgb_color.ts";
 import { _floatStringify, _FormatOptions, _Pattern } from "./utils.ts";
 
@@ -99,7 +99,7 @@ function _parseRgbComponents(
   gStr: string,
   bStr: string,
   aStr: string,
-): Color.Rgb {
+): Rgb {
   const r = Number.parseFloat(rStr) / (rStr.endsWith("%") ? 100 : 255);
   const g = Number.parseFloat(gStr) / (gStr.endsWith("%") ? 100 : 255);
   const b = Number.parseFloat(bStr) / (bStr.endsWith("%") ? 100 : 255);

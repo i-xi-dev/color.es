@@ -15,11 +15,17 @@ Deno.test("RgbColor.prototype.toHexString()", () => {
     "#010203FF",
   );
   assertStrictEquals(
-    RgbColor.fromHexString("#010203").toHexString({ order: "argb", discardAlpha: true }),
+    RgbColor.fromHexString("#010203").toHexString({
+      order: "argb",
+      discardAlpha: true,
+    }),
     "#FF010203",
   );
   assertStrictEquals(
-    RgbColor.fromHexString("#010203").toHexString({ order: "rgba", discardAlpha: true }),
+    RgbColor.fromHexString("#010203").toHexString({
+      order: "rgba",
+      discardAlpha: true,
+    }),
     "#010203",
   );
   assertStrictEquals(

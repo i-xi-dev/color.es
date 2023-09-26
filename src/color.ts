@@ -2,31 +2,6 @@ import { Angle, NumberUtils } from "../deps.ts";
 
 namespace Color {
   /**
-   * The RGB object, that represents RGB color in red, green, and blue.
-   */
-  export type Rgb = {
-    /**
-     * Red
-     */
-    r: number;
-
-    /**
-     * Green
-     */
-    g: number;
-
-    /**
-     * Blue
-     */
-    b: number;
-
-    /**
-     * Alpha
-     */
-    a?: number;
-  };
-
-  /**
    * The HSL object, that represents RGB color in hue, saturation, and lightness.
    */
   export type Hsl = {
@@ -203,7 +178,7 @@ namespace Color {
 
   /**
    * The object with the following optional fields.
-   * 
+   *
    * - `ignoreAlpha`:
    *     Whether to interpret `a` (alpha) as `1` or not.
    *     If `order` is `"argb"`, ignore `ignoreAlpha`.
@@ -211,7 +186,7 @@ namespace Color {
   export type FromOptions = {
     /**
      * Whether to interpret `a` (alpha) as `1` or not.
-     * 
+     *
      * If `order` is `"argb"`, ignore `ignoreAlpha`.
      */
     ignoreAlpha?: boolean;
@@ -219,7 +194,7 @@ namespace Color {
 
   /**
    * The object with the following optional fields.
-   * 
+   *
    * - `discardAlpha`:
    *     Whether to discard `a` (alpha).
    *     The default is `false`.
