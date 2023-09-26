@@ -1,4 +1,4 @@
-import { Color } from "../color.ts";
+import { Hsl } from "../rgb/hsl.ts";
 import { RgbColor } from "../rgb_color.ts";
 import { _floatStringify, _FormatOptions, _Pattern } from "./utils.ts";
 
@@ -87,7 +87,7 @@ function _parseHslComponents(
   sStr: string,
   lStr: string,
   aStr: string,
-): Color.Hsl {
+): Hsl {
   //XXX s,l の<number>は実装しているブラウザが無いとおもわれるので、現バージョンでは対応しない
   const h = _Pattern.parseHue(hStr);
   const s = Number.parseFloat(sStr) / 100;

@@ -1,7 +1,8 @@
 import { ByteSequence, NumberUtils, Uint8 } from "../deps.ts";
 import { Color } from "./color.ts";
 import { Rgb } from "./rgb.ts";
-import { RgbBytes } from "./rgb/bytes.ts";
+import { RgbBytes } from "./rgb/rgb_bytes.ts";
+import { Hsl } from "./rgb/hsl.ts";
 
 type _0_1 = number;
 const _0_1_MIN = 0;
@@ -11,22 +12,6 @@ function _normalize_0_1(value: unknown): _0_1 {
     return NumberUtils.clamp(value as number, _0_1_MIN, _0_1_MAX);
   }
   return _0_1_MIN;
-}
-
-//XXX ここで適切？
-type _Saturation = _0_1;
-namespace _Saturation {
-  export const MIN_VALUE = _0_1_MIN;
-  export const MAX_VALUE = _0_1_MAX;
-  export const normalize = _normalize_0_1;
-}
-
-//XXX ここで適切？
-type _Lightness = _0_1;
-namespace _Lightness {
-  export const MIN_VALUE = _0_1_MIN;
-  export const MAX_VALUE = _0_1_MAX;
-  export const normalize = _normalize_0_1;
 }
 
 //XXX ここで適切？
@@ -66,89 +51,6 @@ export type ToHexStringOptions =
   & _ToStringOptons
   & Color.ToOptions;
 
-namespace _Hsl {
-  export type Normalized = {
-    h: Color.Hue;
-    s: _Saturation;
-    l: _Lightness;
-  };
-
-  export function normalize(value: Color.Hsl): Normalized {
-    let h: unknown = undefined;
-    let s: unknown = undefined;
-    let l: unknown = undefined;
-    if (value && (typeof value === "object")) {
-      if ("h" in value) {
-        h = value.h;
-      }
-      if ("s" in value) {
-        s = value.s;
-      }
-      if ("l" in value) {
-        l = value.l;
-      }
-    }
-    return {
-      h: Color.Hue.normalize(h),
-      s: _Saturation.normalize(s),
-      l: _Lightness.normalize(l),
-    };
-  }
-
-  export function fromRgb(rgb: Rgb): Normalized {
-    const { r, g, b } = Rgb.normalize(rgb);
-
-    const maxRgb = Math.max(r, g, b);
-    const minRgb = Math.min(r, g, b);
-
-    const d = maxRgb - minRgb;
-
-    let h = Color.Hue.ZERO_TURN; //XXX Number.NaNにするか
-    if (d !== 0) {
-      switch (maxRgb) {
-        case r:
-          h = (g - b) / d;
-          break;
-
-        case g:
-          h = ((b - r) / d) + 2;
-          break;
-
-        // case b:
-        default:
-          h = ((r - g) / d) + 4;
-          break;
-      }
-      h = Color.Hue.normalize(h * 60);
-    }
-
-    const l = (minRgb + maxRgb) / 2;
-
-    let s = 0;
-    if (d !== 0) {
-      if ((l !== 0) && (l !== 1)) {
-        s = (maxRgb - l) / Math.min(l, 1 - l);
-      }
-    }
-    return { h, s, l };
-  }
-
-  export function toRgb(hsl: Color.Hsl): Rgb.Normalized {
-    const normalizedHsl = normalize(hsl);
-    return {
-      r: _f(0, normalizedHsl),
-      g: _f(8, normalizedHsl),
-      b: _f(4, normalizedHsl),
-    };
-  }
-
-  function _f(n: number, { h, s, l }: Normalized): number {
-    const k = (n + h / 30) % 12;
-    const a = s * Math.min(l, 1 - l);
-    return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
-  }
-}
-
 namespace _Hwb {
   export type Normalized = {
     h: Color.Hue;
@@ -181,7 +83,7 @@ namespace _Hwb {
 
   export function fromRgb(rgb: Rgb): Normalized {
     const { r, g, b } = Rgb.normalize(rgb);
-    const { h } = _Hsl.fromRgb(rgb);
+    const { h } = Hsl.fromRgb(rgb);
     const w = Math.min(r, g, b);
     const blackness = 1 - Math.max(r, g, b);
     return { h, w, b: blackness };
@@ -198,7 +100,7 @@ namespace _Hwb {
       };
     }
 
-    const rgb = _Hsl.toRgb({ h, s: 1, l: 0.5 });
+    const rgb = Hsl.toRgb({ h, s: 1, l: 0.5 });
     rgb.r = (rgb.r * (1 - w - b)) + w;
     rgb.g = (rgb.g * (1 - w - b)) + w;
     rgb.b = (rgb.b * (1 - w - b)) + w;
@@ -233,7 +135,7 @@ class RgbColor {
 
   #rgbBytesCache?: RgbBytes.Normalized;
   #alphaByteCache?: Uint8;
-  #hslCache?: _Hsl.Normalized;
+  #hslCache?: Hsl.Normalized;
   #hwbCache?: _Hwb.Normalized;
 
   private constructor(
@@ -358,11 +260,11 @@ class RgbColor {
     return this.#hsl.h;
   }
 
-  get saturation(): _Saturation {
+  get saturation(): Hsl.Saturation {
     return this.#hsl.s;
   }
 
-  get lightness(): _Lightness {
+  get lightness(): Hsl.Lightness {
     return this.#hsl.l;
   }
 
@@ -392,9 +294,9 @@ class RgbColor {
     return this.#alphaByteCache as Uint8;
   }
 
-  get #hsl(): _Hsl.Normalized {
+  get #hsl(): Hsl.Normalized {
     if (!this.#hslCache) {
-      this.#hslCache = _Hsl.fromRgb({
+      this.#hslCache = Hsl.fromRgb({
         r: this.#r,
         g: this.#g,
         b: this.#b,
@@ -442,8 +344,8 @@ class RgbColor {
     }
   }
 
-  static fromHsl(hsla: Color.Hsl, options?: FromHslOptions): RgbColor {
-    const { r, g, b } = _Hsl.toRgb(hsla);
+  static fromHsl(hsla: Hsl, options?: FromHslOptions): RgbColor {
+    const { r, g, b } = Hsl.toRgb(hsla);
     const a = (options?.ignoreAlpha === true)
       ? Color.Alpha.MAX_VALUE
       : Color.Alpha.normalize(hsla.a);
@@ -594,7 +496,7 @@ class RgbColor {
    * //     }
    * ```
    */
-  toHsl(options?: Color.ToOptions): Color.Hsl {
+  toHsl(options?: Color.ToOptions): Hsl {
     const { h, s, l } = this.#hsl;
     if (_isRequiredAlpha(this.#a, options)) {
       return { h, s, l, a: this.#a };

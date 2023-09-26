@@ -2,31 +2,6 @@ import { Angle, NumberUtils } from "../deps.ts";
 
 namespace Color {
   /**
-   * The HSL object, that represents RGB color in hue, saturation, and lightness.
-   */
-  export type Hsl = {
-    /**
-     * Hue
-     */
-    h: number;
-
-    /**
-     * Saturation
-     */
-    s: number;
-
-    /**
-     * Lightness
-     */
-    l: number;
-
-    /**
-     * Alpha
-     */
-    a?: number;
-  };
-
-  /**
    * The HWB object, that represents RGB color in hue, whiteness, and blackness.
    */
   export type Hwb = {
