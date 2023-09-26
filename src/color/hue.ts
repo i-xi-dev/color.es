@@ -6,7 +6,7 @@ import { Angle } from "../../deps.ts";
 type Hue = Angle.Degrees;
 
 namespace Hue {
-  export const ZERO_TURN = 0;
+  export const NONE = 0; //XXX 0だと赤と無彩色の区別がつかない
 
   /**
    * If the `value` is a numeric type, returns the result rounded to `0` or more and less than `360`.
@@ -37,7 +37,7 @@ namespace Hue {
     if (Number.isFinite(value)) {
       return Angle.Degrees.normalize(value as number);
     }
-    return ZERO_TURN; //XXX Number.NaN にするか？
+    return NONE;
   }
 }
 

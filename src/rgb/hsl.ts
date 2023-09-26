@@ -94,7 +94,7 @@ namespace Hsl {
 
     const d = maxRgb - minRgb;
 
-    let h = Hue.ZERO_TURN; //XXX Number.NaNにするか
+    let h = Hue.NONE;
     if (d !== 0) {
       switch (maxRgb) {
         case r:
