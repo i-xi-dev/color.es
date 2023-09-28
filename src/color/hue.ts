@@ -16,19 +16,19 @@ namespace Hue {
    * @returns A normalized hue.
    * @example
    * ```javascript
-   * const hue = Color.Hue.normalize(90);
+   * const hue = Hue.normalize(90);
    * // hue
    * //   → 90
    * ```
    * @example
    * ```javascript
-   * const hue = Color.Hue.normalize(-90);
+   * const hue = Hue.normalize(-90);
    * // hue
    * //   → 270
    * ```
    * @example
    * ```javascript
-   * const hue = Color.Hue.normalize(720);
+   * const hue = Hue.normalize(720);
    * // hue
    * //   → 0
    * ```

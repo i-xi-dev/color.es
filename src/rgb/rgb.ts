@@ -50,6 +50,24 @@ namespace Rgb {
      *
      * @param component - A component value
      * @returns A component value normalized to the range of 0 to 1.
+     * @example
+     * ```javascript
+     * const r = Rgb.Component.normalize(1);
+     * // r
+     * //   → 1
+     * ```
+     * @example
+     * ```javascript
+     * const r = Rgb.Component.normalize(2.5);
+     * // r
+     * //   → 1
+     * ```
+     * @example
+     * ```javascript
+     * const r = Rgb.Component.normalize(-5);
+     * // r
+     * //   → 0
+     * ```
      */
     export function normalize(component: unknown): Component {
       if (Number.isFinite(component)) {
@@ -73,6 +91,16 @@ namespace Rgb {
    *
    * @param components - RGB components.
    * @returns RGB components where the value of each component is normalized from 0 to 1.
+   * @example
+   * ```javascript
+   * const rgb = Rgb.normalize({ r: -1, g: 0.5, b: 3.2 });
+   * // rgb.r
+   * //   → 0
+   * // rgb.g
+   * //   → 0.5
+   * // rgb.b
+   * //   → 1
+   * ```
    */
   export function normalize(components: Rgb): Normalized {
     let r: unknown = undefined;

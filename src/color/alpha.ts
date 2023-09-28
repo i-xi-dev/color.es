@@ -27,25 +27,25 @@ namespace Alpha {
    * @returns A normalized alpha value.
    * @example
    * ```javascript
-   * const alpha = Color.Alpha.normalize(1.1);
+   * const alpha = Alpha.normalize(1.1);
    * // alpha
    * //   → 1
    * ```
    * @example
    * ```javascript
-   * const alpha = Color.Alpha.normalize(-1);
+   * const alpha = Alpha.normalize(-1);
    * // alpha
    * //   → 0
    * ```
    * @example
    * ```javascript
-   * const alpha = Color.Alpha.normalize(0.5);
+   * const alpha = Alpha.normalize(0.5);
    * // alpha
    * //   → 0.5
    * ```
    * @example
    * ```javascript
-   * const alpha = Color.Alpha.normalize(undefined);
+   * const alpha = Alpha.normalize(undefined);
    * // alpha
    * //   → 1
    * ```
