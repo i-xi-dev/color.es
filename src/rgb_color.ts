@@ -156,14 +156,47 @@ class RgbColor {
     return this.#a;
   }
 
+  /**
+   * Get the hue value in degrees.
+   *
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#598910");
+   * const hue = color.hue;
+   * // hue
+   * //   → 83.801653
+   * ```
+   */
   get hue(): Hue {
     return this.#hsl.h;
   }
 
+  /**
+   * Get the HSL saturation value.
+   *
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#598910");
+   * const saturation = color.saturation;
+   * // saturation
+   * //   → 0.790850
+   * ```
+   */
   get saturation(): Hsl.Saturation {
     return this.#hsl.s;
   }
 
+  /**
+   * Get the HSL lightness value.
+   *
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#598910");
+   * const lightness = color.lightness;
+   * // lightness
+   * //   → 0.300000
+   * ```
+   */
   get lightness(): Hsl.Lightness {
     return this.#hsl.l;
   }

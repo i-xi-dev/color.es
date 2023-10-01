@@ -67,6 +67,10 @@ Deno.test("RgbColor.prototype.hue", () => {
     RgbColor.fromRgb({ r: 255, g: 255, b: 255 }).hue,
     0,
   );
+  assertStrictEquals(
+    RgbColor.fromHexString("#598910").hue.toFixed(6),
+    "83.801653",
+  );
 });
 
 Deno.test("RgbColor.prototype.saturation", () => {
@@ -82,6 +86,10 @@ Deno.test("RgbColor.prototype.saturation", () => {
     RgbColor.fromRgb({ r: 255, g: 255, b: 255 }).saturation,
     0,
   );
+  assertStrictEquals(
+    RgbColor.fromHexString("#598910").saturation.toFixed(6),
+    "0.790850",
+  );
 });
 
 Deno.test("RgbColor.prototype.lightness", () => {
@@ -96,5 +104,9 @@ Deno.test("RgbColor.prototype.lightness", () => {
   assertStrictEquals(
     RgbColor.fromRgb({ r: 255, g: 255, b: 255 }).lightness,
     1,
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#598910").lightness.toFixed(6),
+    "0.300000",
   );
 });
