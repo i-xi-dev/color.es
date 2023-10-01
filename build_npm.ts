@@ -15,12 +15,21 @@ await build({
   rootTestDir: "./tests",
   package: {
     name: "@i-xi-dev/color",
-    version: "5.2.2",
+    version: "5.2.3",
     description: "A JavaScript immutable object that represents the color.",
     license: "MIT",
     author: "i-xi-dev",
     homepage: "https://github.com/i-xi-dev/color.es#readme",
-    keywords: [],
+    keywords: [
+      "color",
+      "css",
+      "hsl",
+      "rgb",
+      "browser",
+      "deno",
+      "nodejs",
+      "zero-dependency",
+    ],
     repository: {
       type: "git",
       url: "git+https://github.com/i-xi-dev/color.es.git",
