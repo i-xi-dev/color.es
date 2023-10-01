@@ -1,4 +1,8 @@
-namespace Convert {
+namespace Options {
+  export type CompareOptions = {
+    ignoreAlpha?: boolean;
+  };
+
   /**
    * The object with the following optional fields.
    *
@@ -67,4 +71,4 @@ namespace Convert {
     & ToOptions;
 }
 
-export { type Convert };
+export { type Options };

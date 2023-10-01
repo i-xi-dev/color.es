@@ -19,16 +19,4 @@
   // invert(): SRgbColor {
   // }
 
-  //XXX
-  // equals(rgb: Rgb | SRgbColor): boolean {
-  //   if (rgb instanceof SRgbColor) {
-  //     return (this.red === rgb.red) && (this.green === rgb.green) && (this.blue === rgb.blue) && (this.alpha === rgb.alpha);
-  //   }
-  //   else  {
-
-  //   }
-  // }
-
-  //XXX bytesEquals
-
   //XXX mix(blendMode, other: SRgbColor | *)
