@@ -71,7 +71,7 @@ export namespace _Pattern {
   // <hue> https://drafts.csswg.org/css-color-4/#typedef-hue
   export const HUE = `${_Pattern.NUM}(?:deg|grad|rad|turn)?`;
 
-  export function parseHue(input: string): number {
+  export function parseHue(input: string): Angle.Degrees {
     // 形式チェック済の前提
     const lowerCased = input.toLowerCase();
     const numberValue = Number.parseFloat(input);
