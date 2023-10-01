@@ -1,4 +1,4 @@
-import { assertStrictEquals, assertThrows } from "../deps.ts";
+import { assertStrictEquals } from "../deps.ts";
 import { RgbColor } from "../../mod.ts";
 
 Deno.test("RgbColor.prototype.equalsBytes(*)", () => {

@@ -610,6 +610,15 @@ class RgbColor {
     return equalsRgb && (this.#alphaByte === other.#alphaByte);
   }
 
+  invert(): RgbColor {
+    return new RgbColor(
+      Rgb.Component.MAX_VALUE - this.#r,
+      Rgb.Component.MAX_VALUE - this.#g,
+      Rgb.Component.MAX_VALUE - this.#b,
+      this.#a,
+    );
+  }
+
   plusHue(relativeHue: number): RgbColor {
     const { h, s, l } = this.#hsl;
     return RgbColor.fromHsl({

@@ -16,7 +16,4 @@
   // grayscale(): SRgbColor {
   // }
 
-  // invert(): SRgbColor {
-  // }
-
   //XXX mix(blendMode, other: SRgbColor | *)
