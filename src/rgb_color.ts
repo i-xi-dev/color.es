@@ -610,6 +610,11 @@ class RgbColor {
     return equalsRgb && (this.#alphaByte === other.#alphaByte);
   }
 
+  /**
+   * Returns a inverted color.
+   *
+   * @returns A new instance of `Color` representing the inverted color of this color.
+   */
   invert(): RgbColor {
     return new RgbColor(
       Rgb.Component.MAX_VALUE - this.#r,
@@ -617,6 +622,15 @@ class RgbColor {
       Rgb.Component.MAX_VALUE - this.#b,
       this.#a,
     );
+  }
+
+  /**
+   * Returns a complementary color.
+   *
+   * @returns A new instance of `Color` representing the complementary color of this color.
+   */
+  complementary(): RgbColor {
+    return this.plusHue(180);
   }
 
   plusHue(relativeHue: number): RgbColor {

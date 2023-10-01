@@ -1,7 +1,5 @@
 
 
-  //XXX complementaryColor() 補色を返す
-
   // lighter(percentage): SRgbColor {
   // }
 
