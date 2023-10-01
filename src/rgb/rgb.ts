@@ -5,22 +5,22 @@ import { NumberUtils } from "../../deps.ts";
  */
 type Rgb = {
   /**
-   * Red
+   * Red component.
    */
   r: number;
 
   /**
-   * Green
+   * Green component.
    */
   g: number;
 
   /**
-   * Blue
+   * Blue component.
    */
   b: number;
 
   /**
-   * Alpha
+   * Alpha component.
    */
   a?: number;
 };
@@ -81,8 +81,19 @@ namespace Rgb {
    * A normalized RGB components.
    */
   export type Normalized = {
+    /**
+     * Red component.
+     */
     r: Component;
+
+    /**
+     * Green component.
+     */
     g: Component;
+
+    /**
+     * Blue component.
+     */
     b: Component;
   };
 
