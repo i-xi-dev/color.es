@@ -1,17 +1,5 @@
 import { Angle } from "../../deps.ts";
 
-/*
-export type _Options =
-export type _ParseOptions = _Options & {
-*/
-
-export type _FormatOptions = /* _Options & */ {
-  notation?: "hex" | "rgb" | "hsl"; //TODO hwb
-  upperCase?: boolean;
-  shortenIfPossible?: boolean;
-  legacy?: boolean;
-};
-
 export function _floatStringify(
   input: number,
   shortenIfPossible: boolean,
@@ -27,7 +15,7 @@ export function _floatStringify(
 
 //XXX css-utils とかに外出しする
 export namespace _Pattern {
-  // 以下、全般的にコメントには対応しない
+  // 以下、全般的にCSSコメントには対応しない
 
   //XXX ドラフトを参照しているものは注意（意外と頻繁に変わる）
 

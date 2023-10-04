@@ -1,5 +1,5 @@
 import { RgbColor } from "../rgb_color.ts";
-import { _FormatOptions } from "./utils.ts";
+import { CssOptions } from "./options.ts";
 
 namespace _CssHex {
   export function parse(source: string): RgbColor {
@@ -25,7 +25,7 @@ namespace _CssHex {
 
   export function format(
     color: RgbColor,
-    options?: _FormatOptions,
+    options?: CssOptions.FormatOptions,
   ): string {
     let hex = color.toHexString({ lowerCase: (options?.upperCase !== true) });
     if (options?.shortenIfPossible === true) {

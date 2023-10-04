@@ -1,6 +1,7 @@
 import { Rgb } from "../rgb/rgb.ts";
 import { RgbColor } from "../rgb_color.ts";
-import { _floatStringify, _FormatOptions, _Pattern } from "./utils.ts";
+import { _floatStringify, _Pattern } from "./utils.ts";
+import { CssOptions } from "./options.ts";
 
 namespace _CssRgb {
   export function parse(source: string): RgbColor {
@@ -18,7 +19,7 @@ namespace _CssRgb {
   //XXX r,g,bを整数に丸めるか指定可能にする？
   export function format(
     color: RgbColor,
-    options?: _FormatOptions,
+    options?: CssOptions.FormatOptions,
   ): string {
     const shortenIfPossible = options?.shortenIfPossible === true;
 

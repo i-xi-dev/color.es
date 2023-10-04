@@ -1,13 +1,13 @@
 import { StringUtils } from "../deps.ts";
 import { RgbColor } from "./rgb_color.ts";
-import { _FormatOptions } from "./css_color/utils.ts";
+import { CssOptions } from "./css_color/options.ts";
 import { _CssHex } from "./css_color/hex.ts";
 import { _CssRgb } from "./css_color/rgb.ts";
 import { _CssHsl } from "./css_color/hsl.ts";
 import { _rgbFromName } from "./css_color/name.ts";
 
 namespace CssColorFormat {
-  export type FormatOptions = _FormatOptions;
+  export type FormatOptions = CssOptions.FormatOptions;
 
   export function parse(colorString: string): RgbColor {
     if (StringUtils.isNonEmptyString(colorString) !== true) {
