@@ -55,7 +55,7 @@ class RgbColor {
   /**
    * Gets the color space.
    *
-   * Always returns `"srgb"` in this version.
+   * Always returns `"srgb"` in the current version.
    */
   get space(): ColorSpace {
     return this.#space;
@@ -201,10 +201,32 @@ class RgbColor {
     return this.#hsl.l;
   }
 
+  /**
+   * Get the HWB whiteness value.
+   *
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#598910");
+   * const whiteness = color.whiteness;
+   * // whiteness
+   * //   → 0.062745
+   * ```
+   */
   get whiteness(): Hwb.Whiteness {
     return this.#hwb.w;
   }
 
+  /**
+   * Get the HWB blackness value.
+   *
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#598910");
+   * const blackness = color.blackness;
+   * // blackness
+   * //   → 0.462745
+   * ```
+   */
   get blackness(): Hwb.Blackness {
     return this.#hwb.b;
   }

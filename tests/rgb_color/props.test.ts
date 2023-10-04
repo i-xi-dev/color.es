@@ -110,3 +110,41 @@ Deno.test("RgbColor.prototype.lightness", () => {
     "0.300000",
   );
 });
+
+Deno.test("RgbColor.prototype.whiteness", () => {
+  assertStrictEquals(
+    RgbColor.fromRgb({ r: 255, g: 0, b: 0 }).whiteness,
+    0,
+  );
+  assertStrictEquals(
+    RgbColor.fromRgb({ r: 0, g: 0, b: 0 }).whiteness,
+    0,
+  );
+  assertStrictEquals(
+    RgbColor.fromRgb({ r: 255, g: 255, b: 255 }).whiteness,
+    1,
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#598910").whiteness.toFixed(6),
+    "0.062745",
+  );
+});
+
+Deno.test("RgbColor.prototype.blackness", () => {
+  assertStrictEquals(
+    RgbColor.fromRgb({ r: 255, g: 0, b: 0 }).blackness,
+    0,
+  );
+  assertStrictEquals(
+    RgbColor.fromRgb({ r: 0, g: 0, b: 0 }).blackness,
+    1,
+  );
+  assertStrictEquals(
+    RgbColor.fromRgb({ r: 255, g: 255, b: 255 }).blackness,
+    0,
+  );
+  assertStrictEquals(
+    RgbColor.fromHexString("#598910").blackness.toFixed(6),
+    "0.462745",
+  );
+});
