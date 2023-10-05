@@ -7,7 +7,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("");
     },
     TypeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -15,7 +15,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse(255 as unknown as string);
     },
     TypeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -23,7 +23,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("inherit");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -31,7 +31,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("initial");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -39,7 +39,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("unset");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -47,7 +47,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("revert");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -55,7 +55,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("currentcolor");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -63,7 +63,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("var(--x)");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -71,7 +71,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("Var(--x)");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   assertThrows(
@@ -79,7 +79,7 @@ Deno.test("CssColorFormat.parse(string)", () => {
       CssColorFormat.parse("calc(1)");
     },
     RangeError,
-    "colorString",
+    "cssColor",
   );
 
   const c1 = CssColorFormat.parse("transparent");
