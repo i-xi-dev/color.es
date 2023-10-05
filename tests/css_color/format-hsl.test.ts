@@ -41,6 +41,16 @@ Deno.test("CssColorFormat.format(object) - hsl", () => {
     CssColorFormat.format(c2, { ...op, shortenIfPossible: true }),
     `hsl(165.23 30.52% 41.76% / 0)`,
   );
+
+  const c3 = RgbColor.fromHexString("#ff0000");
+  assertStrictEquals(
+    CssColorFormat.format(c3, op),
+    `hsl(0.00deg 100.00% 50.00% / 1.00)`,
+  );
+  assertStrictEquals(
+    CssColorFormat.format(c3, { ...op, shortenIfPossible: true }),
+    `hsl(0 100% 50%)`,
+  );
 });
 
 Deno.test("CssColorFormat.format(object) - hsl,legacy", () => {
@@ -78,5 +88,15 @@ Deno.test("CssColorFormat.format(object) - hsl,legacy", () => {
   assertStrictEquals(
     CssColorFormat.format(c3, { ...op, shortenIfPossible: true }),
     `hsla(165.23, 30.52%, 41.76%, 0)`,
+  );
+
+  const c4 = RgbColor.fromHexString("#ff0000");
+  assertStrictEquals(
+    CssColorFormat.format(c4, op),
+    `hsla(0.00deg, 100.00%, 50.00%, 1.00)`,
+  );
+  assertStrictEquals(
+    CssColorFormat.format(c4, { ...op, shortenIfPossible: true }),
+    `hsl(0, 100%, 50%)`,
   );
 });

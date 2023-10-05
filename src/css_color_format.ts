@@ -6,22 +6,38 @@ import { _CssRgb } from "./css_color/rgb.ts";
 import { _CssHsl } from "./css_color/hsl.ts";
 import { _rgbFromName } from "./css_color/name.ts";
 
+/**
+ * The CSS color value format.
+ *
+ * CSS Color Level 3 values are supported except for the following values:
+ * - `<system-color>`
+ * - `currentcolor`
+ * - `inherit`
+ * - `initial`
+ * - `revert`
+ * - `unset`
+ * - `var()`
+ * - ...
+ */
 namespace CssColorFormat {
   export type FormatOptions = CssOptions.FormatOptions;
 
   /**
    * Creates a new instance of `RgbColor` from a CSS color value.
-   * 
-   * CSS Color Level 3 values are supported except for the following values:
-   * - `<system-color>`
-   * - `currentcolor`
-   * - `inherit`
-   * - `initial`
-   * - `revert`
-   * - `unset`
-   * - `var()`
-   * - ...
-   * 
+   *
+   * The following CSS Color Level 3 values are supported:
+   * - `<hex-color>`
+   * - `<named-color>`
+   * - `transparent`
+   * - `<rgb()>`
+   * - `<rgba()>`
+   * - `<hsl()>`
+   * - `<hsla()>`
+   *
+   * The following CSS Color Level 4 values are experimentally supported:
+   * - `<rgb()>`
+   * - `<hsl()>`
+   *
    * @param cssColor - A text representation of CSS color value.
    * @returns A `RgbColor`
    * @example
@@ -56,7 +72,7 @@ namespace CssColorFormat {
    * ```
    * @example
    * ```javascript
-   * // parse the notation for CSS color level 4, this is an experimental implementation
+   * // parse the notation for CSS color level 4
    * const color = CssColorFormat.parse("rgb(255 0 0 / 1)");
    * // color.toHexString()
    * //   → "#FF0000FF"
@@ -75,12 +91,11 @@ namespace CssColorFormat {
    * ```
    * @example
    * ```javascript
-   * // parse the notation for CSS color level 4, this is an experimental implementation
+   * // parse the notation for CSS color level 4
    * const color = CssColorFormat.parse("hsl(0 100% 50% / 1)");
    * // color.toHexString()
    * //   → "#FF0000FF"
    * ```
-   * 
    * @example
    * ```javascript
    * const color = CssColorFormat.parse("red");
@@ -99,7 +114,7 @@ namespace CssColorFormat {
       throw new TypeError("cssColor");
     }
 
-    const lowerCased = cssColor.toLocaleLowerCase();
+    const lowerCased = cssColor.toLowerCase();
     if (lowerCased.startsWith("#")) {
       return _CssHex.parse(cssColor);
     } else if (/^rgba?\(/.test(lowerCased)) {
@@ -117,10 +132,94 @@ namespace CssColorFormat {
       return RgbColor.fromUint8Array(Uint8Array.of(0, 0, 0, 0));
     }
 
-
     throw new RangeError("cssColor");
   }
 
+  /**
+   * Creates CSS color value from an instance of `RgbColor`.
+   *
+   * The following CSS Color Level 3 values are supported:
+   * - `<hex-color>`
+   * - `<rgb()>`
+   * - `<rgba()>`
+   * - `<hsl()>`
+   * - `<hsla()>`
+   *
+   * The following CSS Color Level 4 values are experimentally supported:
+   * - `<rgb()>`
+   * - `<hsl()>`
+   *
+   * @param color - A `RgbColor`
+   * @param options - A `FormatOptions` dictionary.
+   * @returns A text representation of CSS color value.
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color);
+   * // cssText
+   * //   → "#ff0000ff"
+   * ```
+   * @example
+   * ```javascript
+   * // format to the notation for CSS color level 4
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "rgb" });
+   * // cssText
+   * //   → "rgb(255 0 0 / 1.00)"
+   * ```
+   * @example
+   * ```javascript
+   * // format to the notation for CSS color level 4
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "rgb", shortenIfPossible: true });
+   * // cssText
+   * //   → "rgb(255 0 0)"
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "rgb", legacy: true });
+   * // cssText
+   * //   → "rgba(255, 0, 0, 1.00)"
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "rgb", legacy: true, shortenIfPossible: true });
+   * // cssText
+   * //   → "rgb(255, 0, 0)"
+   * ```
+   * @example
+   * ```javascript
+   * // format to the notation for CSS color level 4
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "hsl" });
+   * // cssText
+   * //   → "hsl(0.00deg 100.00% 50.00% / 1.00)"
+   * ```
+   * @example
+   * ```javascript
+   * // format to the notation for CSS color level 4
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "hsl", shortenIfPossible: true });
+   * // cssText
+   * //   → "hsl(0 100% 50%)"
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "hsl", legacy: true });
+   * // cssText
+   * //   → "hsla(0.00deg, 100.00%, 50.00%, 1.00)"
+   * ```
+   * @example
+   * ```javascript
+   * const color = RgbColor.fromHexString("#ff0000");
+   * const cssText = CssColorFormat.format(color, { notation: "hsl", legacy: true, shortenIfPossible: true });
+   * // cssText
+   * //   → "hsl(0, 100%, 50%)"
+   * ```
+   */
   export function format(color: RgbColor, options?: FormatOptions): string {
     if ((color instanceof RgbColor) !== true) {
       throw new TypeError("color");
