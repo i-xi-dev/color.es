@@ -18,7 +18,15 @@ Deno.test("RgbColor.prototype.complementary()", () => {
   const c4i = c4.complementary().toHexString();
   assertStrictEquals(c4i, "#FFFFFFFF");
 
-  const c5 = RgbColor.fromHexString("#27E87C");
+  const c5 = RgbColor.fromHexString("#FF0000");
   const c5i = c5.complementary().toHexString();
-  assertStrictEquals(c5i, "#E82793FF");
+  assertStrictEquals(c5i, "#00FFFFFF");
+
+  const c6 = RgbColor.fromHexString("#27E87C");
+  const c6i = c6.complementary().toHexString();
+  assertStrictEquals(c6i, "#E82793FF");
+
+  const c7 = RgbColor.fromHexString("#20206080");
+  const c7i = c7.complementary().toHexString();
+  assertStrictEquals(c7i, "#60602080");
 });
