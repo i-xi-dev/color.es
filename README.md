@@ -31,7 +31,7 @@ import { RgbColor, CssColorFormat } from "https://cdn.skypack.dev/@i-xi-dev/colo
 
 ## Usage
 
-### [`RgbColor` class](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.3/mod.ts/~/RgbColor)
+### [`RgbColor`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.3/mod.ts/~/RgbColor) class
 
 ```javascript
 const red = RgbColor.fromRgb({ r: 255, g: 0, b: 0 });
@@ -165,8 +165,23 @@ const complementaryColorOfTranslucentPaleNavy = translucentPaleNavy.complementar
 ```
 
 
-### [`CssColorFormat` static class](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.3/mod.ts/~/CssColorFormat)
+### [`CssColorFormat`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.3/mod.ts/~/CssColorFormat) static class
 
 ```javascript
- 
+const red = CssColorFormat.parse("#ff0000");
+// red.equalsBytes(CssColorFormat.parse("red"))
+//   → true
+// red.equalsBytes(CssColorFormat.parse("rgb(255, 0, 0)"))
+//   → true
+// red.equalsBytes(CssColorFormat.parse("rgba(255, 0, 0, 1)"))
+//   → true
+// red.equalsBytes(CssColorFormat.parse("hsl(0, 100%, 50%)"))
+//   → true
+// red.equalsBytes(CssColorFormat.parse("hsla(0, 100%, 50%, 1)"))
+//   → true
+
+const cssHexString = CssColorFormat.format(red);
+// cssHexString
+//   → "#ff0000ff"
+
 ```

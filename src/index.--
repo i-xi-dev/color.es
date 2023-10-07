@@ -1,13 +1,13 @@
 
 
-  // lighter(percentage): SRgbColor {
+  // lighter(percentage): RgbColor {
   // }
 
-  // darker(percentage): SRgbColor {
+  // darker(percentage): RgbColor {
   // }
 
 // ColorFilter
-  // grayscale(): SRgbColor {
+  // grayscale(): RgbColor {
   // }
 
   // contrast,saturate,sepia,...
