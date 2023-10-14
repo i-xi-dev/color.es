@@ -15,7 +15,7 @@ A JavaScript immutable object that represents the color.
 ### npm
 
 ```console
-$ npm i @i-xi-dev/color@5.2.3
+$ npm i @i-xi-dev/color@5.2.4
 ```
 
 ```javascript
@@ -26,12 +26,12 @@ import { RgbColor, CssColorFormat } from "@i-xi-dev/color";
 
 Example for Skypack
 ```javascript
-import { RgbColor, CssColorFormat } from "https://cdn.skypack.dev/@i-xi-dev/color@5.2.3";
+import { RgbColor, CssColorFormat } from "https://cdn.skypack.dev/@i-xi-dev/color@5.2.4";
 ```
 
 ## Usage
 
-### [`RgbColor`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.3/mod.ts/~/RgbColor) class
+### [`RgbColor`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.4/mod.ts/~/RgbColor) class
 
 ```javascript
 const red = RgbColor.fromRgb({ r: 255, g: 0, b: 0 });
@@ -165,7 +165,7 @@ const complementaryColorOfTranslucentPaleNavy = translucentPaleNavy.complementar
 ```
 
 
-### [`CssColorFormat`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.3/mod.ts/~/CssColorFormat) static class
+### [`CssColorFormat`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.4/mod.ts/~/CssColorFormat) static class
 
 ```javascript
 const red = CssColorFormat.parse("#ff0000");
