@@ -1,4 +1,4 @@
-import { ByteSequence, Uint8 } from "../deps.ts";
+import { ByteSequence, SafeInteger, Uint8 } from "../deps.ts";
 import { Options } from "./options.ts";
 import { ColorSpace } from "./color_space.ts";
 import { Alpha } from "./color/alpha.ts";
@@ -22,6 +22,10 @@ function _isRequiredAlpha(
   }
   return true;
 }
+
+const uint8FromOptions: Uint8.FromOptions = {
+  roundingMode: SafeInteger.RoundingMode.HALF_UP,
+} as const;
 
 /**
  * A color represented by red, green, and blue channels
@@ -244,7 +248,10 @@ class RgbColor {
 
   get #alphaByte(): Uint8 {
     if (Uint8.isUint8(this.#alphaByteCache) !== true) {
-      this.#alphaByteCache = Uint8.clamp(this.#a * Uint8.MAX_VALUE);
+      this.#alphaByteCache = Uint8.fromNumber(
+        this.#a * Uint8.MAX_VALUE,
+        uint8FromOptions,
+      );
     }
     return this.#alphaByteCache as Uint8;
   }
@@ -289,7 +296,7 @@ class RgbColor {
       if (options?.ignoreAlpha !== true) {
         if (options?.mode === "bytes") {
           if (Number.isFinite(rgba.a)) {
-            a = Uint8.clamp(rgba.a) / Uint8.MAX_VALUE;
+            a = Uint8.fromNumber(rgba.a as number) / Uint8.MAX_VALUE;
           }
         } else {
           a = Alpha.normalize(rgba.a);

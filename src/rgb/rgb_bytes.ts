@@ -1,5 +1,9 @@
-import { Uint8 } from "../../deps.ts";
+import { SafeInteger, Uint8 } from "../../deps.ts";
 import { Rgb } from "./rgb.ts";
+
+const uint8FromOptions: Uint8.FromOptions = {
+  roundingMode: SafeInteger.RoundingMode.HALF_UP,
+} as const;
 
 namespace RgbBytes {
   export const Order = {
@@ -60,18 +64,18 @@ namespace RgbBytes {
       }
     }
     return {
-      r: Uint8.clamp(r),
-      g: Uint8.clamp(g),
-      b: Uint8.clamp(b),
+      r: Uint8.fromNumber(r ?? 0),
+      g: Uint8.fromNumber(g ?? 0),
+      b: Uint8.fromNumber(b ?? 0),
     };
   }
 
   export function fromRgb(rgb: Rgb): Normalized {
     const normalizedRgb = Rgb.normalize(rgb);
     return {
-      r: Uint8.clamp(normalizedRgb.r * Uint8.MAX_VALUE),
-      g: Uint8.clamp(normalizedRgb.g * Uint8.MAX_VALUE),
-      b: Uint8.clamp(normalizedRgb.b * Uint8.MAX_VALUE),
+      r: Uint8.fromNumber(normalizedRgb.r * Uint8.MAX_VALUE, uint8FromOptions),
+      g: Uint8.fromNumber(normalizedRgb.g * Uint8.MAX_VALUE, uint8FromOptions),
+      b: Uint8.fromNumber(normalizedRgb.b * Uint8.MAX_VALUE, uint8FromOptions),
     };
   }
 
