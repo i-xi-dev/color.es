@@ -1,4 +1,4 @@
-import { NumberUtils } from "../../deps.ts";
+import { NumberEx } from "../../deps.ts";
 import { Hue } from "../color/hue.ts";
 import { Rgb } from "./rgb.ts";
 import { Hsl } from "./hsl.ts";
@@ -37,7 +37,7 @@ namespace Hwb {
 
     export function normalize(value: unknown): Whiteness {
       if (Number.isFinite(value)) {
-        return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
+        return NumberEx.clampNumber(value as number, [MIN_VALUE, MAX_VALUE]);
       }
       return MIN_VALUE;
     }
@@ -51,7 +51,7 @@ namespace Hwb {
 
     export function normalize(value: unknown): Blackness {
       if (Number.isFinite(value)) {
-        return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
+        return NumberEx.clampNumber(value as number, [MIN_VALUE, MAX_VALUE]);
       }
       return MIN_VALUE;
     }

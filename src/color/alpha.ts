@@ -1,4 +1,4 @@
-import { NumberUtils } from "../../deps.ts";
+import { NumberEx } from "../../deps.ts";
 
 /**
  * The opacity value, represented as a `number`.
@@ -52,7 +52,7 @@ namespace Alpha {
    */
   export function normalize(value: unknown): Alpha {
     if (Number.isFinite(value)) {
-      return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
+      return NumberEx.clampNumber(value as number, [MIN_VALUE, MAX_VALUE]);
     }
     return MAX_VALUE;
   }

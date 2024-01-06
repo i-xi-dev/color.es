@@ -1,4 +1,4 @@
-import { ByteSequence, SafeInteger, Uint8 } from "../deps.ts";
+import { ByteSequence, NumberEx } from "../deps.ts";
 import { Options } from "./options.ts";
 import { ColorSpace } from "./color_space.ts";
 import { Alpha } from "./color/alpha.ts";
@@ -23,8 +23,8 @@ function _isRequiredAlpha(
   return true;
 }
 
-const uint8FromOptions: Uint8.FromOptions = {
-  roundingMode: SafeInteger.RoundingMode.HALF_UP,
+const uint8FromOptions: NumberEx.Uint8.FromOptions = {
+  roundingMode: NumberEx.RoundingMode.HALF_UP,
 } as const;
 
 /**
@@ -38,7 +38,7 @@ class RgbColor {
   readonly #a: Alpha;
 
   #rgbBytesCache?: RgbBytes.Normalized;
-  #alphaByteCache?: Uint8;
+  #alphaByteCache?: NumberEx.Uint8;
   #hslCache?: Hsl.Normalized;
   #hwbCache?: Hwb.Normalized;
 
@@ -246,14 +246,14 @@ class RgbColor {
     return { ...this.#rgbBytesCache };
   }
 
-  get #alphaByte(): Uint8 {
-    if (Uint8.isUint8(this.#alphaByteCache) !== true) {
-      this.#alphaByteCache = Uint8.fromNumber(
-        this.#a * Uint8.MAX_VALUE,
+  get #alphaByte(): NumberEx.Uint8 {
+    if (NumberEx.Uint8.isUint8(this.#alphaByteCache) !== true) {
+      this.#alphaByteCache = NumberEx.Uint8.fromNumber(
+        this.#a * NumberEx.Uint8.MAX_VALUE,
         uint8FromOptions,
       );
     }
-    return this.#alphaByteCache as Uint8;
+    return this.#alphaByteCache as NumberEx.Uint8;
   }
 
   get #hsl(): Hsl.Normalized {
@@ -296,7 +296,8 @@ class RgbColor {
       if (options?.ignoreAlpha !== true) {
         if (options?.mode === "bytes") {
           if (Number.isFinite(rgba.a)) {
-            a = Uint8.fromNumber(rgba.a as number) / Uint8.MAX_VALUE;
+            a = NumberEx.Uint8.fromNumber(rgba.a as number) /
+              NumberEx.Uint8.MAX_VALUE;
           }
         } else {
           a = Alpha.normalize(rgba.a);
@@ -330,23 +331,24 @@ class RgbColor {
       const [byte0, byte1, byte2, byte3] = rgbaBytes;
 
       const bytes = {
-        r: Uint8.MIN_VALUE,
-        g: Uint8.MIN_VALUE,
-        b: Uint8.MIN_VALUE,
-        a: Uint8.MAX_VALUE,
+        r: NumberEx.Uint8.MIN_VALUE,
+        g: NumberEx.Uint8.MIN_VALUE,
+        b: NumberEx.Uint8.MIN_VALUE,
+        a: NumberEx.Uint8.MAX_VALUE,
       };
       if (options?.order === RgbBytes.Order.ARGB) {
-        bytes.r = Uint8.isUint8(byte1) ? byte1 : bytes.r;
-        bytes.g = Uint8.isUint8(byte2) ? byte2 : bytes.g;
-        bytes.b = Uint8.isUint8(byte3) ? byte3 : bytes.b;
-        bytes.a = Uint8.isUint8(byte0) ? byte0 : bytes.a;
+        bytes.r = NumberEx.Uint8.isUint8(byte1) ? byte1 : bytes.r;
+        bytes.g = NumberEx.Uint8.isUint8(byte2) ? byte2 : bytes.g;
+        bytes.b = NumberEx.Uint8.isUint8(byte3) ? byte3 : bytes.b;
+        bytes.a = NumberEx.Uint8.isUint8(byte0) ? byte0 : bytes.a;
       } else {
-        bytes.r = Uint8.isUint8(byte0) ? byte0 : bytes.r;
-        bytes.g = Uint8.isUint8(byte1) ? byte1 : bytes.g;
-        bytes.b = Uint8.isUint8(byte2) ? byte2 : bytes.b;
-        bytes.a = ((options?.ignoreAlpha !== true) && Uint8.isUint8(byte3))
-          ? byte3
-          : bytes.a;
+        bytes.r = NumberEx.Uint8.isUint8(byte0) ? byte0 : bytes.r;
+        bytes.g = NumberEx.Uint8.isUint8(byte1) ? byte1 : bytes.g;
+        bytes.b = NumberEx.Uint8.isUint8(byte2) ? byte2 : bytes.b;
+        bytes.a =
+          ((options?.ignoreAlpha !== true) && NumberEx.Uint8.isUint8(byte3))
+            ? byte3
+            : bytes.a;
       }
 
       return RgbColor.fromRgb(bytes, { mode: "bytes" });
@@ -516,7 +518,12 @@ class RgbColor {
 
   #toByteArray(
     options?: Options.ToArrayOptions,
-  ): [Uint8, Uint8, Uint8] | [Uint8, Uint8, Uint8, Uint8] {
+  ): [NumberEx.Uint8, NumberEx.Uint8, NumberEx.Uint8] | [
+    NumberEx.Uint8,
+    NumberEx.Uint8,
+    NumberEx.Uint8,
+    NumberEx.Uint8,
+  ] {
     const { r, g, b } = this.#rgbBytes;
 
     if (options?.order === RgbBytes.Order.ARGB) {

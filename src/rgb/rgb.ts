@@ -1,4 +1,4 @@
-import { NumberUtils } from "../../deps.ts";
+import { NumberEx } from "../../deps.ts";
 
 /**
  * The RGB object, that represents RGB color in red, green, and blue.
@@ -71,7 +71,10 @@ namespace Rgb {
      */
     export function normalize(component: unknown): Component {
       if (Number.isFinite(component)) {
-        return NumberUtils.clamp(component as number, MIN_VALUE, MAX_VALUE);
+        return NumberEx.clampNumber(component as number, [
+          MIN_VALUE,
+          MAX_VALUE,
+        ]);
       }
       return MIN_VALUE;
     }

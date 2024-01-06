@@ -1,4 +1,4 @@
-import { StringUtils } from "../deps.ts";
+import { StringEx } from "../deps.ts";
 import { RgbColor } from "./rgb_color.ts";
 import { CssOptions } from "./css_color/options.ts";
 import { _CssHex } from "./css_color/hex.ts";
@@ -110,7 +110,7 @@ namespace CssColorFormat {
    * ```
    */
   export function parse(cssColor: string): RgbColor {
-    if (StringUtils.isNonEmptyString(cssColor) !== true) {
+    if (StringEx.isNonEmptyString(cssColor) !== true) {
       throw new TypeError("cssColor");
     }
 

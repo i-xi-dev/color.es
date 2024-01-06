@@ -1,4 +1,4 @@
-import { NumberUtils } from "../../deps.ts";
+import { NumberEx } from "../../deps.ts";
 import { Hue } from "../color/hue.ts";
 import { Rgb } from "./rgb.ts";
 
@@ -37,7 +37,7 @@ namespace Hsl {
 
     export function normalize(value: unknown): Saturation {
       if (Number.isFinite(value)) {
-        return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
+        return NumberEx.clampNumber(value as number, [MIN_VALUE, MAX_VALUE]);
       }
       return MIN_VALUE;
     }
@@ -52,7 +52,7 @@ namespace Hsl {
 
     export function normalize(value: unknown): Lightness {
       if (Number.isFinite(value)) {
-        return NumberUtils.clamp(value as number, MIN_VALUE, MAX_VALUE);
+        return NumberEx.clampNumber(value as number, [MIN_VALUE, MAX_VALUE]);
       }
       return MIN_VALUE;
     }
