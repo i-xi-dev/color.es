@@ -1,9 +1,9 @@
-import { NumberEx } from "../../deps.ts";
+import { Uint8 } from "../../deps.ts";
 
 /** @deprecated */
 export function _rgbFromName(
   lowerCasedName: string,
-): [r: NumberEx.Uint8, g: NumberEx.Uint8, b: NumberEx.Uint8] | null {
+): [r: Uint8, g: Uint8, b: Uint8] | null {
   switch (lowerCasedName) {
     case "aliceblue":
       return [240, 248, 255];

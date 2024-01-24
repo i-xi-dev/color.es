@@ -1,8 +1,8 @@
-import { NumberEx } from "../../deps.ts";
+import { RoundingMode, Uint8 } from "../../deps.ts";
 import { Rgb } from "./rgb.ts";
 
-const uint8FromOptions: NumberEx.Uint8.FromOptions = {
-  roundingMode: NumberEx.RoundingMode.HALF_UP,
+const uint8FromOptions: Uint8.FromOptions = {
+  roundingMode: RoundingMode.HALF_UP,
 } as const;
 
 namespace RgbBytes {
@@ -19,17 +19,17 @@ namespace RgbBytes {
     /**
      * Red component.
      */
-    r: NumberEx.Uint8;
+    r: Uint8;
 
     /**
      * Green component.
      */
-    g: NumberEx.Uint8;
+    g: Uint8;
 
     /**
      * Blue component.
      */
-    b: NumberEx.Uint8;
+    b: Uint8;
   };
 
   /**
@@ -64,25 +64,25 @@ namespace RgbBytes {
       }
     }
     return {
-      r: NumberEx.Uint8.fromNumber(r ?? 0),
-      g: NumberEx.Uint8.fromNumber(g ?? 0),
-      b: NumberEx.Uint8.fromNumber(b ?? 0),
+      r: Uint8.fromNumber(r ?? 0),
+      g: Uint8.fromNumber(g ?? 0),
+      b: Uint8.fromNumber(b ?? 0),
     };
   }
 
   export function fromRgb(rgb: Rgb): Normalized {
     const normalizedRgb = Rgb.normalize(rgb);
     return {
-      r: NumberEx.Uint8.fromNumber(
-        normalizedRgb.r * NumberEx.Uint8.MAX_VALUE,
+      r: Uint8.fromNumber(
+        normalizedRgb.r * Uint8.MAX_VALUE,
         uint8FromOptions,
       ),
-      g: NumberEx.Uint8.fromNumber(
-        normalizedRgb.g * NumberEx.Uint8.MAX_VALUE,
+      g: Uint8.fromNumber(
+        normalizedRgb.g * Uint8.MAX_VALUE,
         uint8FromOptions,
       ),
-      b: NumberEx.Uint8.fromNumber(
-        normalizedRgb.b * NumberEx.Uint8.MAX_VALUE,
+      b: Uint8.fromNumber(
+        normalizedRgb.b * Uint8.MAX_VALUE,
         uint8FromOptions,
       ),
     };
@@ -91,9 +91,9 @@ namespace RgbBytes {
   export function toRgb(rgbBytes: Rgb): Rgb.Normalized {
     const normalizedRgbBytes = normalize(rgbBytes);
     return {
-      r: normalizedRgbBytes.r / NumberEx.Uint8.MAX_VALUE,
-      g: normalizedRgbBytes.g / NumberEx.Uint8.MAX_VALUE,
-      b: normalizedRgbBytes.b / NumberEx.Uint8.MAX_VALUE,
+      r: normalizedRgbBytes.r / Uint8.MAX_VALUE,
+      g: normalizedRgbBytes.g / Uint8.MAX_VALUE,
+      b: normalizedRgbBytes.b / Uint8.MAX_VALUE,
     };
   }
 }
