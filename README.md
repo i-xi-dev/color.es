@@ -15,7 +15,7 @@ A JavaScript immutable object that represents the color.
 ### npm
 
 ```console
-$ npm i @i-xi-dev/color@5.2.10
+$ npm i @i-xi-dev/color@5.3.0
 ```
 
 ```javascript
@@ -26,12 +26,12 @@ import { RgbColor, CssColorFormat } from "@i-xi-dev/color";
 
 Example for Skypack
 ```javascript
-import { RgbColor, CssColorFormat } from "https://cdn.skypack.dev/@i-xi-dev/color@5.2.10";
+import { RgbColor, CssColorFormat } from "https://cdn.skypack.dev/@i-xi-dev/color@5.3.0";
 ```
 
 ## Usage
 
-### [`RgbColor`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.10/mod.ts/~/RgbColor) class
+### [`RgbColor`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.3.0/mod.ts/~/RgbColor) class
 
 ```javascript
 const red = RgbColor.fromRgb({ r: 255, g: 0, b: 0 });
@@ -154,18 +154,18 @@ const translucentPaleNavy = paleNavy.withAlpha(0.5);
 // paleNavy.equalsBytes(translucentPaleNavy.withoutAlpha())
 //   → true
 
-const invertedTranslucentPaleNavy = translucentPaleNavy.invert();
+const invertedTranslucentPaleNavy = translucentPaleNavy.toInverted();
 // invertedTranslucentPaleNavy.toHexString()
 //   → "#DFDF9F80"
 
-const complementaryColorOfTranslucentPaleNavy = translucentPaleNavy.complementary();
+const complementaryColorOfTranslucentPaleNavy = translucentPaleNavy.toComplementary();
 // complementaryColorOfTranslucentPaleNavy.toHexString()
 //   → "#60602080"
 
 ```
 
 
-### [`CssColorFormat`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.2.10/mod.ts/~/CssColorFormat) static class
+### [`CssColorFormat`](https://doc.deno.land/https://raw.githubusercontent.com/i-xi-dev/color.es/5.3.0/mod.ts/~/CssColorFormat) static class
 
 ```javascript
 const red = CssColorFormat.parse("#ff0000");

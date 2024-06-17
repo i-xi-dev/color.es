@@ -64,11 +64,11 @@ export namespace _Pattern {
     const lowerCased = input.toLowerCase();
     const numberValue = Number.parseFloat(input);
     if (lowerCased.endsWith("grad")) {
-      return Angle.Degrees.fromGradians(numberValue);
+      return Angle.gradiansToDegrees(numberValue);
     } else if (lowerCased.endsWith("rad")) {
-      return Angle.Degrees.fromRadians(numberValue);
+      return Angle.radiansToDegrees(numberValue);
     } else if (lowerCased.endsWith("turn")) {
-      return Angle.Degrees.fromTurns(numberValue);
+      return Angle.turnsToDegrees(numberValue);
     } else {
       return numberValue;
     }

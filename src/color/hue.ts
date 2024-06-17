@@ -35,7 +35,7 @@ namespace Hue {
    */
   export function normalize(value: unknown): Hue {
     if (Number.isFinite(value)) {
-      return Angle.Degrees.normalize(value as number);
+      return Angle.normalizeDegrees(value as number);
     }
     return NONE;
   }

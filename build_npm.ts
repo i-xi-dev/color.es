@@ -15,7 +15,7 @@ await build({
   rootTestDir: "./tests",
   package: {
     name: "@i-xi-dev/color",
-    version: "5.2.10",
+    version: "5.3.0",
     description: "A JavaScript immutable object that represents the color.",
     license: "MIT",
     author: "i-xi-dev",

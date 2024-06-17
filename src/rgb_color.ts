@@ -682,11 +682,20 @@ class RgbColor {
   }
 
   /**
+   * Alias for `toInverted` method.
+   *
+   * @deprecated
+   */
+  invert(): RgbColor {
+    return this.toInverted();
+  }
+
+  /**
    * Returns a inverted color.
    *
    * @returns A new instance of `Color` representing the inverted color of this color.
    */
-  invert(): RgbColor {
+  toInverted(): RgbColor {
     return new RgbColor(
       Rgb.Component.MAX_VALUE - this.#r,
       Rgb.Component.MAX_VALUE - this.#g,
@@ -696,11 +705,20 @@ class RgbColor {
   }
 
   /**
+   * Alias for `toComplementary` method.
+   *
+   * @deprecated
+   */
+  complementary(): RgbColor {
+    return this.toComplementary();
+  }
+
+  /**
    * Returns a complementary color.
    *
    * @returns A new instance of `Color` representing the complementary color of this color.
    */
-  complementary(): RgbColor {
+  toComplementary(): RgbColor {
     return this.plusHue(180);
   }
 
